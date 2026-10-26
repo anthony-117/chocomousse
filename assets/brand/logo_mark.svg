@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" fill="none">
+  <!-- TravelGenie logo mark v0.3 (approved). Pin halves are explicit paths (no clipPath) for flutter_svg. -->
+  <defs>
+    <linearGradient id="pinL" x1="40" y1="30" x2="95" y2="185" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#5B4FE0"/><stop offset="1" stop-color="#2E2694"/></linearGradient>
+    <linearGradient id="pinR" x1="150" y1="30" x2="95" y2="185" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FF9A76"/><stop offset="1" stop-color="#EE5A36"/></linearGradient>
+    <linearGradient id="trail" x1="14" y1="150" x2="176" y2="70" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#3730A3"/><stop offset="0.55" stop-color="#8B5CF6"/><stop offset="1" stop-color="#FF7A59"/></linearGradient>
+    <linearGradient id="trail2" x1="30" y1="160" x2="160" y2="95" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#4338CA" stop-opacity="0.15"/><stop offset="1" stop-color="#FF7A59" stop-opacity="0.55"/></linearGradient>
+  </defs>
+  <path d="M60 18 L95 10 L132 22 M60 18 L30 46 L18 86 L30 122 M132 22 L160 52 L176 92 L160 128 M30 46 L52 62 M160 52 L138 62 M18 86 L40 92 M176 92 L150 96 M160 128 L132 150 L118 178 M30 122 L50 146" stroke="#C9CBF2" stroke-width="1.1"/>
+  <circle cx="95" cy="10" r="5.5" fill="#C9CBF2"/><circle cx="60" cy="18" r="4" fill="#14142B"/><circle cx="132" cy="22" r="4" fill="#1F9D6B"/><circle cx="30" cy="46" r="3.5" fill="#8C8CA6"/><circle cx="160" cy="52" r="3" fill="#E8A317"/><circle cx="18" cy="86" r="6" fill="#FF7A59"/><circle cx="176" cy="92" r="5" fill="#8C8CA6"/><circle cx="30" cy="122" r="3.5" fill="#1F9D6B"/><circle cx="160" cy="128" r="5.5" fill="#6D5DF5"/><circle cx="132" cy="150" r="3.5" fill="#C9CBF2"/><circle cx="118" cy="178" r="3" fill="#E8A317"/><circle cx="50" cy="146" r="4" fill="#4338CA"/>
+  <path d="M26 158 C60 176 128 170 168 104 C124 158 66 166 26 158 Z" fill="url(#trail2)"/>
+  <path d="M95 186 C76 158 42 132 42 88 A53 53 0 0 1 95 35 Z" fill="url(#pinL)"/>
+  <path d="M95 186 C114 158 148 132 148 88 A53 53 0 0 0 95 35 Z" fill="url(#pinR)"/>
+  <path d="M58 70 A40 40 0 0 1 88 42" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="95" cy="86" r="27" fill="#F7F7FB" stroke="#FFFFFF" stroke-opacity="0.6" stroke-width="2"/>
+  <path d="M95 86 L72 60 M95 86 L118 60 M95 86 L64 96 M95 86 L126 98 M95 86 L95 120 M72 60 L95 50 L118 60 M64 96 L72 60 M126 98 L118 60" stroke="#FFFFFF" stroke-opacity="0.75" stroke-width="1.6"/>
+  <path d="M95 86 L84 74 M95 86 L108 74 M95 86 L80 92 M95 86 L110 93 M95 86 L95 104" stroke="#4338CA" stroke-opacity="0.35" stroke-width="1.2"/>
+  <circle cx="95" cy="86" r="9.5" fill="#4338CA"/><circle cx="95" cy="86" r="4" fill="#FFFFFF"/><circle cx="72" cy="60" r="4.2" fill="#FFFFFF"/><circle cx="118" cy="60" r="4.2" fill="#FFFFFF"/><circle cx="95" cy="50" r="3.2" fill="#FFFFFF"/>
+  <circle cx="64" cy="96" r="4.2" fill="#FF7A59" stroke="#FFFFFF" stroke-width="1.5"/><circle cx="126" cy="98" r="4.2" fill="#C9CBF2" stroke="#FFFFFF" stroke-width="1.5"/><circle cx="95" cy="120" r="3.6" fill="#FFFFFF"/>
+  <path d="M14 150 C40 186 128 186 176 76 C124 168 52 176 14 150 Z" fill="url(#trail)"/>
+  <path d="M30 156 C62 170 112 166 150 120" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="1.2" stroke-linecap="round"/>
+  <path d="M146 130 L156 118 L166 118" stroke="#3730A3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="170" cy="118" r="4" stroke="#3730A3" stroke-width="2" fill="#F7F7FB"/>
+  <g transform="translate(150 54) rotate(45) translate(-50 -50) scale(0.62) translate(30 30)">
+    <path d="M50 0 C55 0 58 7 58 16 L58 38 L100 62 L100 71 L58 58 L58 82 L70 92 L70 99 L50 93 L30 99 L30 92 L42 82 L42 58 L0 71 L0 62 L42 38 L42 16 C42 7 45 0 50 0 Z" fill="#2E2694"/>
+    <path d="M50 4 C53 4 55 9 55 16 L55 30 L45 30 L45 16 C45 9 47 4 50 4 Z" fill="#FFFFFF" fill-opacity="0.18"/>
+    <rect x="20" y="52" width="7" height="12" rx="3" fill="#1E1B6B"/><rect x="73" y="52" width="7" height="12" rx="3" fill="#1E1B6B"/>
+  </g>
+</svg>
