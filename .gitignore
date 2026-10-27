@@ -68,3 +68,6 @@ desktop.ini
 .env
 .env.*
 !.env.example
+
+# Local app settings (copy assets/env/app.env.example)
+assets/env/app.env
