@@ -1,5 +1,5 @@
 #!/bin/sh
-# Blocks `git push` unless formatting, the linter and EVERY test pass (the same checks as CI).
+# Blocks `git push` unless every CI step passes locally: formatting, lint, EVERY test and the web release build.
 # Installed by scripts/install-hooks.sh (git config core.hooksPath .githooks).
 # Emergency bypass, only if you know CI will catch it: git push --no-verify
 set -e
@@ -15,5 +15,8 @@ flutter analyze --fatal-infos
 
 step "tests (every test must pass)"
 flutter test
+
+step "web release build (the build CI runs)"
+flutter build web --release
 
 printf '\n\033[32mpre-push: all checks passed, pushing.\033[0m\n'

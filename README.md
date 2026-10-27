@@ -66,8 +66,8 @@ Sections whose data source has no API key yet show the backend's warning instead
 ```bash
 sh scripts/install-hooks.sh
 ```
-This sets `core.hooksPath` to the versioned `.githooks/` folder. The **pre-push** hook runs `dart format`, `flutter analyze --fatal-infos` and every test
-— the same checks as CI — and **blocks the push if any of them fails**. (Emergency bypass: `git push --no-verify`; CI still runs.)
+This sets `core.hooksPath` to the versioned `.githooks/` folder. The **pre-push** hook runs `dart format`, `flutter analyze --fatal-infos`, every test and the web release build
+— every CI step — and **blocks the push if any of them fails**. (Emergency bypass: `git push --no-verify`; CI still runs.)
 
 ## Linting (like Rust's clippy)
 [very_good_analysis](https://pub.dev/packages/very_good_analysis) turns on almost every Dart lint, plus strict casts, inference and raw types.
