@@ -71,8 +71,8 @@ dart fix --apply              # apply automatic lint fixes
 flutter analyze --fatal-infos # lint
 ```
 
-## Tests and coverage
-Every feature ships with tests:
+## Tests
+Every feature ships with tests, and CI requires **every test to pass**:
 
 | Folder | Kind | What it covers |
 |---|---|---|
@@ -81,7 +81,7 @@ Every feature ships with tests:
 | `test/flows/` | Flow (integration) | The real app — router, shell, providers, screens — driven like a user: Discover → overview → places → details, search, failures |
 
 ```bash
-flutter test --coverage   # writes coverage/lcov.info; CI fails below 85% line coverage
+flutter test
 ```
 Shared test helpers: `test/helpers.dart` (host a screen, phone size) and `test/destination/fakes.dart` (configurable fake API).
 
