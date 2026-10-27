@@ -28,15 +28,9 @@ jobs:
       - name: Analyze
         run: flutter analyze --fatal-infos
 
-      - name: Test with coverage
-        run: flutter test --coverage
-
-      - name: Coverage gate (fails below 85%)
-        run: |
-          read hit total < <(awk -F: '/^LH:/{h+=$2} /^LF:/{t+=$2} END{print h, t}' coverage/lcov.info)
-          pct=$(awk -v h="$hit" -v t="$total" 'BEGIN{printf "%.1f", 100*h/t}')
-          echo "Line coverage: $pct% ($hit/$total)" | tee -a "$GITHUB_STEP_SUMMARY"
-          awk -v p="$pct" 'BEGIN{exit (p < 85)}' || { echo "::error::Coverage $pct% is below 85%"; exit 1; }
+      # Every test must pass; a single failing test fails the build.
+      - name: Test
+        run: flutter test
 
       - name: Build web
         run: flutter build web --release

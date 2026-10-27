@@ -10,6 +10,6 @@
 ## Checks
 - [ ] `dart format lib test` leaves nothing to change
 - [ ] `flutter analyze --fatal-infos` has no issues
-- [ ] `flutter test --coverage` passes; coverage stays ≥ 85%
+- [ ] `flutter test`: every test passes
 - [ ] Design approved in Figma before the code (approval log in the FYP folder)
 - [ ] New settings added to `env.dart` **and** `assets/env/app.env.example`

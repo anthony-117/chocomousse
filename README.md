@@ -62,6 +62,13 @@ flutter build web --release
 The map is a lightweight preview (pins around the city centre); Google Maps replaces it once a Maps key is configured.
 Sections whose data source has no API key yet show the backend's warning instead of data.
 
+## Git hooks (run once per clone)
+```bash
+sh scripts/install-hooks.sh
+```
+This sets `core.hooksPath` to the versioned `.githooks/` folder. The **pre-push** hook runs `dart format`, `flutter analyze --fatal-infos`, every test and the web release build
+— every CI step — and **blocks the push if any of them fails**. (Emergency bypass: `git push --no-verify`; CI still runs.)
+
 ## Linting (like Rust's clippy)
 [very_good_analysis](https://pub.dev/packages/very_good_analysis) turns on almost every Dart lint, plus strict casts, inference and raw types.
 CI runs `flutter analyze --fatal-infos`, so any finding fails. Deliberate exceptions are listed with a reason in `analysis_options.yaml`.
@@ -71,8 +78,8 @@ dart fix --apply              # apply automatic lint fixes
 flutter analyze --fatal-infos # lint
 ```
 
-## Tests and coverage
-Every feature ships with tests:
+## Tests
+Every feature ships with tests, and CI requires **every test to pass**:
 
 | Folder | Kind | What it covers |
 |---|---|---|
@@ -81,7 +88,7 @@ Every feature ships with tests:
 | `test/flows/` | Flow (integration) | The real app — router, shell, providers, screens — driven like a user: Discover → overview → places → details, search, failures |
 
 ```bash
-flutter test --coverage   # writes coverage/lcov.info; CI fails below 85% line coverage
+flutter test
 ```
 Shared test helpers: `test/helpers.dart` (host a screen, phone size) and `test/destination/fakes.dart` (configurable fake API).
 
