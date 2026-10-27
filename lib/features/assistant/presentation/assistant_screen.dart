@@ -1,7 +1,6 @@
+import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/core/widgets/page_frame.dart';
 import 'package:flutter/material.dart';
-
-import '../../../app/theme/tokens.dart';
-import '../../../core/widgets/page_frame.dart';
 
 class AssistantScreen extends StatelessWidget {
   const AssistantScreen({super.key});

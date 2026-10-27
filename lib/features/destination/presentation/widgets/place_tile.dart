@@ -1,9 +1,8 @@
+import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/features/destination/data/models.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-import '../../../../app/theme/tokens.dart';
-import '../../data/models.dart';
-import 'common.dart';
 
 /// Row for an attraction or restaurant (design 05 / W2).
 class PlaceTile extends StatelessWidget {

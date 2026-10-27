@@ -1,13 +1,12 @@
+import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/features/destination/application/destination_providers.dart';
+import 'package:chocomousse/features/destination/data/models.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/place_tile.dart';
+import 'package:chocomousse/features/shell/floating_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../app/theme/tokens.dart';
-import '../../shell/floating_nav.dart';
-import '../application/destination_providers.dart';
-import '../data/models.dart';
-import 'widgets/common.dart';
-import 'widgets/place_tile.dart';
 
 /// Place details (design 13): photo, description, address, opening hours, website.
 class PlaceDetailsScreen extends ConsumerWidget {

@@ -62,6 +62,29 @@ flutter build web --release
 The map is a lightweight preview (pins around the city centre); Google Maps replaces it once a Maps key is configured.
 Sections whose data source has no API key yet show the backend's warning instead of data.
 
+## Linting (like Rust's clippy)
+[very_good_analysis](https://pub.dev/packages/very_good_analysis) turns on almost every Dart lint, plus strict casts, inference and raw types.
+CI runs `flutter analyze --fatal-infos`, so any finding fails. Deliberate exceptions are listed with a reason in `analysis_options.yaml`.
+```bash
+dart format lib test          # format (CI fails on unformatted code)
+dart fix --apply              # apply automatic lint fixes
+flutter analyze --fatal-infos # lint
+```
+
+## Tests and coverage
+Every feature ships with tests:
+
+| Folder | Kind | What it covers |
+|---|---|---|
+| `test/destination/*_test.dart`, `test/system/`, `test/core/` | Unit | Models, repository against a fake Dio adapter (URLs, query, parsing), providers, error messages, `Env` |
+| `test/destination/` (screens, chips, events) | Widget | Each screen and widget with a fake repository, incl. loading, error, empty and missing-key states |
+| `test/flows/` | Flow (integration) | The real app — router, shell, providers, screens — driven like a user: Discover → overview → places → details, search, failures |
+
+```bash
+flutter test --coverage   # writes coverage/lcov.info; CI fails below 85% line coverage
+```
+Shared test helpers: `test/helpers.dart` (host a screen, phone size) and `test/destination/fakes.dart` (configurable fake API).
+
 ## Conventions
 - Colours, spacing and radii live in `lib/app/theme/tokens.dart` and mirror the Figma variables; don't hard-code new values in screens.
 - Line length 120 (`analysis_options.yaml`); CI fails on unformatted code (`dart format lib test`).

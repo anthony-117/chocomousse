@@ -1,6 +1,5 @@
+import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:flutter/material.dart';
-
-import 'tokens.dart';
 
 /// Material theme built from the Figma tokens.
 ///

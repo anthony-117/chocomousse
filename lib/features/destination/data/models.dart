@@ -1,7 +1,7 @@
 /// Models for the pamplemousse destination API (see Features/Destinations/DestinationContracts.cs).
 library;
 
-DateTime _date(Object? value) => DateTime.parse(value as String);
+DateTime _date(Object? value) => DateTime.parse(value! as String);
 double? _double(Object? value) => (value as num?)?.toDouble();
 List<T> _list<T>(Object? value, T Function(Map<String, dynamic>) read) =>
     (value as List? ?? const []).cast<Map<String, dynamic>>().map(read).toList();
@@ -221,7 +221,7 @@ enum PlaceCategory {
   attraction('Attractions'),
   restaurant('Restaurants');
 
-  const PlaceCategory(this.label);
+  PlaceCategory(this.label);
 
   final String label;
 }

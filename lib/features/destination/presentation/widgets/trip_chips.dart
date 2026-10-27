@@ -1,10 +1,9 @@
+import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/features/destination/application/destination_providers.dart';
+import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-
-import '../../../../app/theme/tokens.dart';
-import '../../application/destination_providers.dart';
-import '../../data/models.dart';
 
 /// "Travelling with" chips (design 03): passport, currency and dates, each editable.
 class TripChips extends ConsumerWidget {

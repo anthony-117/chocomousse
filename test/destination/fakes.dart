@@ -2,7 +2,7 @@ import 'package:chocomousse/features/destination/data/destination_repository.dar
 import 'package:chocomousse/features/destination/data/models.dart';
 
 /// Overview JSON as returned by pamplemousse (trimmed), with one failed section.
-const overviewJson = {
+const Map<String, Object?> overviewJson = {
   'destination': {
     'id': '3169070',
     'name': 'Rome',
@@ -56,8 +56,58 @@ const rome = DestinationSummary(
   timeZone: 'Europe/Rome',
 );
 
+const missingKeyWarning = 'OpenTripMap is not configured. Set OPENTRIPMAP_API_KEY in the environment or .env file.';
+
+/// Builds a [Place] with sensible defaults for tests.
+Place place({
+  String id = 'otm:W3',
+  String name = 'Colosseum',
+  PlaceCategory category = PlaceCategory.attraction,
+  String? kind = 'Amphitheatres',
+  String? description,
+  String? address,
+  String? website,
+  List<String> openingHours = const [],
+  double? rating,
+}) => Place(
+  id: id,
+  name: name,
+  category: category,
+  lat: 41.8902,
+  lng: 12.4922,
+  kind: kind,
+  rating: rating,
+  ratingCount: rating == null ? null : 1200,
+  priceLevel: null,
+  address: address,
+  description: description,
+  imageUrl: null,
+  website: website,
+  openingHours: openingHours,
+  source: 'OpenTripMap',
+);
+
+/// Configurable stand-in for the API. Defaults mirror a backend without API keys.
 class FakeDestinationRepository implements DestinationRepository {
+  FakeDestinationRepository({
+    this.attractions = const PlacesResult(items: [], warnings: [missingKeyWarning]),
+    this.restaurants = const PlacesResult(items: [], warnings: [missingKeyWarning]),
+    this.details,
+    this.eventsResult = const EventsResult(items: [], warnings: []),
+    this.countryOptions = const [],
+    this.overviewError,
+  });
+
+  final PlacesResult attractions;
+  final PlacesResult restaurants;
+  final Place? details;
+  final EventsResult eventsResult;
+  final List<CountryOption> countryOptions;
+  final Error? overviewError;
+
   final searches = <String>[];
+  final overviewCalls = <({String passport, String currency})>[];
+  final placesCalls = <PlaceCategory>[];
 
   @override
   Future<List<DestinationSummary>> search(String query) async {
@@ -75,21 +125,24 @@ class FakeDestinationRepository implements DestinationRepository {
     required String currency,
     required DateTime from,
     required DateTime to,
-  }) async => DestinationOverview.fromJson(overviewJson);
+  }) async {
+    overviewCalls.add((passport: passport, currency: currency));
+    if (overviewError != null) throw overviewError!;
+    return DestinationOverview.fromJson(overviewJson);
+  }
 
   @override
-  Future<PlacesResult> places(String id, PlaceCategory category) async => const PlacesResult(
-    items: [],
-    warnings: ['OpenTripMap is not configured. Set OPENTRIPMAP_API_KEY in the environment or .env file.'],
-  );
+  Future<PlacesResult> places(String id, PlaceCategory category) async {
+    placesCalls.add(category);
+    return category == PlaceCategory.attraction ? attractions : restaurants;
+  }
 
   @override
-  Future<Place> place(String placeId) => throw UnimplementedError();
+  Future<Place> place(String placeId) async => details ?? (throw StateError('No details for $placeId'));
 
   @override
-  Future<EventsResult> events(String id, {required DateTime from, required DateTime to}) async =>
-      const EventsResult(items: [], warnings: []);
+  Future<EventsResult> events(String id, {required DateTime from, required DateTime to}) async => eventsResult;
 
   @override
-  Future<List<CountryOption>> countries() async => const [];
+  Future<List<CountryOption>> countries() async => countryOptions;
 }

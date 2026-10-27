@@ -1,8 +1,7 @@
+import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/core/network/api_client.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../../app/theme/tokens.dart';
-import '../../../../core/network/api_client.dart';
 
 /// Indigo → coral gradient used for destination photos until real photos are wired in.
 const LinearGradient kPhotoGradient = LinearGradient(

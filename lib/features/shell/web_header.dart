@@ -1,8 +1,7 @@
+import 'package:chocomousse/app/router.dart';
+import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/core/widgets/app_logo.dart';
 import 'package:flutter/material.dart';
-
-import '../../app/router.dart';
-import '../../app/theme/tokens.dart';
-import '../../core/widgets/app_logo.dart';
 
 /// Desktop header from the approved web design (W1–W9): logo, main links, avatar for Profile.
 class WebHeader extends StatelessWidget {

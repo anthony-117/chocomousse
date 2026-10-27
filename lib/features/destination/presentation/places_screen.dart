@@ -1,14 +1,13 @@
+import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/core/widgets/page_frame.dart';
+import 'package:chocomousse/features/destination/application/destination_providers.dart';
+import 'package:chocomousse/features/destination/data/models.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/pin_map.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/place_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../app/theme/tokens.dart';
-import '../../../core/widgets/page_frame.dart';
-import '../application/destination_providers.dart';
-import '../data/models.dart';
-import 'widgets/common.dart';
-import 'widgets/pin_map.dart';
-import 'widgets/place_tile.dart';
 
 /// Attractions and restaurants with a map (designs 05 / W2).
 class PlacesScreen extends ConsumerStatefulWidget {

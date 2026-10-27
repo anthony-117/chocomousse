@@ -1,10 +1,9 @@
+import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/core/widgets/page_frame.dart';
+import 'package:chocomousse/env.dart';
+import 'package:chocomousse/features/system/data/system_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../app/theme/tokens.dart';
-import '../../../core/widgets/page_frame.dart';
-import '../../../env.dart';
-import '../../system/data/system_api.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});

@@ -20,14 +20,23 @@ jobs:
       - name: Install packages
         run: flutter pub get
 
+      # Like `cargo fmt --check`.
       - name: Check formatting
         run: dart format --output=none --set-exit-if-changed lib test
 
+      # very_good_analysis; any finding, even an info, fails (like `cargo clippy -D warnings`).
       - name: Analyze
-        run: flutter analyze
+        run: flutter analyze --fatal-infos
 
-      - name: Test
-        run: flutter test
+      - name: Test with coverage
+        run: flutter test --coverage
+
+      - name: Coverage gate (fails below 85%)
+        run: |
+          read hit total < <(awk -F: '/^LH:/{h+=$2} /^LF:/{t+=$2} END{print h, t}' coverage/lcov.info)
+          pct=$(awk -v h="$hit" -v t="$total" 'BEGIN{printf "%.1f", 100*h/t}')
+          echo "Line coverage: $pct% ($hit/$total)" | tee -a "$GITHUB_STEP_SUMMARY"
+          awk -v p="$pct" 'BEGIN{exit (p < 85)}' || { echo "::error::Coverage $pct% is below 85%"; exit 1; }
 
       - name: Build web
         run: flutter build web --release

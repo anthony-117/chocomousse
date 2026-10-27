@@ -1,7 +1,6 @@
+import 'package:chocomousse/app/router.dart';
+import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:flutter/material.dart';
-
-import '../../app/router.dart';
-import '../../app/theme/tokens.dart';
 
 /// Minimal floating tab bar from the approved v0.2 design: light pill, icons only,
 /// active tab drawn as an indigo circle.
@@ -13,7 +12,7 @@ class FloatingNav extends StatelessWidget {
 
   static const height = 64.0;
 
-  static const _icons = {
+  static const Map<AppTab, IconData> _icons = {
     AppTab.discover: Icons.explore_outlined,
     AppTab.plans: Icons.work_outline,
     AppTab.assistant: Icons.auto_awesome_outlined,

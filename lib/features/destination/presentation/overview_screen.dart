@@ -1,16 +1,15 @@
+import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/features/destination/application/destination_providers.dart';
+import 'package:chocomousse/features/destination/data/models.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/pin_map.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/place_tile.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/trip_chips.dart';
+import 'package:chocomousse/features/shell/floating_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
-
-import '../../../app/theme/tokens.dart';
-import '../../shell/floating_nav.dart';
-import '../application/destination_providers.dart';
-import '../data/models.dart';
-import 'widgets/common.dart';
-import 'widgets/pin_map.dart';
-import 'widgets/place_tile.dart';
-import 'widgets/trip_chips.dart';
 
 /// City overview (designs 04 / W2): facts for the trip dates, top attractions and events.
 class OverviewScreen extends ConsumerWidget {
