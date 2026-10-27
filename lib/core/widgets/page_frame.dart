@@ -1,7 +1,6 @@
+import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/features/shell/floating_nav.dart';
 import 'package:flutter/material.dart';
-
-import '../../app/theme/tokens.dart';
-import '../../features/shell/floating_nav.dart';
 
 /// Standard scrollable page: mobile padding and room for the floating nav on phones,
 /// wider centred content on the web layout.

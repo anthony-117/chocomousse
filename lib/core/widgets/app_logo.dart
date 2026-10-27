@@ -1,7 +1,6 @@
+import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-import '../../app/theme/tokens.dart';
 
 /// The approved v0.3 logo mark.
 class AppLogoMark extends StatelessWidget {

@@ -1,9 +1,8 @@
 import 'dart:math' as math;
 
+import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../app/theme/tokens.dart';
-import '../../data/models.dart';
 
 /// Lightweight map preview: places plotted around the city centre on a soft canvas.
 /// Replaced by Google Maps once a Maps key is configured (see the Sprint 1 notes).
@@ -71,8 +70,9 @@ class _PinMapPainter extends CustomPainter {
     for (final place in places) {
       final at = project(place.lat, place.lng);
       final color = place.category == PlaceCategory.restaurant ? AppColors.accent : AppColors.primary;
-      canvas.drawCircle(at, 9, Paint()..color = AppColors.surface);
-      canvas.drawCircle(at, 6, Paint()..color = color);
+      canvas
+        ..drawCircle(at, 9, Paint()..color = AppColors.surface)
+        ..drawCircle(at, 6, Paint()..color = color);
     }
   }
 

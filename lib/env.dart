@@ -30,8 +30,8 @@ abstract final class Env {
   static Future<void> load({AssetBundle? bundle}) async {
     try {
       parse(await (bundle ?? rootBundle).loadString(assetPath));
-    } catch (_) {
-      // No app.env bundled (each platform reports a missing asset differently): defaults apply.
+    } on Object {
+      // No app.env bundled (each platform reports a missing asset differently, some as Error): defaults apply.
     }
   }
 

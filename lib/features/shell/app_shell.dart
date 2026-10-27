@@ -1,10 +1,9 @@
+import 'package:chocomousse/app/router.dart';
+import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/features/shell/floating_nav.dart';
+import 'package:chocomousse/features/shell/web_header.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../app/router.dart';
-import '../../app/theme/tokens.dart';
-import 'floating_nav.dart';
-import 'web_header.dart';
 
 /// Hosts the four tabs: floating nav on phones (design 01–13), web header on wide screens (W1–W9).
 class AppShell extends StatelessWidget {

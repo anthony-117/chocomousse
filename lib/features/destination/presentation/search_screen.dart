@@ -1,14 +1,13 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/core/widgets/page_frame.dart';
+import 'package:chocomousse/features/destination/application/destination_providers.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/trip_chips.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
-import '../../../app/theme/tokens.dart';
-import '../../../core/widgets/page_frame.dart';
-import '../application/destination_providers.dart';
-import 'widgets/common.dart';
-import 'widgets/trip_chips.dart';
 
 /// Destination search (designs 03 / W1 search bar).
 class SearchScreen extends ConsumerStatefulWidget {

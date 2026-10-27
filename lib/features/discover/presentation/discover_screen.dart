@@ -1,12 +1,11 @@
+import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/core/widgets/page_frame.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../app/theme/tokens.dart';
-import '../../../core/widgets/page_frame.dart';
-import '../../destination/presentation/widgets/common.dart';
-
 /// Hand-picked starting points until personalised suggestions arrive (ids are GeoNames city ids).
-const _trending = [
+const List<({String city, String country, String id, String theme})> _trending = [
   (id: '3169070', city: 'Rome', country: 'Italy', theme: 'Culture & food'),
   (id: '2267057', city: 'Lisbon', country: 'Portugal', theme: 'Food & ocean views'),
   (id: '745044', city: 'Istanbul', country: 'Türkiye', theme: 'History & bazaars'),

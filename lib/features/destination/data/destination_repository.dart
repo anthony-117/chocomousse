@@ -1,9 +1,8 @@
+import 'package:chocomousse/core/network/api_client.dart';
+import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-
-import '../../../core/network/api_client.dart';
-import 'models.dart';
 
 /// Calls the pamplemousse destination endpoints. Tests replace it through [destinationRepositoryProvider].
 class DestinationRepository {

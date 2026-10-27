@@ -1,15 +1,14 @@
+import 'package:chocomousse/features/assistant/presentation/assistant_screen.dart';
+import 'package:chocomousse/features/destination/presentation/overview_screen.dart';
+import 'package:chocomousse/features/destination/presentation/place_details_screen.dart';
+import 'package:chocomousse/features/destination/presentation/places_screen.dart';
+import 'package:chocomousse/features/destination/presentation/search_screen.dart';
+import 'package:chocomousse/features/discover/presentation/discover_screen.dart';
+import 'package:chocomousse/features/plans/presentation/plans_screen.dart';
+import 'package:chocomousse/features/profile/presentation/profile_screen.dart';
+import 'package:chocomousse/features/shell/app_shell.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-
-import '../features/assistant/presentation/assistant_screen.dart';
-import '../features/destination/presentation/overview_screen.dart';
-import '../features/destination/presentation/place_details_screen.dart';
-import '../features/destination/presentation/places_screen.dart';
-import '../features/destination/presentation/search_screen.dart';
-import '../features/discover/presentation/discover_screen.dart';
-import '../features/plans/presentation/plans_screen.dart';
-import '../features/profile/presentation/profile_screen.dart';
-import '../features/shell/app_shell.dart';
 
 /// Top-level destinations, in the order shown by the floating nav and the web header.
 enum AppTab {
@@ -18,7 +17,7 @@ enum AppTab {
   assistant('/assistant', 'Assistant'),
   profile('/profile', 'Profile');
 
-  const AppTab(this.path, this.label);
+  AppTab(this.path, this.label);
 
   final String path;
   final String label;

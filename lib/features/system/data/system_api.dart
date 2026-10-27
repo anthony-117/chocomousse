@@ -1,7 +1,6 @@
+import 'package:chocomousse/core/network/api_client.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../core/network/api_client.dart';
 
 /// Response of `GET /api/v1/system/ping` (PingResponse in pamplemousse).
 class PingInfo {
@@ -36,4 +35,6 @@ class SystemApi {
 
 final systemApiProvider = Provider<SystemApi>((ref) => SystemApi(ref.watch(dioProvider)));
 
-final pingProvider = FutureProvider.autoDispose<PingInfo>((ref) => ref.watch(systemApiProvider).ping());
+final FutureProvider<PingInfo> pingProvider = FutureProvider.autoDispose<PingInfo>(
+  (ref) => ref.watch(systemApiProvider).ping(),
+);
