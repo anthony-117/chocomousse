@@ -27,7 +27,7 @@ void main() {
 
   test('place parses category, location and optional fields', () {
     final place = Place.fromJson({
-      'id': 'gp:abc',
+      'id': 'otm:N123',
       'name': 'Trattoria Da Enzo',
       'category': 'restaurant',
       'location': {'lat': 41.88, 'lng': 12.47},
@@ -36,7 +36,7 @@ void main() {
       'ratingCount': 9800,
       'priceLevel': r'$$',
       'openingHours': ['Monday: 12:30 – 15:00'],
-      'source': 'Google Places',
+      'source': 'OpenTripMap',
     });
 
     expect(place.category, PlaceCategory.restaurant);
