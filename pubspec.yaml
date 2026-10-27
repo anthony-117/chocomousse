@@ -58,6 +58,8 @@ flutter:
 
   assets:
     - assets/brand/
+    # app.env (git-ignored) is bundled when present; app.env.example keeps the folder in the repo.
+    - assets/env/
 
   # Plus Jakarta Sans (SIL Open Font License, see assets/fonts/OFL.txt), bundled so the app works offline.
   fonts:

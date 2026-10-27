@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/theme/tokens.dart';
-import '../../../core/network/api_client.dart';
 import '../../../core/widgets/page_frame.dart';
+import '../../../env.dart';
 import '../../system/data/system_api.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -77,7 +77,7 @@ class BackendStatusCard extends ConsumerWidget {
                   children: [
                     const Icon(Icons.error_outline, color: AppColors.danger, size: 20),
                     const SizedBox(width: AppSpacing.sm),
-                    Expanded(child: Text('Cannot reach $apiBaseUrl', style: textTheme.bodyLarge)),
+                    Expanded(child: Text('Cannot reach ${Env.apiBaseUrl}', style: textTheme.bodyLarge)),
                   ],
                 ),
                 const SizedBox(height: AppSpacing.md),

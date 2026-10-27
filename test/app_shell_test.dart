@@ -45,8 +45,9 @@ void main() {
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
-    // "Discover" appears twice: header link + page title.
-    expect(find.text('Discover'), findsNWidgets(2));
+    // Desktop Discover (W1): header link plus the large "Where to next?" search hero.
+    expect(find.text('Discover'), findsOneWidget);
+    expect(find.text('Where to next?'), findsWidgets);
 
     await tester.tap(find.text('Plans'));
     await tester.pumpAndSettle();
