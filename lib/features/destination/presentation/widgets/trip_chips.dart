@@ -7,7 +7,10 @@ import 'package:intl/intl.dart';
 
 /// "Travelling with" chips (design 03): passport, currency and dates, each editable.
 class TripChips extends ConsumerWidget {
-  const TripChips({super.key});
+  const TripChips({this.showPassport = true, super.key});
+
+  /// Flights don't depend on the passport, so the flight screen leaves it out.
+  final bool showPassport;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -19,14 +22,15 @@ class TripChips extends ConsumerWidget {
       spacing: AppSpacing.sm,
       runSpacing: AppSpacing.sm,
       children: [
-        ActionChip(
-          avatar: const Icon(Icons.badge_outlined, size: 16, color: AppColors.primary),
-          label: Text('Passport: ${trip.passport}'),
-          onPressed: () async {
-            final code = await _pickCountry(context, title: 'Your passport', value: (c) => c.code);
-            if (code != null) notifier.setPassport(code);
-          },
-        ),
+        if (showPassport)
+          ActionChip(
+            avatar: const Icon(Icons.badge_outlined, size: 16, color: AppColors.primary),
+            label: Text('Passport: ${trip.passport}'),
+            onPressed: () async {
+              final code = await _pickCountry(context, title: 'Your passport', value: (c) => c.code);
+              if (code != null) notifier.setPassport(code);
+            },
+          ),
         ActionChip(
           avatar: const Icon(Icons.payments_outlined, size: 16, color: AppColors.primary),
           label: Text(trip.currency),
@@ -70,6 +74,7 @@ class TripChips extends ConsumerWidget {
   }) {
     return showModalBottomSheet<String>(
       context: context,
+      useRootNavigator: true,
       isScrollControlled: true,
       showDragHandle: true,
       builder: (context) => _CountryPicker(title: title, value: value),

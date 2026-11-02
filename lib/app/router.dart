@@ -4,6 +4,7 @@ import 'package:chocomousse/features/destination/presentation/place_details_scre
 import 'package:chocomousse/features/destination/presentation/places_screen.dart';
 import 'package:chocomousse/features/destination/presentation/search_screen.dart';
 import 'package:chocomousse/features/discover/presentation/discover_screen.dart';
+import 'package:chocomousse/features/flights/presentation/flights_screen.dart';
 import 'package:chocomousse/features/plans/presentation/plans_screen.dart';
 import 'package:chocomousse/features/profile/presentation/profile_screen.dart';
 import 'package:chocomousse/features/shell/app_shell.dart';
@@ -47,6 +48,10 @@ final routerProvider = Provider<GoRouter>((ref) {
                           id: state.pathParameters['id']!,
                           initialCategory: state.uri.queryParameters['category'],
                         ),
+                      ),
+                      GoRoute(
+                        path: 'flights',
+                        builder: (context, state) => FlightsScreen(id: state.pathParameters['id']!),
                       ),
                     ],
                   ),

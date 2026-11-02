@@ -6,6 +6,7 @@ import 'package:chocomousse/features/destination/presentation/widgets/common.dar
 import 'package:chocomousse/features/destination/presentation/widgets/pin_map.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/place_tile.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/trip_chips.dart';
+import 'package:chocomousse/features/flights/presentation/widgets/flights_entry.dart';
 import 'package:chocomousse/features/shell/floating_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -79,6 +80,10 @@ class _OverviewPlaceholder extends StatelessWidget {
                 FactTile.placeholder(icon: icon, title: title, animate: animate),
             ],
           ),
+          const SizedBox(height: AppSpacing.xl),
+          const SectionTitle('Flights'),
+          const SizedBox(height: AppSpacing.sm),
+          SkeletonBox(height: 72, radius: AppRadius.md, animate: animate),
           const SizedBox(height: AppSpacing.xl),
           const SectionTitle('Top attractions'),
           PlaceTilePlaceholders(animate: animate),
@@ -158,6 +163,10 @@ class _OverviewBody extends StatelessWidget {
           _WeatherStrip(report: data.weather!),
         ],
         for (final warning in data.warnings) ...[const SizedBox(height: AppSpacing.sm), WarningNote(warning)],
+        const SizedBox(height: AppSpacing.xl),
+        const SectionTitle('Flights'),
+        const SizedBox(height: AppSpacing.sm),
+        FlightsEntry(destinationId: id, destinationName: data.destination.name),
         const SizedBox(height: AppSpacing.xl),
         SectionTitle(
           'Top attractions',
