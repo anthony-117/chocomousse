@@ -15,6 +15,10 @@ final dioProvider = Provider<Dio>((ref) {
   return dio;
 });
 
+/// Turns off Riverpod's automatic retries, which keep a failed screen loading for about 38 seconds.
+/// Screens show the error at once, with a Try again button.
+Duration? noRetry(int retryCount, Object error) => null;
+
 /// Short, user-facing explanation of a failed API call.
 String describeApiError(Object error) {
   if (error is DioException) {
