@@ -31,8 +31,34 @@
 
   <title>TravelGenie</title>
   <link rel="manifest" href="manifest.json">
+  <style>
+    html, body { margin: 0; height: 100%; background: #FFFFFF; }
+    #loader {
+      position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 20px; font: 700 28px/1 system-ui, sans-serif; color: #14142B;
+    }
+    #loader b { color: #4338CA; }
+    #loader i { color: #FF7A59; font-style: normal; }
+    #loader span {
+      width: 28px; height: 28px; border-radius: 50%; border: 3px solid #E4E4EE; border-top-color: #4338CA;
+      animation: spin .9s linear infinite;
+    }
+    #loader small { font: 400 14px/1 system-ui, sans-serif; color: #6B6B85; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
+  <!-- Shown until Flutter draws its first frame, because the app takes a few seconds to download and start. -->
+  <div id="loader" role="status">
+    <div>travel<b>genie</b><i>.</i></div>
+    <span></span>
+    <small>Loading your trip planner…</small>
+  </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      document.getElementById('loader').remove();
+    });
+  </script>
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader

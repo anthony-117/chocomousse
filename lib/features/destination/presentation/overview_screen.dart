@@ -1,4 +1,5 @@
 import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/core/widgets/skeleton.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
@@ -22,20 +23,115 @@ class OverviewScreen extends ConsumerWidget {
     final overview = ref.watch(overviewProvider(id));
 
     return overview.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xl),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const BackCircleButton(),
-              ErrorRetry(error: e, onRetry: () => ref.invalidate(overviewProvider(id))),
-            ],
-          ),
-        ),
+      loading: () => const _OverviewPlaceholder(),
+      error: (e, _) => _OverviewPlaceholder(
+        banner: ErrorRetry(error: e, onRetry: () => ref.invalidate(overviewProvider(id))),
       ),
       data: (data) => _OverviewBody(id: id, data: data),
+    );
+  }
+}
+
+/// The overview layout with empty boxes, while it loads or after it failed ([banner] set).
+class _OverviewPlaceholder extends StatelessWidget {
+  const _OverviewPlaceholder({this.banner});
+
+  final Widget? banner;
+
+  @override
+  Widget build(BuildContext context) {
+    final wide = MediaQuery.sizeOf(context).width >= kWideLayoutBreakpoint;
+    final sidePadding = wide ? 64.0 : AppSpacing.xl;
+    final animate = banner == null;
+    final onHero = AppColors.onPrimary.withValues(alpha: 0.35);
+
+    return _OverviewFrame(
+      wide: wide,
+      sidePadding: sidePadding,
+      hero: _HeroFrame(
+        sidePadding: sidePadding,
+        rounded: wide,
+        lines: [
+          SkeletonBox(width: 120, height: 12, color: onHero, animate: animate),
+          const SizedBox(height: AppSpacing.sm),
+          SkeletonBox(width: 180, height: 32, color: onHero, animate: animate),
+          const SizedBox(height: AppSpacing.sm),
+          SkeletonBox(width: 150, height: 14, color: onHero, animate: animate),
+        ],
+      ),
+      main: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (banner != null) ...[banner!, const SizedBox(height: AppSpacing.lg)],
+          const TripChips(),
+          const SizedBox(height: AppSpacing.lg),
+          _FactGrid(
+            columns: wide ? 3 : 2,
+            tiles: [
+              for (final (icon, title) in const [
+                (Icons.wb_sunny_outlined, 'Weather'),
+                (Icons.payments_outlined, 'Currency'),
+                (Icons.badge_outlined, 'Visa'),
+                (Icons.shield_outlined, 'Safety'),
+                (Icons.celebration_outlined, 'Holidays'),
+                (Icons.translate_outlined, 'Country'),
+              ])
+                FactTile.placeholder(icon: icon, title: title, animate: animate),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.xl),
+          const SectionTitle('Top attractions'),
+          PlaceTilePlaceholders(animate: animate),
+          const SizedBox(height: AppSpacing.xl),
+          const SectionTitle('Events during your trip'),
+          const SizedBox(height: AppSpacing.sm),
+          SkeletonBox(height: 64, radius: AppRadius.md, animate: animate),
+        ],
+      ),
+      side: SkeletonBox(height: 420, radius: AppRadius.lg + 4, animate: animate),
+    );
+  }
+}
+
+/// Hero on top, then the main column, with [side] beside it on wide screens.
+class _OverviewFrame extends StatelessWidget {
+  const _OverviewFrame({
+    required this.wide,
+    required this.sidePadding,
+    required this.hero,
+    required this.main,
+    required this.side,
+  });
+
+  final bool wide;
+  final double sidePadding;
+  final Widget hero;
+  final Widget main;
+  final Widget side;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(bottom: wide ? 64 : FloatingNav.height + 48),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          hero,
+          Padding(
+            padding: EdgeInsets.fromLTRB(sidePadding, AppSpacing.xl, sidePadding, 0),
+            child: wide
+                ? Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(child: main),
+                      const SizedBox(width: AppSpacing.xxl),
+                      SizedBox(width: 420, child: side),
+                    ],
+                  )
+                : main,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -86,30 +182,12 @@ class _OverviewBody extends StatelessWidget {
       ],
     );
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.only(bottom: wide ? 64 : FloatingNav.height + 48),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _Hero(data: data, sidePadding: sidePadding, rounded: wide),
-          Padding(
-            padding: EdgeInsets.fromLTRB(sidePadding, AppSpacing.xl, sidePadding, 0),
-            child: wide
-                ? Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(child: main),
-                      const SizedBox(width: AppSpacing.xxl),
-                      SizedBox(
-                        width: 420,
-                        child: _MapColumn(id: id, data: data),
-                      ),
-                    ],
-                  )
-                : main,
-          ),
-        ],
-      ),
+    return _OverviewFrame(
+      wide: wide,
+      sidePadding: sidePadding,
+      hero: _Hero(data: data, sidePadding: sidePadding, rounded: wide),
+      main: main,
+      side: _MapColumn(id: id, data: data),
     );
   }
 }
@@ -128,6 +206,31 @@ class _Hero extends StatelessWidget {
     final days = data.to.difference(data.from).inDays + 1;
     final dates = '${DateFormat('d MMM').format(data.from)} – ${DateFormat('d MMM y').format(data.to)} · $days days';
 
+    return _HeroFrame(
+      sidePadding: sidePadding,
+      rounded: rounded,
+      lines: [
+        Text(
+          '${d.flag ?? ''} ${d.countryName.toUpperCase()} · ${d.timeZone.toUpperCase()}'.trim(),
+          style: textTheme.labelSmall?.copyWith(color: AppColors.primarySoft),
+        ),
+        Text(d.name, style: textTheme.displaySmall?.copyWith(color: AppColors.onPrimary)),
+        Text(dates, style: textTheme.bodyLarge?.copyWith(color: AppColors.onPrimary)),
+      ],
+    );
+  }
+}
+
+/// Gradient hero with the back button above [lines].
+class _HeroFrame extends StatelessWidget {
+  const _HeroFrame({required this.sidePadding, required this.rounded, required this.lines});
+
+  final double sidePadding;
+  final bool rounded;
+  final List<Widget> lines;
+
+  @override
+  Widget build(BuildContext context) {
     final hero = Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -142,12 +245,7 @@ class _Hero extends StatelessWidget {
           children: [
             const BackCircleButton(onDark: true),
             SizedBox(height: rounded ? 80 : 96),
-            Text(
-              '${d.flag ?? ''} ${d.countryName.toUpperCase()} · ${d.timeZone.toUpperCase()}'.trim(),
-              style: textTheme.labelSmall?.copyWith(color: AppColors.primarySoft),
-            ),
-            Text(d.name, style: textTheme.displaySmall?.copyWith(color: AppColors.onPrimary)),
-            Text(dates, style: textTheme.bodyLarge?.copyWith(color: AppColors.onPrimary)),
+            ...lines,
           ],
         ),
       ),
@@ -168,18 +266,9 @@ class _Facts extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final trip = ref.watch(tripSettingsProvider);
-    final tiles = [_weather(), _currency(trip.currency), _visa(trip.passport), _safety(), _holidays(), _country()];
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        const gap = AppSpacing.md;
-        final width = (constraints.maxWidth - gap * (columns - 1)) / columns;
-        return Wrap(
-          spacing: gap,
-          runSpacing: gap,
-          children: [for (final tile in tiles) SizedBox(width: width, child: tile)],
-        );
-      },
+    return _FactGrid(
+      columns: columns,
+      tiles: [_weather(), _currency(trip.currency), _visa(trip.passport), _safety(), _holidays(), _country()],
     );
   }
 
@@ -286,6 +375,28 @@ class _Facts extends ConsumerWidget {
   }
 }
 
+class _FactGrid extends StatelessWidget {
+  const _FactGrid({required this.columns, required this.tiles});
+
+  final int columns;
+  final List<Widget> tiles;
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        const gap = AppSpacing.md;
+        final width = (constraints.maxWidth - gap * (columns - 1)) / columns;
+        return Wrap(
+          spacing: gap,
+          runSpacing: gap,
+          children: [for (final tile in tiles) SizedBox(width: width, child: tile)],
+        );
+      },
+    );
+  }
+}
+
 class _WeatherStrip extends StatelessWidget {
   const _WeatherStrip({required this.report});
 
@@ -335,7 +446,7 @@ class _PlacesPreview extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final places = ref.watch(placesProvider((id, PlaceCategory.attraction)));
     return places.when(
-      loading: () => const LoadingBlock(height: 80),
+      loading: () => const PlaceTilePlaceholders(),
       error: (e, _) =>
           ErrorRetry(error: e, onRetry: () => ref.invalidate(placesProvider((id, PlaceCategory.attraction)))),
       data: (result) {
@@ -362,7 +473,7 @@ class _EventsPreview extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final events = ref.watch(eventsProvider(id));
     return events.when(
-      loading: () => const LoadingBlock(height: 80),
+      loading: () => const SkeletonBox(height: 64, radius: AppRadius.md),
       error: (e, _) => ErrorRetry(error: e, onRetry: () => ref.invalidate(eventsProvider(id))),
       data: (result) {
         if (result.items.isEmpty) {

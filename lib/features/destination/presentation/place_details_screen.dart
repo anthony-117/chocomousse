@@ -1,4 +1,5 @@
 import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/core/widgets/skeleton.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
@@ -19,20 +20,67 @@ class PlaceDetailsScreen extends ConsumerWidget {
     final place = ref.watch(placeDetailsProvider(placeId));
 
     return place.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (e, _) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.xl),
+      loading: () => const _DetailsPlaceholder(),
+      error: (e, _) => _DetailsPlaceholder(
+        banner: ErrorRetry(error: e, onRetry: () => ref.invalidate(placeDetailsProvider(placeId))),
+      ),
+      data: (p) => _Details(place: p),
+    );
+  }
+}
+
+/// The details layout with empty boxes, while the place loads or after it failed ([banner] set).
+class _DetailsPlaceholder extends StatelessWidget {
+  const _DetailsPlaceholder({this.banner});
+
+  final Widget? banner;
+
+  @override
+  Widget build(BuildContext context) {
+    final wide = MediaQuery.sizeOf(context).width >= kWideLayoutBreakpoint;
+    final side = wide ? 64.0 : AppSpacing.xl;
+    final animate = banner == null;
+
+    return SingleChildScrollView(
+      padding: EdgeInsets.only(bottom: wide ? 64 : FloatingNav.height + 48),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 900),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const BackCircleButton(),
-              ErrorRetry(error: e, onRetry: () => ref.invalidate(placeDetailsProvider(placeId))),
+              const Stack(
+                children: [
+                  SizedBox(
+                    height: 280,
+                    width: double.infinity,
+                    child: DecoratedBox(decoration: BoxDecoration(gradient: kPhotoGradient)),
+                  ),
+                  SafeArea(
+                    child: Padding(padding: EdgeInsets.all(AppSpacing.lg), child: BackCircleButton(onDark: true)),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(side, AppSpacing.xl, side, 0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (banner != null) ...[banner!, const SizedBox(height: AppSpacing.lg)],
+                    SkeletonBox(width: 220, height: 28, animate: animate),
+                    const SizedBox(height: AppSpacing.sm),
+                    SkeletonBox(width: 120, height: 12, animate: animate),
+                    const SizedBox(height: AppSpacing.lg),
+                    SkeletonBox(height: 72, animate: animate),
+                    const SizedBox(height: AppSpacing.lg),
+                    SkeletonBox(height: 110, radius: AppRadius.lg, animate: animate),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
       ),
-      data: (p) => _Details(place: p),
     );
   }
 }

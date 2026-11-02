@@ -1,5 +1,6 @@
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/network/api_client.dart';
+import 'package:chocomousse/core/widgets/skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -55,15 +56,25 @@ class SectionTitle extends StatelessWidget {
 
 /// One fact on the overview (InfoTile in Figma): title, big value, small note.
 class FactTile extends StatelessWidget {
-  const FactTile({required this.icon, required this.title, required this.value, this.note, this.tone, super.key});
+  const FactTile({required this.icon, required this.title, required String this.value, this.note, this.tone, super.key})
+    : animate = false;
+
+  /// The same tile with empty boxes in place of its value and note.
+  const FactTile.placeholder({required this.icon, required this.title, this.animate = true, super.key})
+    : value = null,
+      note = null,
+      tone = null;
 
   final IconData icon;
   final String title;
-  final String value;
+  final String? value;
   final String? note;
 
   /// Optional colour for the value (e.g. green for visa free, red for level 4).
   final Color? tone;
+
+  /// Whether a placeholder's boxes pulse.
+  final bool animate;
 
   @override
   Widget build(BuildContext context) {
@@ -86,12 +97,18 @@ class FactTile extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
-          Text(
-            value,
-            style: textTheme.titleMedium?.copyWith(color: tone),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
+          if (value case final value?)
+            Text(
+              value,
+              style: textTheme.titleMedium?.copyWith(color: tone),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            )
+          else ...[
+            SkeletonBox(width: 80, height: 20, animate: animate),
+            const SizedBox(height: AppSpacing.xs),
+            SkeletonBox(width: 110, height: 12, animate: animate),
+          ],
           if (note != null) Text(note!, style: textTheme.bodySmall, maxLines: 2, overflow: TextOverflow.ellipsis),
         ],
       ),
@@ -123,7 +140,7 @@ class WarningNote extends StatelessWidget {
   }
 }
 
-/// Error block with retry, for a whole screen or section.
+/// Error banner with retry, shown above a screen's or section's placeholders.
 class ErrorRetry extends StatelessWidget {
   const ErrorRetry({required this.error, required this.onRetry, super.key});
 
@@ -132,29 +149,18 @@ class ErrorRetry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
-      child: Column(
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.sm, AppSpacing.sm),
+      decoration: BoxDecoration(color: AppColors.canvas, borderRadius: BorderRadius.circular(AppRadius.md)),
+      child: Row(
         children: [
-          const Icon(Icons.cloud_off_outlined, color: AppColors.muted, size: 32),
-          const SizedBox(height: AppSpacing.sm),
-          Text(describeApiError(error), style: Theme.of(context).textTheme.bodyLarge, textAlign: TextAlign.center),
-          const SizedBox(height: AppSpacing.md),
-          OutlinedButton(onPressed: onRetry, child: const Text('Try again')),
+          const Icon(Icons.cloud_off_outlined, color: AppColors.muted, size: 20),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(child: Text(describeApiError(error), style: Theme.of(context).textTheme.bodySmall)),
+          TextButton(onPressed: onRetry, child: const Text('Try again')),
         ],
       ),
     );
   }
-}
-
-class LoadingBlock extends StatelessWidget {
-  const LoadingBlock({this.height = 120, super.key});
-
-  final double height;
-
-  @override
-  Widget build(BuildContext context) => SizedBox(
-    height: height,
-    child: const Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
-  );
 }

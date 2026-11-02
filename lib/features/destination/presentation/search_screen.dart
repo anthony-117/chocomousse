@@ -4,6 +4,7 @@ import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/place_tile.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/trip_chips.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -66,8 +67,14 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
           Text('DESTINATIONS', style: textTheme.labelSmall),
           const SizedBox(height: AppSpacing.sm),
           results.when(
-            loading: () => const LoadingBlock(height: 80),
-            error: (e, _) => ErrorRetry(error: e, onRetry: () => ref.invalidate(destinationSearchProvider(_query))),
+            loading: () => const PlaceTilePlaceholders(),
+            error: (e, _) => Column(
+              children: [
+                ErrorRetry(error: e, onRetry: () => ref.invalidate(destinationSearchProvider(_query))),
+                const SizedBox(height: AppSpacing.sm),
+                const PlaceTilePlaceholders(animate: false),
+              ],
+            ),
             data: (items) => items.isEmpty
                 ? Text('No city matches "$_query".', style: textTheme.bodyLarge)
                 : Column(

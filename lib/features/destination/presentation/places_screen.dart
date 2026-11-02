@@ -1,5 +1,6 @@
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
+import 'package:chocomousse/core/widgets/skeleton.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
@@ -53,11 +54,26 @@ class _PlacesScreenState extends ConsumerState<PlacesScreen> {
         ),
         const SizedBox(height: AppSpacing.lg),
         if (destination.value case final d?)
-          PinMap(centerLat: d.lat, centerLng: d.lng, places: places.value?.items ?? const []),
+          PinMap(centerLat: d.lat, centerLng: d.lng, places: places.value?.items ?? const [])
+        else
+          SkeletonBox(height: 220, radius: AppRadius.lg + 4, animate: !destination.hasError),
         const SizedBox(height: AppSpacing.lg),
         places.when(
-          loading: () => const LoadingBlock(),
-          error: (e, _) => ErrorRetry(error: e, onRetry: () => ref.invalidate(placesProvider((widget.id, _category)))),
+          loading: () => const PlaceTilePlaceholders(),
+          error: (e, _) => Column(
+            children: [
+              ErrorRetry(
+                error: e,
+                onRetry: () {
+                  ref
+                    ..invalidate(destinationProvider(widget.id))
+                    ..invalidate(placesProvider((widget.id, _category)));
+                },
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              const PlaceTilePlaceholders(animate: false),
+            ],
+          ),
           data: (result) => result.items.isEmpty
               ? WarningNote(result.warnings.firstOrNull ?? 'Nothing found here yet.')
               : Column(
