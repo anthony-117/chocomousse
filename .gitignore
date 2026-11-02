@@ -71,3 +71,10 @@ desktop.ini
 
 # Local app settings (copy assets/env/app.env.example)
 assets/env/app.env
+
+# Firebase CLI cache
+.firebase/
+firebase-debug.log
+
+# Local app.env while scripts/deploy-web.sh runs
+assets/env/app.env.local

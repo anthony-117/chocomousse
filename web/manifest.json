@@ -1,11 +1,11 @@
 {
-    "name": "chocomousse",
-    "short_name": "chocomousse",
+    "name": "TravelGenie",
+    "short_name": "TravelGenie",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "TravelGenie app (Flutter)",
+    "background_color": "#F7F7FB",
+    "theme_color": "#4338CA",
+    "description": "TravelGenie: plan your trip in one place",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
