@@ -1,4 +1,5 @@
 import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/core/widgets/skeleton.dart';
 import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +41,42 @@ class PlaceTile extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Empty rows in the shape of [PlaceTile], for a list that has not arrived.
+class PlaceTilePlaceholders extends StatelessWidget {
+  const PlaceTilePlaceholders({this.count = 3, this.animate = true, super.key});
+
+  final int count;
+  final bool animate;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        for (var i = 0; i < count; i++)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
+            child: Row(
+              children: [
+                SkeletonBox(width: 64, height: 64, radius: AppRadius.md + 4, animate: animate),
+                const SizedBox(width: AppSpacing.md),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SkeletonBox(width: 160, animate: animate),
+                      const SizedBox(height: AppSpacing.sm),
+                      SkeletonBox(width: 100, height: 12, animate: animate),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

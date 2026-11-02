@@ -51,6 +51,13 @@ flutter analyze
 flutter build web --release
 ```
 
+## Deploy (Firebase Hosting)
+The web app is hosted on Firebase project `travelgenie-1fdd1`. Install the Firebase CLI and run `firebase login` once, then:
+```bash
+API_BASE_URL=https://your-api.example.com sh scripts/deploy-web.sh
+```
+The script requires an https API address, builds with it, deploys, and leaves any local `app.env` as it was. Until the backend is online, use `https://api.invalid`: the app loads but data sections fail.
+
 ## Screens (Sprint 1)
 | Route | Screen | Design |
 |---|---|---|
