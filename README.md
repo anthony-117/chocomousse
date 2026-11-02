@@ -5,7 +5,8 @@ Flutter app for Android, iOS and web, built from the approved Figma design v0.2 
 - Talks only to `pamplemousse` (the .NET backend) — never to third-party APIs or MCP servers directly
 - State: Riverpod · Navigation: go_router · HTTP: dio · Logo: flutter_svg
 - Hosting: Firebase Hosting (web), Firebase App Distribution (Android test builds)
-- Design and docs: OneDrive FYP folder (`04-design/figma/figma-links.md`)
+- Design: OneDrive FYP folder (`04-design/figma/figma-links.md`)
+- Docs (architecture, ADRs, process): [`pamplemousse/docs`](https://github.com/anthony-117/pamplemousse/blob/main/docs/README.md)
 
 ## Structure
 ```
