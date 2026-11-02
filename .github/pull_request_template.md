@@ -7,6 +7,9 @@
 - [ ] Flow test (`test/flows/`) when a new user journey is added
 - [ ] Phone (390 px) and desktop layouts checked
 
+## Spec
+- [ ] Backlog feature: spec and plan in `specs/`, approved by the owner (bug fixes and small refactors may skip this)
+
 ## Checks
 - [ ] `dart format lib test` leaves nothing to change
 - [ ] `flutter analyze --fatal-infos` has no issues

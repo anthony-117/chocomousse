@@ -7,6 +7,7 @@ Flutter app for Android, iOS and web, built from the approved Figma design v0.2 
 - Hosting: Firebase Hosting (web), Firebase App Distribution (Android test builds)
 - Design: OneDrive FYP folder (`04-design/figma/figma-links.md`)
 - Docs (architecture, ADRs, process): [`pamplemousse/docs`](https://github.com/anthony-117/pamplemousse/blob/main/docs/README.md)
+- Rules: the [constitution](.specify/memory/constitution.md). Feature specs go in `specs/`, written with Spec Kit (`/speckit-specify`, `/speckit-plan`, `/speckit-tasks`, `/speckit-implement`)
 
 ## Structure
 ```
