@@ -1,0 +1,37 @@
+name: Release
+
+# Pushing a tag such as v1.2.0 publishes that version. factory_mousse decides when it goes live,
+# and writes assets/assets/env/app.env into the bundle at deploy time, so one build fits any backend address.
+on:
+  push:
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.0
+          cache: true
+
+      - name: Install packages
+        run: flutter pub get
+
+      - name: Test
+        run: flutter test
+
+      - name: Build web
+        run: flutter build web --release --build-name "${GITHUB_REF_NAME#v}"
+
+      - name: Create the GitHub release with the web bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tar -czf chocomousse-web.tar.gz firebase.json build/web
+          gh release create "$GITHUB_REF_NAME" chocomousse-web.tar.gz --generate-notes
