@@ -72,7 +72,7 @@ The map is a lightweight preview (pins around the city centre); Google Maps repl
 Sections whose data source has no API key yet show the backend's warning instead of data.
 
 ## Releases
-Pushing a tag such as `v1.2.0` runs the tests and publishes a web bundle on the GitHub release. That doesn't make it live: [`factory_mousse`](https://github.com/anthony-117/factor_mousse) decides which version runs.
+Pushing a tag such as `v1.2.0` runs the tests and publishes a web bundle on the GitHub release. That doesn't make it live: [`factory_mousse`](https://github.com/anthony-117/factory_mousse) decides which version runs.
 
 ## Git hooks (run once per clone)
 ```bash
