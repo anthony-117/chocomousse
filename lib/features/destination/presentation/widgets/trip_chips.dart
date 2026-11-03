@@ -7,10 +7,13 @@ import 'package:intl/intl.dart';
 
 /// "Travelling with" chips (design 03): passport, currency and dates, each editable.
 class TripChips extends ConsumerWidget {
-  const TripChips({this.showPassport = true, super.key});
+  const TripChips({this.showPassport = true, this.showAdults = false, super.key});
 
-  /// Flights don't depend on the passport, so the flight screen leaves it out.
+  /// Flights and hotels don't depend on the passport, so their screens leave it out.
   final bool showPassport;
+
+  /// Only hotels depend on the number of adults.
+  final bool showAdults;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -62,6 +65,17 @@ class TripChips extends ConsumerWidget {
             notifier.setDates(range.start, end);
           },
         ),
+        if (showAdults)
+          ActionChip(
+            avatar: const Icon(Icons.person_outline, size: 16, color: AppColors.primary),
+            label: Text('${adultsLabel(trip.adults)} · 1 room'),
+            onPressed: () => showModalBottomSheet<void>(
+              context: context,
+              useRootNavigator: true,
+              showDragHandle: true,
+              builder: (context) => const _AdultsPicker(),
+            ),
+          ),
       ],
     );
   }
@@ -78,6 +92,50 @@ class TripChips extends ConsumerWidget {
       isScrollControlled: true,
       showDragHandle: true,
       builder: (context) => _CountryPicker(title: title, value: value),
+    );
+  }
+}
+
+String adultsLabel(int adults) => adults == 1 ? '1 adult' : '$adults adults';
+
+class _AdultsPicker extends ConsumerWidget {
+  const _AdultsPicker();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final adults = ref.watch(tripSettingsProvider.select((t) => t.adults));
+    final notifier = ref.read(tripSettingsProvider.notifier);
+    final textTheme = Theme.of(context).textTheme;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppSpacing.xl, 0, AppSpacing.xl, AppSpacing.xxl),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Who is travelling', style: textTheme.titleLarge),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(child: Text('Adults in one room', style: textTheme.bodyLarge)),
+              IconButton.outlined(
+                tooltip: 'Fewer adults',
+                onPressed: adults > 1 ? () => notifier.setAdults(adults - 1) : null,
+                icon: const Icon(Icons.remove),
+              ),
+              SizedBox(
+                width: 40,
+                child: Text('$adults', textAlign: TextAlign.center, style: textTheme.titleMedium),
+              ),
+              IconButton.outlined(
+                tooltip: 'More adults',
+                onPressed: adults < TripSettings.maxAdults ? () => notifier.setAdults(adults + 1) : null,
+                icon: const Icon(Icons.add),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

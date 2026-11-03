@@ -7,6 +7,7 @@ import 'package:chocomousse/features/destination/presentation/widgets/pin_map.da
 import 'package:chocomousse/features/destination/presentation/widgets/place_tile.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/trip_chips.dart';
 import 'package:chocomousse/features/flights/presentation/widgets/flights_entry.dart';
+import 'package:chocomousse/features/hotels/presentation/widgets/hotels_entry.dart';
 import 'package:chocomousse/features/shell/floating_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -82,6 +83,10 @@ class _OverviewPlaceholder extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.xl),
           const SectionTitle('Flights'),
+          const SizedBox(height: AppSpacing.sm),
+          SkeletonBox(height: 72, radius: AppRadius.md, animate: animate),
+          const SizedBox(height: AppSpacing.xl),
+          const SectionTitle('Hotels'),
           const SizedBox(height: AppSpacing.sm),
           SkeletonBox(height: 72, radius: AppRadius.md, animate: animate),
           const SizedBox(height: AppSpacing.xl),
@@ -167,6 +172,10 @@ class _OverviewBody extends StatelessWidget {
         const SectionTitle('Flights'),
         const SizedBox(height: AppSpacing.sm),
         FlightsEntry(destinationId: id, destinationName: data.destination.name),
+        const SizedBox(height: AppSpacing.xl),
+        const SectionTitle('Hotels'),
+        const SizedBox(height: AppSpacing.sm),
+        HotelsEntry(destinationId: id, destinationName: data.destination.name),
         const SizedBox(height: AppSpacing.xl),
         SectionTitle(
           'Top attractions',
