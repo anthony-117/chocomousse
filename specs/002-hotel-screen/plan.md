@@ -51,7 +51,7 @@ Add a `hotels` feature to the app: a list route and a details route under the de
 8. **Photos.** `Image.network` with the gradient placeholder on error, as places do. On the web, Booking.com's image server may not allow cross-origin reads; the image uses `webHtmlElementStrategy: WebHtmlElementStrategy.fallback`, which shows it as a plain `<img>` when that happens. Checked in the running app (SC-004).
 9. **Languages.** A small map from the codes seen in live data to English names; anything else is shown as the code.
 10. **Overview entry.** A row under the flights entry (H7) that makes no hotel request. Its subtitle shows the dates and adults; the placeholder layout gets a matching box.
-11. **Wide layout.** At 1024 px and above, filters sit in a side panel and hotels in two columns (W1); below that, the sheet and one column.
+11. **Wide layout.** At the app's wide breakpoint (900 px, as flights) and above, filters sit in a side panel and hotels in two columns (W1); below that, the sheet and one column.
 
 ## Project Structure
 

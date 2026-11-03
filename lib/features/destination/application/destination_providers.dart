@@ -6,21 +6,34 @@ import 'package:flutter_riverpod/misc.dart' show FutureProviderFamily;
 
 /// Who is travelling and when: drives visa checks, currency conversion and date-based sections.
 class TripSettings {
-  const TripSettings({required this.passport, required this.currency, required this.from, required this.to});
+  const TripSettings({
+    required this.passport,
+    required this.currency,
+    required this.from,
+    required this.to,
+    this.adults = defaultAdults,
+  });
+
+  /// The hotels API's default; flights always search for one adult.
+  static const defaultAdults = 2;
+  static const maxAdults = 8;
 
   final String passport;
   final String currency;
   final DateTime from;
   final DateTime to;
+  final int adults;
 
   int get nights => to.difference(from).inDays;
 
-  TripSettings copyWith({String? passport, String? currency, DateTime? from, DateTime? to}) => TripSettings(
-    passport: passport ?? this.passport,
-    currency: currency ?? this.currency,
-    from: from ?? this.from,
-    to: to ?? this.to,
-  );
+  TripSettings copyWith({String? passport, String? currency, DateTime? from, DateTime? to, int? adults}) =>
+      TripSettings(
+        passport: passport ?? this.passport,
+        currency: currency ?? this.currency,
+        from: from ?? this.from,
+        to: to ?? this.to,
+        adults: adults ?? this.adults,
+      );
 }
 
 class TripSettingsNotifier extends Notifier<TripSettings> {
@@ -42,6 +55,9 @@ class TripSettingsNotifier extends Notifier<TripSettings> {
   void setCurrency(String code) => state = state.copyWith(currency: code);
 
   void setDates(DateTime from, DateTime to) => state = state.copyWith(from: from, to: to);
+
+  /// One room fits 1 to 8 adults, as the API accepts.
+  void setAdults(int adults) => state = state.copyWith(adults: adults.clamp(1, TripSettings.maxAdults));
 }
 
 final tripSettingsProvider = NotifierProvider<TripSettingsNotifier, TripSettings>(TripSettingsNotifier.new);

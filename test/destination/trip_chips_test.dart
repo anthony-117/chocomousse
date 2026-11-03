@@ -19,6 +19,26 @@ void main() {
     expect(find.text('Passport: LB'), findsOneWidget);
     expect(find.text('USD'), findsOneWidget);
     expect(find.textContaining(' – '), findsOneWidget);
+    expect(find.textContaining('adults'), findsNothing); // only hotels ask for adults
+  });
+
+  testWidgets('adults chip changes the number of adults', (tester) async {
+    usePhoneSize(tester);
+    await tester.pumpWidget(host(const TripChips(showPassport: false, showAdults: true), FakeDestinationRepository()));
+    expect(find.text('Passport: LB'), findsNothing);
+
+    await tester.tap(find.text('2 adults · 1 room'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byTooltip('Fewer adults'));
+    await tester.pumpAndSettle();
+    expect(find.text('1 adult · 1 room'), findsOneWidget);
+    expect(tester.widget<IconButton>(find.widgetWithIcon(IconButton, Icons.remove)).onPressed, isNull);
+
+    await tester.tap(find.byTooltip('More adults'));
+    await tester.pump();
+    await tester.tap(find.byTooltip('More adults'));
+    await tester.pumpAndSettle();
+    expect(find.text('3 adults · 1 room'), findsOneWidget);
   });
 
   testWidgets('passport picker filters countries and updates the chip', (tester) async {

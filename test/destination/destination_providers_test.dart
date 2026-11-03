@@ -27,6 +27,15 @@ void main() {
     expect(trip.currency, Env.defaultCurrency);
     expect(trip.from.difference(DateTime(today.year, today.month, today.day)).inDays, 30);
     expect(trip.nights, 4);
+    expect(trip.adults, 2);
+  });
+
+  test('adults stay between 1 and 8', () {
+    final notifier = container.read(tripSettingsProvider.notifier)..setAdults(0);
+    expect(container.read(tripSettingsProvider).adults, 1);
+
+    notifier.setAdults(9);
+    expect(container.read(tripSettingsProvider).adults, 8);
   });
 
   test('trip settings can be changed', () {
