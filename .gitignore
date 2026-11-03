@@ -78,3 +78,6 @@ firebase-debug.log
 
 # Local app.env while scripts/deploy-web.sh runs
 assets/env/app.env.local
+
+# FVM Version Cache
+.fvm/
