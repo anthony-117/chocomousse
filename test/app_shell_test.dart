@@ -30,7 +30,7 @@ void main() {
 
     await tester.tap(find.byTooltip('Assistant'));
     await tester.pumpAndSettle();
-    expect(find.text('Your travel assistant'), findsOneWidget);
+    expect(find.text('Ask about any city'), findsOneWidget);
 
     await tester.tap(find.byTooltip('Profile'));
     await tester.pumpAndSettle();
