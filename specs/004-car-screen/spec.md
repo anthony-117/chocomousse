@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-05
 
-**Status**: Draft, waiting for the owner's approval. Design: Figma page "Sprint 2 — Cars", C1–C7, approved 2026-11-05
+**Status**: Approved by the owner on 2026-11-05. Design: Figma page "Sprint 2 — Cars", C1–C7, approved 2026-11-05
 
 **Input**: User description: "TG-08: As Fares, I want to see car rental options." The API is merged in `pamplemousse`: [spec](https://github.com/anthony-117/pamplemousse/blob/main/specs/004-cars/spec.md) and [contract](https://github.com/anthony-117/pamplemousse/blob/main/specs/004-cars/contracts/cars-api.md).
 
@@ -12,7 +12,7 @@
 
 ### Session 2026-11-05
 
-Proposed with the spec, for the owner to confirm.
+Confirmed by the owner with the spec.
 
 - Q: A car search takes 15–30 s at the source, but the app gives up on any answer after 30 s. → A: Car searches get their own 60 s limit. Other requests keep 30 s. While waiting, the screen shows the searching state (C5).
 - Q: There is no API for one car's details. Where does the details screen (C4) get its data? → A: From the car the traveller tapped in the list. Opening a car's web link with no list loaded (a reload, or a pasted link) goes back to the list for the same trip, which comes from the cache at once.
