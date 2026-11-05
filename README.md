@@ -22,6 +22,7 @@ lib/
     destination/  search, city overview, places, place details (data → application → presentation)
     flights/      flights screen: departure city, fares, links to book (data → application → presentation)
     hotels/       hotels list and details: sort, filters, pages, links to book on Booking.com
+    cars/         rental cars: pick-up place and driver's age, sort, filters, pages, car details, Booking.com search
     plans/        My plans tab
     assistant/    Assistant tab: chat with TravelGenie (Gemini on the backend), cards into the screens
     profile/      Profile tab (shows backend connection status)
@@ -71,6 +72,8 @@ The script requires an https API address, builds with it, deploys, and leaves an
 | `/discover/destination/:id/flights` | Recent flight prices from a chosen city | Sprint 2: F1–F5 / W1 |
 | `/discover/destination/:id/hotels` | Hotels for the trip's dates and adults, with sort, filters and pages | Sprint 2: H1, H2, H4–H7 / W1 |
 | `/discover/destination/:id/hotels/:hotelId` | One hotel's details and its Booking.com link | Sprint 2: H3 |
+| `/discover/destination/:id/cars` | Rental cars for the trip's dates, a pick-up place (city centre or an airport) and the driver's age, with sort, filters and pages | Sprint 2: C1–C3, C5–C7 |
+| `/discover/destination/:id/cars/:carId` | One car from the list, and Booking.com's search for it. Opened without the list (a reload or a shared link), it goes to the list | Sprint 2: C4 |
 | `/discover/place/:placeId` | Place details | 13 |
 | `/assistant` | Assistant: chat about any city, or the one opened from an overview; answers carry cards into the screens above | 09 / W6 (chat column) |
 
@@ -101,15 +104,15 @@ Every feature ships with tests, and CI requires **every test to pass**:
 
 | Folder | Kind | What it covers |
 |---|---|---|
-| `test/destination/*_test.dart`, `test/flights/*_test.dart`, `test/hotels/hotel_data_test.dart`, `test/system/`, `test/core/` | Unit | Models, repository against a fake Dio adapter (URLs, query, parsing), providers, error messages, `Env` |
-| `test/destination/` (screens, chips, events), `test/flights/flights_screen_test.dart`, `test/hotels/hotels_screen_test.dart` | Widget | Each screen and widget with a fake repository, incl. loading, error, empty and missing-key states |
+| `test/destination/*_test.dart`, `test/flights/*_test.dart`, `test/hotels/hotel_data_test.dart`, `test/cars/car_data_test.dart`, `test/system/`, `test/core/` | Unit | Models, repository against a fake Dio adapter (URLs, query, parsing), providers, error messages, `Env` |
+| `test/destination/` (screens, chips, events), `test/flights/flights_screen_test.dart`, `test/hotels/hotels_screen_test.dart`, `test/cars/cars_screen_test.dart` | Widget | Each screen and widget with a fake repository, incl. loading, error, empty and missing-key states |
 | `test/assistant/` | Unit + widget | Models, repository (body, last 20 messages, time-out), chat controller (send, retry, New chat, context), card opener, the screen's states |
-| `test/flows/` | Flow (integration) | The real app — router, shell, providers, screens — driven like a user: Discover → overview → places → details, flights, hotels, assistant, search, failures |
+| `test/flows/` | Flow (integration) | The real app — router, shell, providers, screens — driven like a user: Discover → overview → places → details, flights, hotels, cars, assistant, search, failures |
 
 ```bash
 flutter test
 ```
-Shared test helpers: `test/helpers.dart` (host a screen, phone size) and `test/destination/fakes.dart`, `test/flights/fakes.dart`, `test/hotels/fakes.dart` (configurable fake APIs).
+Shared test helpers: `test/helpers.dart` (host a screen, phone size) and `test/destination/fakes.dart`, `test/flights/fakes.dart`, `test/hotels/fakes.dart`, `test/cars/fakes.dart` (configurable fake APIs).
 
 ## Conventions
 - Colours, spacing and radii live in `lib/app/theme/tokens.dart` and mirror the Figma variables; don't hard-code new values in screens.

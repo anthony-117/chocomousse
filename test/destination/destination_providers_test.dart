@@ -38,6 +38,19 @@ void main() {
     expect(container.read(tripSettingsProvider).adults, 8);
   });
 
+  test("the driver's age starts at 30 and stays between 18 and 99", () {
+    expect(container.read(tripSettingsProvider).driverAge, 30);
+
+    final notifier = container.read(tripSettingsProvider.notifier)..setDriverAge(17);
+    expect(container.read(tripSettingsProvider).driverAge, 18);
+
+    notifier.setDriverAge(120);
+    expect(container.read(tripSettingsProvider).driverAge, 99);
+
+    notifier.setDriverAge(24);
+    expect(container.read(tripSettingsProvider).driverAge, 24);
+  });
+
   test('trip settings can be changed', () {
     container.read(tripSettingsProvider.notifier)
       ..setPassport('FR')

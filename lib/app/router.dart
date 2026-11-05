@@ -1,4 +1,6 @@
 import 'package:chocomousse/features/assistant/presentation/assistant_screen.dart';
+import 'package:chocomousse/features/cars/presentation/car_details_screen.dart';
+import 'package:chocomousse/features/cars/presentation/cars_screen.dart';
 import 'package:chocomousse/features/destination/presentation/overview_screen.dart';
 import 'package:chocomousse/features/destination/presentation/place_details_screen.dart';
 import 'package:chocomousse/features/destination/presentation/places_screen.dart';
@@ -62,6 +64,21 @@ final routerProvider = Provider<GoRouter>((ref) {
                           GoRoute(
                             path: ':hotelId',
                             builder: (context, state) => HotelDetailsScreen(hotelId: state.pathParameters['hotelId']!),
+                          ),
+                        ],
+                      ),
+                      GoRoute(
+                        path: 'cars',
+                        builder: (context, state) => CarsScreen(id: state.pathParameters['id']!),
+                        routes: [
+                          GoRoute(
+                            path: ':carId',
+                            // A car is shown from the search it was tapped in; opened without one (a reload or
+                            // a shared link), it goes to the list instead (spec FR-010).
+                            redirect: (context, state) => state.extra is CarDetailsArgs
+                                ? null
+                                : '/discover/destination/${state.pathParameters['id']}/cars',
+                            builder: (context, state) => CarDetailsScreen(args: state.extra! as CarDetailsArgs),
                           ),
                         ],
                       ),

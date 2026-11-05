@@ -12,11 +12,17 @@ class TripSettings {
     required this.from,
     required this.to,
     this.adults = defaultAdults,
+    this.driverAge = defaultDriverAge,
   });
 
   /// The hotels API's default; flights always search for one adult.
   static const defaultAdults = 2;
   static const maxAdults = 8;
+
+  /// The car API's default and limits.
+  static const defaultDriverAge = 30;
+  static const minDriverAge = 18;
+  static const maxDriverAge = 99;
 
   final String passport;
   final String currency;
@@ -24,16 +30,26 @@ class TripSettings {
   final DateTime to;
   final int adults;
 
+  /// For car rentals: under 25 or over 70, rental companies may charge extra.
+  final int driverAge;
+
   int get nights => to.difference(from).inDays;
 
-  TripSettings copyWith({String? passport, String? currency, DateTime? from, DateTime? to, int? adults}) =>
-      TripSettings(
-        passport: passport ?? this.passport,
-        currency: currency ?? this.currency,
-        from: from ?? this.from,
-        to: to ?? this.to,
-        adults: adults ?? this.adults,
-      );
+  TripSettings copyWith({
+    String? passport,
+    String? currency,
+    DateTime? from,
+    DateTime? to,
+    int? adults,
+    int? driverAge,
+  }) => TripSettings(
+    passport: passport ?? this.passport,
+    currency: currency ?? this.currency,
+    from: from ?? this.from,
+    to: to ?? this.to,
+    adults: adults ?? this.adults,
+    driverAge: driverAge ?? this.driverAge,
+  );
 }
 
 class TripSettingsNotifier extends Notifier<TripSettings> {
@@ -58,6 +74,10 @@ class TripSettingsNotifier extends Notifier<TripSettings> {
 
   /// One room fits 1 to 8 adults, as the API accepts.
   void setAdults(int adults) => state = state.copyWith(adults: adults.clamp(1, TripSettings.maxAdults));
+
+  /// The car API accepts drivers from 18 to 99.
+  void setDriverAge(int age) =>
+      state = state.copyWith(driverAge: age.clamp(TripSettings.minDriverAge, TripSettings.maxDriverAge));
 }
 
 final tripSettingsProvider = NotifierProvider<TripSettingsNotifier, TripSettings>(TripSettingsNotifier.new);
