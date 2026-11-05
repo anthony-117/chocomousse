@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-05
 
-**Status**: Draft, waiting for the owner's approval. Design: Figma page "Sprint 3 — Weighted search", S1–S6 and W1, approved 2026-11-05
+**Status**: Approved by the owner on 2026-11-05. Design: Figma page "Sprint 3 — Weighted search", S1–S6 and W1, approved 2026-11-05
 
 **Input**: User description: "TG-09: As Fares, I want to weight budget, culture, food and style and get ranked options." The API is merged in `pamplemousse`: [spec](https://github.com/anthony-117/pamplemousse/blob/main/specs/007-weighted-search/spec.md) and [contract](https://github.com/anthony-117/pamplemousse/blob/main/specs/007-weighted-search/contracts/weighted-search-api.md).
 
@@ -12,7 +12,7 @@
 
 ### Session 2026-11-05
 
-Proposed with this draft; confirmed by the owner when the spec is approved.
+Confirmed by the owner with the spec.
 
 - Q: The design labels say Low, Medium and High send 20, 50 and 90. The live checks changed Low to 10 (API research R-6). → A: The app sends 10, 50 and 90. The note on the Figma page is updated to match. No frame changes.
 - Q: The sliders in the design look continuous. Can Fares pick any number from 0 to 100? → A: No. Each slider has three stops, Low, Medium and High, as the labels show. The API's 0 ("doesn't matter") isn't offered.
