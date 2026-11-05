@@ -52,32 +52,13 @@ class TripChips extends ConsumerWidget {
         ActionChip(
           avatar: const Icon(Icons.calendar_today_outlined, size: 16, color: AppColors.primary),
           label: Text(dates),
-          onPressed: () async {
-            final now = DateTime.now();
-            final range = await showDateRangePicker(
-              context: context,
-              firstDate: DateTime(now.year, now.month, now.day),
-              lastDate: now.add(const Duration(days: 365 * 2)),
-              initialDateRange: DateTimeRange(start: trip.from, end: trip.to),
-            );
-            if (range == null) return;
-            // The API accepts trips of up to 30 days.
-            final end = range.end.difference(range.start).inDays > 30
-                ? range.start.add(const Duration(days: 30))
-                : range.end;
-            notifier.setDates(range.start, end);
-          },
+          onPressed: () => pickTripDates(context, ref),
         ),
         if (showAdults)
           ActionChip(
             avatar: const Icon(Icons.person_outline, size: 16, color: AppColors.primary),
             label: Text('${adultsLabel(trip.adults)} · 1 room'),
-            onPressed: () => showModalBottomSheet<void>(
-              context: context,
-              useRootNavigator: true,
-              showDragHandle: true,
-              builder: (context) => const _AdultsPicker(),
-            ),
+            onPressed: () => showAdultsPicker(context),
           ),
         ...extra,
       ],
@@ -99,6 +80,29 @@ class TripChips extends ConsumerWidget {
     );
   }
 }
+
+/// The trip's dates in a date range picker, saved in the trip settings. The API accepts trips of up to 30 days.
+Future<void> pickTripDates(BuildContext context, WidgetRef ref) async {
+  final trip = ref.read(tripSettingsProvider);
+  final now = DateTime.now();
+  final range = await showDateRangePicker(
+    context: context,
+    firstDate: DateTime(now.year, now.month, now.day),
+    lastDate: now.add(const Duration(days: 365 * 2)),
+    initialDateRange: DateTimeRange(start: trip.from, end: trip.to),
+  );
+  if (range == null) return;
+  final end = range.end.difference(range.start).inDays > 30 ? range.start.add(const Duration(days: 30)) : range.end;
+  ref.read(tripSettingsProvider.notifier).setDates(range.start, end);
+}
+
+/// The number of adults, in a sheet, saved in the trip settings.
+Future<void> showAdultsPicker(BuildContext context) => showModalBottomSheet<void>(
+  context: context,
+  useRootNavigator: true,
+  showDragHandle: true,
+  builder: (context) => const _AdultsPicker(),
+);
 
 String adultsLabel(int adults) => adults == 1 ? '1 adult' : '$adults adults';
 

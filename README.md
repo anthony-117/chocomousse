@@ -74,6 +74,8 @@ The script requires an https API address, builds with it, deploys, and leaves an
 | `/discover/destination/:id/hotels/:hotelId` | One hotel's details and its Booking.com link | Sprint 2: H3 |
 | `/discover/destination/:id/cars` | Rental cars for the trip's dates, a pick-up place (city centre or an airport) and the driver's age, with sort, filters and pages | Sprint 2: C1–C3, C5–C7 |
 | `/discover/destination/:id/cars/:carId` | One car from the list, and Booking.com's search for it. Opened without the list (a reload or a shared link), it goes to the list | Sprint 2: C4 |
+| `/discover/destination/:id/plan` | Plan your trip: dates, travellers, departure city, total budget and how much six things matter. `?edit=<tab>` returns to that tab | Sprint 3: S1 |
+| `/discover/destination/:id/plan/best?tab=hotels\|flights\|cars` | Best for you: one tab ranked by those preferences, with why each offer ranks where it does; on wide screens the form, the list and the reasons side by side | Sprint 3: S2–S6 / W1 |
 | `/discover/place/:placeId` | Place details | 13 |
 | `/assistant` | Assistant: chat about any city, or the one opened from an overview; answers carry cards into the screens above | 09 / W6 (chat column) |
 

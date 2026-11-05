@@ -39,6 +39,8 @@ void main() {
     expect(find.text('Visa required'), findsOneWidget);
     expect(find.text('Level 2'), findsOneWidget);
 
+    await tester.ensureVisible(find.text('See all'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('See all'));
     await tester.pumpAndSettle();
     expect(find.text('Rome · Places'), findsOneWidget);
