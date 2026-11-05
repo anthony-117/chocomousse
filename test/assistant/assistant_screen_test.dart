@@ -146,6 +146,20 @@ void main() {
     expect(api.requests, hasLength(2));
   });
 
+  testWidgets('only the latest unsent message shows the error and Try again', (tester) async {
+    api
+      ..answerWith(DioException(requestOptions: RequestOptions(), type: DioExceptionType.connectionError))
+      ..answerWith(DioException(requestOptions: RequestOptions(), type: DioExceptionType.connectionError));
+    await show(tester);
+
+    await type(tester, 'Visa?');
+    await type(tester, 'Weather?');
+
+    expect(find.text('Not sent.'), findsOneWidget);
+    expect(find.text('Not sent. Cannot reach the TravelGenie server.'), findsOneWidget);
+    expect(find.text('Try again'), findsOneWidget);
+  });
+
   testWidgets('a busy assistant shows its warning as the answer, with Try again', (tester) async {
     api.answerWith(reply('', warnings: ['The assistant is busy right now. Try again in a minute.']));
     await show(tester);

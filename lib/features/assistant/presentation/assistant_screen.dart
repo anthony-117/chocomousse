@@ -77,7 +77,8 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
                       for (final (i, message) in chat.messages.indexed)
                         _MessageView(
                           message: message,
-                          error: chat.error,
+                          // The error is the last request's, so only the last message shows it.
+                          error: i == chat.messages.length - 1 ? chat.error : null,
                           onRetry: i == chat.messages.length - 1 && chat.canRetry ? controller.retry : null,
                           onOpen: _open,
                         ),

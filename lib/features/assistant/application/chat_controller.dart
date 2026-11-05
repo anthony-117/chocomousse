@@ -72,7 +72,12 @@ class ChatController extends Notifier<ChatState> {
   Future<void> _ask() async {
     state = state.copyWith(sending: true, clearError: true);
     try {
-      final reply = await ref.read(assistantRepositoryProvider).ask(state.messages, _context());
+      // A message left "Not sent" stays on screen but is not part of the conversation unless Try again resends it.
+      final conversation = [
+        for (final m in state.messages)
+          if (!m.notSent) m,
+      ];
+      final reply = await ref.read(assistantRepositoryProvider).ask(conversation, _context());
       if (!ref.mounted) return;
       final answer = ChatMessage(
         role: ChatRole.assistant,

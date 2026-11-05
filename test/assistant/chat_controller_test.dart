@@ -100,6 +100,22 @@ void main() {
     expect(api.requests, hasLength(2));
   });
 
+  test('a new message after a failure leaves the unsent one out of the conversation', () async {
+    api
+      ..answerWith(DioException(requestOptions: RequestOptions(), type: DioExceptionType.connectionError))
+      ..answerWith(reply('Mild, around 14 °C.'));
+
+    await chat().send('Visa?');
+    await chat().send('Weather?');
+
+    expect(api.requests.last.messages.map((m) => m.text), ['Weather?']);
+    expect(state().messages.map((m) => (m.text, m.notSent)), [
+      ('Visa?', true),
+      ('Weather?', false),
+      ('Mild, around 14 °C.', false),
+    ]);
+  });
+
   test('a warning-only answer can be retried, and is replaced by the new answer', () async {
     api
       ..answerWith(reply('', warnings: ['The assistant is busy right now. Try again in a minute.']))
