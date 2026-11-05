@@ -1,5 +1,6 @@
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/skeleton.dart';
+import 'package:chocomousse/features/assistant/presentation/widgets/assistant_entry.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
@@ -176,6 +177,8 @@ class _OverviewBody extends StatelessWidget {
         const SectionTitle('Hotels'),
         const SizedBox(height: AppSpacing.sm),
         HotelsEntry(destinationId: id, destinationName: data.destination.name),
+        const SizedBox(height: AppSpacing.md),
+        AssistantEntry(destinationId: id, destinationName: data.destination.name),
         const SizedBox(height: AppSpacing.xl),
         SectionTitle(
           'Top attractions',

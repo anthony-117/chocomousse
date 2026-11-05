@@ -18,6 +18,10 @@ void main() {
     expect(describeApiError(_error(DioExceptionType.receiveTimeout)), 'The server took too long to answer.');
     expect(describeApiError(_error(DioExceptionType.badResponse, status: 404)), 'Not found.');
     expect(
+      describeApiError(_error(DioExceptionType.badResponse, status: 429)),
+      'Too many messages. Wait a minute and try again.',
+    );
+    expect(
       describeApiError(_error(DioExceptionType.badResponse, status: 500)),
       'The server could not handle this request.',
     );

@@ -26,6 +26,8 @@ String describeApiError(Object error) {
       DioExceptionType.connectionError || DioExceptionType.connectionTimeout => 'Cannot reach the TravelGenie server.',
       DioExceptionType.receiveTimeout => 'The server took too long to answer.',
       DioExceptionType.badResponse when error.response?.statusCode == 404 => 'Not found.',
+      DioExceptionType.badResponse when error.response?.statusCode == 429 =>
+        'Too many messages. Wait a minute and try again.',
       DioExceptionType.badResponse => 'The server could not handle this request.',
       _ => 'Something went wrong. Please try again.',
     };

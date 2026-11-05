@@ -23,7 +23,7 @@ lib/
     flights/      flights screen: departure city, fares, links to book (data → application → presentation)
     hotels/       hotels list and details: sort, filters, pages, links to book on Booking.com
     plans/        My plans tab
-    assistant/    Assistant tab
+    assistant/    Assistant tab: chat with TravelGenie (Gemini on the backend), cards into the screens
     profile/      Profile tab (shows backend connection status)
     system/       ping API
 assets/
@@ -72,6 +72,7 @@ The script requires an https API address, builds with it, deploys, and leaves an
 | `/discover/destination/:id/hotels` | Hotels for the trip's dates and adults, with sort, filters and pages | Sprint 2: H1, H2, H4–H7 / W1 |
 | `/discover/destination/:id/hotels/:hotelId` | One hotel's details and its Booking.com link | Sprint 2: H3 |
 | `/discover/place/:placeId` | Place details | 13 |
+| `/assistant` | Assistant: chat about any city, or the one opened from an overview; answers carry cards into the screens above | 09 / W6 (chat column) |
 
 The map is a lightweight preview (pins around the city centre); Google Maps replaces it once a Maps key is configured.
 Sections whose data source has no API key yet show the backend's warning instead of data.
@@ -102,7 +103,8 @@ Every feature ships with tests, and CI requires **every test to pass**:
 |---|---|---|
 | `test/destination/*_test.dart`, `test/flights/*_test.dart`, `test/hotels/hotel_data_test.dart`, `test/system/`, `test/core/` | Unit | Models, repository against a fake Dio adapter (URLs, query, parsing), providers, error messages, `Env` |
 | `test/destination/` (screens, chips, events), `test/flights/flights_screen_test.dart`, `test/hotels/hotels_screen_test.dart` | Widget | Each screen and widget with a fake repository, incl. loading, error, empty and missing-key states |
-| `test/flows/` | Flow (integration) | The real app — router, shell, providers, screens — driven like a user: Discover → overview → places → details, flights, hotels, search, failures |
+| `test/assistant/` | Unit + widget | Models, repository (body, last 20 messages, time-out), chat controller (send, retry, New chat, context), card opener, the screen's states |
+| `test/flows/` | Flow (integration) | The real app — router, shell, providers, screens — driven like a user: Discover → overview → places → details, flights, hotels, assistant, search, failures |
 
 ```bash
 flutter test
