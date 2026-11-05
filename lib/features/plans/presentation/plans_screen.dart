@@ -14,7 +14,9 @@ class PlansScreen extends StatelessWidget {
         const EmptyState(
           icon: Icons.work_outline,
           title: 'No plans yet',
-          message: 'Weighted search and complete itineraries arrive in Sprints 3 and 4.',
+          message:
+              'Open a destination and choose Plan your trip to rank hotels, flights and cars. '
+              'Saved plans and itineraries arrive in Sprint 4.',
         ),
       ],
     );

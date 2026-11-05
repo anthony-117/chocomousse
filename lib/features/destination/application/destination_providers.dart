@@ -1,6 +1,7 @@
 import 'package:chocomousse/env.dart';
 import 'package:chocomousse/features/destination/data/destination_repository.dart';
 import 'package:chocomousse/features/destination/data/models.dart';
+import 'package:chocomousse/features/destination/data/preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show FutureProviderFamily;
 
@@ -13,6 +14,7 @@ class TripSettings {
     required this.to,
     this.adults = defaultAdults,
     this.driverAge = defaultDriverAge,
+    this.preferences = const Preferences(),
   });
 
   /// The hotels API's default; flights always search for one adult.
@@ -33,6 +35,9 @@ class TripSettings {
   /// For car rentals: under 25 or over 70, rental companies may charge extra.
   final int driverAge;
 
+  /// What matters to the traveller, for weighted search (spec 005).
+  final Preferences preferences;
+
   int get nights => to.difference(from).inDays;
 
   TripSettings copyWith({
@@ -42,6 +47,7 @@ class TripSettings {
     DateTime? to,
     int? adults,
     int? driverAge,
+    Preferences? preferences,
   }) => TripSettings(
     passport: passport ?? this.passport,
     currency: currency ?? this.currency,
@@ -49,6 +55,7 @@ class TripSettings {
     to: to ?? this.to,
     adults: adults ?? this.adults,
     driverAge: driverAge ?? this.driverAge,
+    preferences: preferences ?? this.preferences,
   );
 }
 
@@ -78,6 +85,8 @@ class TripSettingsNotifier extends Notifier<TripSettings> {
   /// The car API accepts drivers from 18 to 99.
   void setDriverAge(int age) =>
       state = state.copyWith(driverAge: age.clamp(TripSettings.minDriverAge, TripSettings.maxDriverAge));
+
+  void setPreferences(Preferences preferences) => state = state.copyWith(preferences: preferences);
 }
 
 final tripSettingsProvider = NotifierProvider<TripSettingsNotifier, TripSettings>(TripSettingsNotifier.new);

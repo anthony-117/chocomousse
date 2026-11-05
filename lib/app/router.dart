@@ -11,6 +11,9 @@ import 'package:chocomousse/features/hotels/presentation/hotel_details_screen.da
 import 'package:chocomousse/features/hotels/presentation/hotels_screen.dart';
 import 'package:chocomousse/features/plans/presentation/plans_screen.dart';
 import 'package:chocomousse/features/profile/presentation/profile_screen.dart';
+import 'package:chocomousse/features/ranking/data/ranking_models.dart';
+import 'package:chocomousse/features/ranking/presentation/best_for_you_screen.dart';
+import 'package:chocomousse/features/ranking/presentation/plan_trip_screen.dart';
 import 'package:chocomousse/features/shell/app_shell.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -79,6 +82,25 @@ final routerProvider = Provider<GoRouter>((ref) {
                                 ? null
                                 : '/discover/destination/${state.pathParameters['id']}/cars',
                             builder: (context, state) => CarDetailsScreen(args: state.extra! as CarDetailsArgs),
+                          ),
+                        ],
+                      ),
+                      GoRoute(
+                        path: 'plan',
+                        builder: (context, state) {
+                          final edit = state.uri.queryParameters['edit'];
+                          return PlanTripScreen(
+                            id: state.pathParameters['id']!,
+                            returnTo: edit == null ? null : RankedKind.parse(edit),
+                          );
+                        },
+                        routes: [
+                          GoRoute(
+                            path: 'best',
+                            builder: (context, state) => BestForYouScreen(
+                              id: state.pathParameters['id']!,
+                              tab: RankedKind.parse(state.uri.queryParameters['tab']),
+                            ),
                           ),
                         ],
                       ),

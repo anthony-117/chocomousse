@@ -2,7 +2,7 @@
 
 **Branch**: `005-weighted-search-screen` | **Date**: 2026-11-05 | **Spec**: [spec.md](spec.md)
 
-**Status**: Draft, waiting for the owner's approval
+**Status**: Approved by the owner on 2026-11-05
 
 ## Summary
 
@@ -140,6 +140,26 @@ test/flows/ranking_flow_test.dart
 8. Story 5: the wide layout with the debounced reload and the selection, with tests.
 9. Flow test. Then run against the real backend at 390 px and desktop (SC-005), and check the backend log for no paid request when a preference changes (SC-004).
 10. Update the README and `pamplemousse`'s sprint 3 review.
+
+## Changes during the build
+
+- **The hotel search also waits 60 s**, not only the car search. The first ranked hotel search for a city counts the
+  places near each hotel; on 5 Nov in Rome it took about 40 s, longer than the usual 30 s limit.
+- **A tab's list is kept for 10 minutes after it is hidden**, not for as long as the route is open. Going back to a tab
+  within that time shows it at once with no request; after that it asks the API again, which answers from its cache.
+- **`Preferences` lives in `destination/data`**, next to the trip settings that hold it, so `destination` doesn't
+  import `ranking`.
+- **The measure row is part of `why_view.dart`**, not a file of its own.
+- **The wide form keeps its own copy while a change settles.** Without it, a second slider move within 500 ms undid
+  the first. A widget test covers this.
+
+## Live check, 5 Nov 2026
+
+Rome, 5–9 Dec, Budget High, at 390 px and 1400 px. The first ranked hotel search took about 40 s (placeholders shown
+throughout), then 20 hotels with their match. The "Why" sheet and the W1 panel showed six measures each. Moving
+Nightlife to High on the wide screen sent one new request with `nightlife=90` 500 ms later; the backend log shows a
+single Booking.com request for the whole check (SC-004). Flights and cars weren't searched live, to save the monthly
+requests; widget and flow tests cover them.
 
 ## Risks
 
