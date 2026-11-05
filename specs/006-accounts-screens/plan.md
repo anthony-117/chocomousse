@@ -2,7 +2,7 @@
 
 **Branch**: `006-accounts-screens` | **Date**: 2026-11-06 | **Spec**: [spec.md](spec.md)
 
-**Status**: Draft, waiting for the owner's approval
+**Status**: Approved by the owner on 2026-11-06, with ADR 0020 and constitution 1.1.0
 
 ## Summary
 

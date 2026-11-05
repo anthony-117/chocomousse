@@ -61,7 +61,8 @@ Rationale: free sources fail, and the backend may be down; the app must still lo
 
 - The app MUST get its data only from `pamplemousse`, under `/api/v1`, and MUST NOT call third-party APIs or MCP
   servers directly.
-- Firebase is used for hosting. Any other direct use of Firebase from the app MUST have an ADR first.
+- Firebase is used for hosting and, from ADR 0020, for sign-in (Firebase Authentication). Any other direct use of
+  Firebase from the app MUST have an ADR first.
 - A change that needs a new or different endpoint MUST be agreed with `pamplemousse` in the same delivery.
 
 Rationale: API keys stay on the server, and the app, chatbot and Telegram bot share the same use cases.
@@ -82,8 +83,9 @@ Rationale: API keys stay on the server, and the app, chatbot and Telegram bot sh
 
 - All settings MUST be read through `lib/env.dart` using `Env.get(name, default)`, the single configuration file
   of this repo, and new ones MUST be added to `assets/env/app.env.example`.
-- `assets/env/app.env` ships inside the app, so it MUST NOT contain secrets. The only key allowed in the app is
-  a platform-restricted Google Maps key.
+- `assets/env/app.env` ships inside the app, so it MUST NOT contain secrets. The only keys allowed in the app are
+  a platform-restricted Google Maps key and Firebase's app settings (API key, app id, project id), which Google
+  documents as public identifiers protected by authorized domains and app fingerprints.
 - Personal data (passport, trips, chat history) MUST NOT be logged.
 
 ## Development Workflow
@@ -113,4 +115,4 @@ Rationale: API keys stay on the server, and the app, chatbot and Telegram bot sh
 - Every plan MUST pass the Constitution Check. Any justified violation MUST be recorded in the plan's Complexity
   Tracking table.
 
-**Version**: 1.0.0 | **Ratified**: 2026-11-02 | **Last Amended**: 2026-11-02
+**Version**: 1.1.0 | **Ratified**: 2026-11-02 | **Last Amended**: 2026-11-06

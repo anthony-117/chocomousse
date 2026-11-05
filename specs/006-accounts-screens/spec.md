@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-06
 
-**Status**: Draft, waiting for the owner's approval. Design: Figma page "Sprint 4 — Accounts & itinerary", A1–A5, P1–P3 and W5, approved 2026-11-06
+**Status**: Approved by the owner on 2026-11-06. Design: Figma page "Sprint 4 — Accounts & itinerary", A1–A5, P1–P3 and W5, approved 2026-11-06
 
 **Input**: User description: "TG-17: As Fares, I want to sign in with email or Google so my plans and travel profile are mine on every device." The API is built in `pamplemousse` on `009-accounts`: [spec](https://github.com/anthony-117/pamplemousse/blob/009-accounts/specs/009-accounts/spec.md), [contract](https://github.com/anthony-117/pamplemousse/blob/009-accounts/specs/009-accounts/contracts/accounts-api.md) and ADR 0019.
 
@@ -14,7 +14,7 @@ The rules are the API spec's (FR-001 to FR-017, Edge Cases). This spec says how 
 
 ### Session 2026-11-06
 
-Proposed with this spec; the owner confirms them with the approval.
+Confirmed by the owner with the spec on 2026-11-06.
 
 - Q: How does the app sign in with Google? → A: Through Firebase Authentication alone: a pop-up on the web, and Firebase's own Google sign-in page on Android. No separate Google sign-in package. Android needs the app's SHA-1 fingerprint in the Firebase console (owner).
 - Q: Where do the Firebase settings come from? → A: From `assets/env/app.env`, read through `lib/env.dart`: the project id, the web and Android app ids, their API keys, the sender id and the auth domain. These identify the project and are public by design (Firebase's documentation), but the constitution only allows a Maps key in the app, so it needs a small amendment. Without them, the welcome screen says sign-in isn't set up, naming the setting, and nothing crashes.
