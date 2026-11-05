@@ -1,39 +1,8 @@
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/skeleton.dart';
-import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/offers.dart';
 import 'package:chocomousse/features/hotels/data/hotel_models.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-
-/// Price in the trip's currency, without cents for large amounts ("$812", "$1,108").
-String formatHotelPrice(num amount, String currency) =>
-    NumberFormat.simpleCurrency(name: currency, decimalDigits: 0).format(amount);
-
-String formatReviews(int count) => count == 1 ? '1 review' : '${NumberFormat.decimalPattern().format(count)} reviews';
-
-/// A Booking.com photo, or the gradient placeholder when there is none or it fails to load.
-class HotelPhoto extends StatelessWidget {
-  const HotelPhoto({required this.url, super.key});
-
-  final String? url;
-
-  @override
-  Widget build(BuildContext context) {
-    const placeholder = DecoratedBox(
-      decoration: BoxDecoration(gradient: kPhotoGradient),
-      child: Center(child: Icon(Icons.image_outlined, color: AppColors.onPrimary, size: 32)),
-    );
-    final src = url;
-    if (src == null) return placeholder;
-    return Image.network(
-      src,
-      fit: BoxFit.cover,
-      // Booking.com's image server may not allow the web build to read the image; a plain <img> still shows it.
-      webHtmlElementStrategy: WebHtmlElementStrategy.fallback,
-      errorBuilder: (_, _, _) => placeholder,
-    );
-  }
-}
 
 /// Stars as small coral icons. Callers hide it when a hotel has none.
 class HotelStars extends StatelessWidget {
@@ -51,52 +20,6 @@ class HotelStars extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [for (var i = 0; i < count; i++) Icon(Icons.star_rounded, size: size, color: AppColors.accent)],
         ),
-      ),
-    );
-  }
-}
-
-/// Indigo score badge, as on Booking.com.
-class ReviewScore extends StatelessWidget {
-  const ReviewScore(this.score, {super.key});
-
-  final double score;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(AppRadius.sm)),
-      child: Text(
-        score.toStringAsFixed(1),
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.onPrimary),
-      ),
-    );
-  }
-}
-
-/// Green pill such as "Free cancellation".
-class HotelTag extends StatelessWidget {
-  const HotelTag({required this.icon, required this.label, super.key});
-
-  final IconData icon;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
-      decoration: BoxDecoration(
-        color: AppColors.success.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(AppRadius.full),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12, color: AppColors.success),
-          const SizedBox(width: AppSpacing.xs),
-          Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.success)),
-        ],
       ),
     );
   }
@@ -144,7 +67,7 @@ class HotelCard extends StatelessWidget {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  HotelPhoto(url: hotel.photoUrl),
+                  OfferPhoto(url: hotel.photoUrl),
                   if (hotel.nearCity)
                     Positioned(
                       left: AppSpacing.md,
@@ -182,7 +105,7 @@ class HotelCard extends StatelessWidget {
                   ),
                   if (hotel.freeCancellation ?? false) ...[
                     const SizedBox(height: AppSpacing.sm),
-                    const HotelTag(icon: Icons.check, label: 'Free cancellation'),
+                    const OfferTag(icon: Icons.check, label: 'Free cancellation'),
                   ],
                   const Divider(height: AppSpacing.xl),
                   Row(
@@ -194,14 +117,14 @@ class HotelCard extends StatelessWidget {
                           children: [
                             Text.rich(
                               TextSpan(
-                                text: formatHotelPrice(price.total, price.currency),
+                                text: formatMoney(price.total, price.currency),
                                 style: textTheme.titleLarge,
                                 children: [TextSpan(text: '  total', style: textTheme.bodySmall)],
                               ),
                             ),
                             Text(
                               '${nights == 1 ? '1 night' : '$nights nights'} · '
-                              '${formatHotelPrice(price.perNight, price.currency)} a night',
+                              '${formatMoney(price.perNight, price.currency)} a night',
                               style: textTheme.bodySmall,
                             ),
                           ],
@@ -257,42 +180,6 @@ class HotelCardPlaceholders extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
         ],
       ],
-    );
-  }
-}
-
-/// "today at 09:40", or "1 Mar at 09:40" for another day, in the device's time.
-String describeCheckedAt(DateTime at, {DateTime? now}) {
-  final today = now ?? DateTime.now();
-  final sameDay = at.year == today.year && at.month == today.month && at.day == today.day;
-  return '${sameDay ? 'today' : DateFormat('d MMM').format(at)} at ${DateFormat('HH:mm').format(at)}';
-}
-
-/// Amber note for warnings such as "showing saved prices" (H4).
-class HotelWarning extends StatelessWidget {
-  const HotelWarning(this.message, {super.key});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.12),
-        borderRadius: BorderRadius.circular(AppRadius.md),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Icon(Icons.warning_amber_rounded, size: 18, color: AppColors.warning),
-          const SizedBox(width: AppSpacing.sm),
-          Expanded(
-            child: Text(message, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.text)),
-          ),
-        ],
-      ),
     );
   }
 }

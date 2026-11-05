@@ -2,7 +2,7 @@
 
 **Branch**: `004-car-screen` | **Date**: 2026-11-05 | **Spec**: [spec.md](spec.md)
 
-**Status**: Draft, waiting for the owner's approval
+**Status**: Approved by the owner on 2026-11-05
 
 ## Summary
 
@@ -131,6 +131,12 @@ test/flows/cars_flow_test.dart
 - **Photos and logos on the web.** They come from `cdn.rcstatic.com`, not Booking.com's image server. If the fallback in decision 14 doesn't work there, photos show as placeholders on the web only.
 - **Fuel policy names.** Only "Like for like" was seen in Rome. Other values show as the source writes them until they are named.
 - **Developer wording in warnings.** A missing key shows "Cars are not configured (RAPIDAPI_KEY)", as for hotels.
+
+## Changes during the build (2026-11-05)
+
+- **Web timeout.** On the web, Dio's 10-second connect timeout runs until the response headers arrive, and the API sends them only when the search ends, so every new search failed at 10 s with "Cannot reach the TravelGenie server". The car search now sets the connect timeout to 60 s as well as the receive timeout.
+- **Failed search with nothing saved.** When Booking.com fails and no saved cars exist, the API returns no cars, a warning and the "no cars here" message. The screen now says "Cars could not be searched" with Try again and the Booking.com search, instead of saying the city has no cars.
+- **Live check.** The screens were checked live at 390 px only up to the searching and failed states. Booking.com sent headers after 5–16 s but the body was still arriving at the backend's 45 s limit, twice, so no live car list was seen. 3 requests were used. The list, sheets and details are covered by widget and flow tests.
 
 ## Complexity Tracking
 

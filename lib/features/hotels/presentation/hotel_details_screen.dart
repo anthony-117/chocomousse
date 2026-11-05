@@ -6,6 +6,7 @@ import 'package:chocomousse/core/widgets/page_frame.dart';
 import 'package:chocomousse/core/widgets/skeleton.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/offers.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/trip_chips.dart';
 import 'package:chocomousse/features/hotels/application/hotel_providers.dart';
 import 'package:chocomousse/features/hotels/data/hotel_models.dart';
@@ -89,7 +90,7 @@ class _Details extends StatelessWidget {
       children: [
         _Photos(urls: hotel.photoUrls),
         const SizedBox(height: AppSpacing.xl),
-        for (final warning in hotel.warnings) ...[HotelWarning(warning), const SizedBox(height: AppSpacing.md)],
+        for (final warning in hotel.warnings) ...[OfferWarning(warning), const SizedBox(height: AppSpacing.md)],
         Text(hotel.name, style: textTheme.headlineSmall),
         if (stars != null || score != null) ...[
           const SizedBox(height: AppSpacing.sm),
@@ -125,9 +126,9 @@ class _Details extends StatelessWidget {
                 avatar: const Icon(Icons.bed_outlined, size: 16, color: AppColors.primary),
                 label: Text(type),
               ),
-            if (hotel.freeCancellation ?? false) const HotelTag(icon: Icons.check, label: 'Free cancellation'),
+            if (hotel.freeCancellation ?? false) const OfferTag(icon: Icons.check, label: 'Free cancellation'),
             if (hotel.breakfastIncluded ?? false)
-              const HotelTag(icon: Icons.free_breakfast_outlined, label: 'Breakfast included'),
+              const OfferTag(icon: Icons.free_breakfast_outlined, label: 'Breakfast included'),
           ],
         ),
         if (times.isNotEmpty) ...[
@@ -189,12 +190,12 @@ class _PhotosState extends State<_Photos> {
           fit: StackFit.expand,
           children: [
             if (urls.isEmpty)
-              const HotelPhoto(url: null)
+              const OfferPhoto(url: null)
             else
               PageView.builder(
                 itemCount: urls.length,
                 onPageChanged: (i) => setState(() => _index = i),
-                itemBuilder: (context, i) => HotelPhoto(url: urls[i]),
+                itemBuilder: (context, i) => OfferPhoto(url: urls[i]),
               ),
             const Positioned(left: AppSpacing.lg, top: AppSpacing.lg, child: BackCircleButton()),
             if (urls.length > 1)
@@ -288,12 +289,12 @@ class _PriceBox extends StatelessWidget {
                       children: [
                         Text.rich(
                           TextSpan(
-                            text: formatHotelPrice(price.total, price.currency),
+                            text: formatMoney(price.total, price.currency),
                             style: textTheme.titleLarge,
                             children: [TextSpan(text: '  total', style: textTheme.bodySmall)],
                           ),
                         ),
-                        Text('${formatHotelPrice(price.perNight, price.currency)} a night', style: textTheme.bodySmall),
+                        Text('${formatMoney(price.perNight, price.currency)} a night', style: textTheme.bodySmall),
                       ],
                     );
               final book = FilledButton(onPressed: onBook, child: const Text('Book on Booking.com'));

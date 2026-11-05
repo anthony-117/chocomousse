@@ -4,6 +4,7 @@ import 'package:chocomousse/app/theme/app_theme.dart';
 import 'package:chocomousse/core/links/link_opener.dart';
 import 'package:chocomousse/core/network/api_client.dart';
 import 'package:chocomousse/features/destination/data/destination_repository.dart';
+import 'package:chocomousse/features/destination/presentation/widgets/offers.dart';
 import 'package:chocomousse/features/hotels/data/hotel_models.dart';
 import 'package:chocomousse/features/hotels/data/hotel_repository.dart';
 import 'package:chocomousse/features/hotels/presentation/hotel_details_screen.dart';
@@ -167,7 +168,7 @@ void main() {
       await tester.pumpWidget(_host(hotels));
       await tester.pumpAndSettle();
 
-      expect(find.widgetWithText(HotelWarning, warning), findsOneWidget);
+      expect(find.widgetWithText(OfferWarning, warning), findsOneWidget);
       expect(find.textContaining('Prices from Booking.com, saved'), findsOneWidget);
       expect(find.byType(HotelCard), findsOneWidget);
     });

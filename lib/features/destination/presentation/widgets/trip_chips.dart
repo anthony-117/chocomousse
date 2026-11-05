@@ -7,13 +7,16 @@ import 'package:intl/intl.dart';
 
 /// "Travelling with" chips (design 03): passport, currency and dates, each editable.
 class TripChips extends ConsumerWidget {
-  const TripChips({this.showPassport = true, this.showAdults = false, super.key});
+  const TripChips({this.showPassport = true, this.showAdults = false, this.extra = const [], super.key});
 
   /// Flights and hotels don't depend on the passport, so their screens leave it out.
   final bool showPassport;
 
   /// Only hotels depend on the number of adults.
   final bool showAdults;
+
+  /// Chips a screen adds after the shared ones, such as the car screen's pick-up place and driver.
+  final List<Widget> extra;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -76,6 +79,7 @@ class TripChips extends ConsumerWidget {
               builder: (context) => const _AdultsPicker(),
             ),
           ),
+        ...extra,
       ],
     );
   }
