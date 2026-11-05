@@ -146,6 +146,29 @@ void main() {
     expect(api.requests, hasLength(2));
   });
 
+  testWidgets('too many messages says to wait, and Try again resends', (tester) async {
+    final options = RequestOptions(path: '/assistant/messages');
+    api
+      ..answerWith(
+        DioException(
+          requestOptions: options,
+          type: DioExceptionType.badResponse,
+          response: Response<void>(requestOptions: options, statusCode: 429),
+        ),
+      )
+      ..answerWith(reply('You need a visa.'));
+    await show(tester);
+
+    await type(tester, 'Visa?');
+
+    expect(find.text('Not sent. Too many messages. Wait a minute and try again.'), findsOneWidget);
+
+    await tester.tap(find.text('Try again'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('You need a visa.'), findsOneWidget);
+  });
+
   testWidgets('only the latest unsent message shows the error and Try again', (tester) async {
     api
       ..answerWith(DioException(requestOptions: RequestOptions(), type: DioExceptionType.connectionError))

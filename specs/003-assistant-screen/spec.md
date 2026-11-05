@@ -70,6 +70,7 @@ at 390 px and desktop width.
 - **FR-006**: The screen MUST show the notice "Answers come from Google Gemini using TravelGenie's data. Don't share personal details."
 - **FR-007**: Loading, error and empty states follow the screen's layout without their own Figma frames (constitution IV); the PR says so.
 - **FR-008**: Chat text MUST NOT be logged.
+- **FR-009**: When the API answers `429` (pamplemousse spec 003, FR-015: too many messages), the message is marked "Not sent. Too many messages. Wait a minute and try again." with Try again. Added 2026-11-05, approved by the owner.
 
 ## Success Criteria *(mandatory)*
 
