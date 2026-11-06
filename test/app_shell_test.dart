@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'account/fakes.dart';
+
 Widget _app() => ProviderScope(
   overrides: [
+    ...signedIn(),
     pingProvider.overrideWith(
       (ref) async => PingInfo(name: 'pamplemousse', version: '1.0.0', environment: 'Test', utcNow: DateTime.utc(2026)),
     ),

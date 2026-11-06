@@ -33,7 +33,7 @@ class TripChips extends ConsumerWidget {
             avatar: const Icon(Icons.badge_outlined, size: 16, color: AppColors.primary),
             label: Text('Passport: ${trip.passport}'),
             onPressed: () async {
-              final code = await _pickCountry(context, title: 'Your passport', value: (c) => c.code);
+              final code = await pickCountry(context, title: 'Your passport', value: (c) => c.code);
               if (code != null) notifier.setPassport(code);
             },
           ),
@@ -41,7 +41,7 @@ class TripChips extends ConsumerWidget {
           avatar: const Icon(Icons.payments_outlined, size: 16, color: AppColors.primary),
           label: Text(trip.currency),
           onPressed: () async {
-            final code = await _pickCountry(
+            final code = await pickCountry(
               context,
               title: 'Your currency',
               value: (c) => c.currencies.isEmpty ? null : c.currencies.first,
@@ -64,22 +64,28 @@ class TripChips extends ConsumerWidget {
       ],
     );
   }
-
-  /// Bottom sheet listing countries; returns [value] of the picked one.
-  Future<String?> _pickCountry(
-    BuildContext context, {
-    required String title,
-    required String? Function(CountryOption) value,
-  }) {
-    return showModalBottomSheet<String>(
-      context: context,
-      useRootNavigator: true,
-      isScrollControlled: true,
-      showDragHandle: true,
-      builder: (context) => _CountryPicker(title: title, value: value),
-    );
-  }
 }
+
+/// Bottom sheet listing countries; returns [value] of the picked one (a country code, or its currency).
+Future<String?> pickCountry(
+  BuildContext context, {
+  required String title,
+  required String? Function(CountryOption) value,
+}) {
+  return showModalBottomSheet<String>(
+    context: context,
+    useRootNavigator: true,
+    isScrollControlled: true,
+    showDragHandle: true,
+    builder: (context) => _CountryPicker(title: title, value: value),
+  );
+}
+
+/// The country's code, for a passport picker.
+String? countryCode(CountryOption c) => c.code;
+
+/// The country's main currency, for a currency picker.
+String? mainCurrency(CountryOption c) => c.currencies.isEmpty ? null : c.currencies.first;
 
 /// The trip's dates in a date range picker, saved in the trip settings. The API accepts trips of up to 30 days.
 Future<void> pickTripDates(BuildContext context, WidgetRef ref) async {

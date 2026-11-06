@@ -6,12 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../account/fakes.dart';
 import '../destination/fakes.dart';
 import '../helpers.dart';
 
 /// End-to-end flows through the real app (router, shell, providers, screens) with the API replaced by a fake.
 Widget _app(FakeDestinationRepository repo) => ProviderScope(
   overrides: [
+    ...signedIn(),
     destinationRepositoryProvider.overrideWithValue(repo),
     pingProvider.overrideWith(
       (ref) async => PingInfo(name: 'pamplemousse', version: '1.0.0', environment: 'Test', utcNow: DateTime.utc(2026)),

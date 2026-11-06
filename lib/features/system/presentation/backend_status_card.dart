@@ -5,41 +5,6 @@ import 'package:chocomousse/features/system/data/system_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-
-    return PageFrame(
-      children: [
-        Row(
-          children: [
-            const CircleAvatar(
-              radius: 32,
-              backgroundColor: AppColors.primary,
-              child: Icon(Icons.person_outline, color: AppColors.onPrimary, size: 32),
-            ),
-            const SizedBox(width: AppSpacing.lg),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Guest', style: textTheme.titleLarge),
-                  Text('Sign-in arrives in a later sprint', style: textTheme.bodySmall),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppSpacing.xl),
-        const BackendStatusCard(),
-      ],
-    );
-  }
-}
-
 /// Shows whether the app can reach pamplemousse (Sprint 0 end-to-end check).
 class BackendStatusCard extends ConsumerWidget {
   const BackendStatusCard({super.key});

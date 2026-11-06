@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
+import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
 import 'package:chocomousse/features/flights/application/flight_providers.dart';
 import 'package:flutter/material.dart';
@@ -24,13 +25,10 @@ class DepartureCityField extends ConsumerWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.md),
-        onTap: () => showModalBottomSheet<void>(
-          context: context,
-          useRootNavigator: true,
-          isScrollControlled: true,
-          showDragHandle: true,
-          builder: (context) => const _DepartureCityPicker(),
-        ),
+        onTap: () async {
+          final chosen = await pickCity(context, title: 'Where are you flying from?');
+          if (chosen != null) ref.read(departureCityProvider.notifier).choose(chosen);
+        },
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
           child: Row(
@@ -59,8 +57,20 @@ class DepartureCityField extends ConsumerWidget {
   }
 }
 
+/// A city search in a sheet; returns the city picked, or null.
+Future<DestinationSummary?> pickCity(BuildContext context, {required String title}) =>
+    showModalBottomSheet<DestinationSummary>(
+      context: context,
+      useRootNavigator: true,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (context) => _DepartureCityPicker(title: title),
+    );
+
 class _DepartureCityPicker extends ConsumerStatefulWidget {
-  const _DepartureCityPicker();
+  const _DepartureCityPicker({required this.title});
+
+  final String title;
 
   @override
   ConsumerState<_DepartureCityPicker> createState() => _DepartureCityPickerState();
@@ -95,7 +105,7 @@ class _DepartureCityPickerState extends ConsumerState<_DepartureCityPicker> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Where are you flying from?', style: textTheme.titleLarge),
+            Text(widget.title, style: textTheme.titleLarge),
             const SizedBox(height: AppSpacing.md),
             TextField(
               autofocus: true,
@@ -121,10 +131,7 @@ class _DepartureCityPickerState extends ConsumerState<_DepartureCityPicker> {
                             leading: const Icon(Icons.place_outlined, color: AppColors.primary),
                             title: Text(city.name, style: textTheme.labelLarge),
                             subtitle: Text('${city.subtitle} ${city.flag ?? ''}'.trim(), style: textTheme.bodySmall),
-                            onTap: () {
-                              ref.read(departureCityProvider.notifier).choose(city);
-                              Navigator.pop(context);
-                            },
+                            onTap: () => Navigator.pop(context, city),
                           );
                         },
                       ),

@@ -19,6 +19,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../account/fakes.dart';
 import '../cars/fakes.dart';
 import '../destination/fakes.dart';
 import '../flights/fakes.dart';
@@ -55,6 +56,7 @@ class _App {
       ProviderScope(
         retry: noRetry,
         overrides: [
+          ...signedIn(),
           destinationRepositoryProvider.overrideWithValue(FakeDestinationRepository()),
           rankingRepositoryProvider.overrideWithValue(ranking),
           hotelRepositoryProvider.overrideWithValue(hotels),
