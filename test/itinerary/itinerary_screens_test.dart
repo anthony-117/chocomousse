@@ -40,7 +40,7 @@ void main() {
       expect(find.text('Land at FCO, then to the hotel'), findsOneWidget);
       expect(find.text('Arrival · 1h 45'), findsOneWidget);
       expect(find.text('Sight · 2h · 0.4 km walk'), findsOneWidget);
-      expect(app.plans.calls, ['plan p1']);
+      expect(app.plans.asked, ['plan p1']);
     });
 
     testWidgets('a day chip shows that day in time order, without the notes', (tester) async {
@@ -150,7 +150,7 @@ void main() {
       await app.tapText('Try again');
 
       expect(find.text('Rome, 5 days'), findsOneWidget);
-      expect(plans.calls, ['plan p1', 'plan p1']);
+      expect(plans.asked, ['plan p1', 'plan p1']);
     });
 
     testWidgets("a plan that isn't the traveller's links to My plans", (tester) async {
@@ -184,7 +184,7 @@ void main() {
 
       expect(find.text('Building your plan for Rome…'), findsOneWidget);
       expect(find.byType(DayPlaceholders), findsOneWidget);
-      expect(plans.calls, ['build']);
+      expect(plans.asked, ['build']);
 
       plans.gate!.complete();
       await tester.pumpAndSettle();
@@ -192,7 +192,7 @@ void main() {
       expect(app.location, '/plans/p2');
       expect(find.text('Rome, 5 days'), findsOneWidget);
       expect(plans.builtWith!.pace, Pace.packed);
-      expect(plans.calls, ['build'], reason: 'the built plan opens without asking the API again');
+      expect(plans.asked, ['build'], reason: 'the built plan opens without asking the API again');
     });
 
     testWidgets('at 50 plans, says so with a link to My plans', (tester) async {
@@ -248,7 +248,7 @@ void main() {
 
       await app.tapText('Try again');
       expect(app.location, '/plans/p2');
-      expect(plans.calls, ['build', 'build']);
+      expect(plans.asked, ['build', 'build']);
     });
 
     testWidgets('a reload of /plans/new opens My plans instead of building again', (tester) async {
@@ -257,7 +257,7 @@ void main() {
       await app.open('/plans/new');
 
       expect(app.location, '/plans');
-      expect(app.plans.calls, isNot(contains('build')));
+      expect(app.plans.asked, isNot(contains('build')));
     });
   });
 
@@ -283,7 +283,7 @@ void main() {
 
       expect(app.location, '/plans/p1');
       expect(find.text('Hotel Santa Maria'), findsOneWidget);
-      expect(app.plans.calls, ['plan p1', 'hotels p1', 'swap p1 hotel bk:2']);
+      expect(app.plans.asked, ['plan p1', 'hotels p1', 'swap p1 hotel bk:2']);
     });
 
     testWidgets('picking the plan own hotel changes nothing', (tester) async {
@@ -293,7 +293,7 @@ void main() {
 
       await app.tapText('Hotel Artemide');
 
-      expect(app.plans.calls, isNot(contains(startsWith('swap'))));
+      expect(app.plans.asked, isNot(contains(startsWith('swap'))));
     });
 
     testWidgets('adds a car, then removes it', (tester) async {
@@ -314,7 +314,7 @@ void main() {
       await app.tapText('Remove car');
 
       expect(find.text('No car'), findsOneWidget);
-      expect(app.plans.calls, containsAllInOrder(['swap p1 car bk:car:1', 'remove car p1']));
+      expect(app.plans.asked, containsAllInOrder(['swap p1 car bk:car:1', 'remove car p1']));
     });
 
     testWidgets('a failed swap shows Try again and keeps the plan', (tester) async {

@@ -196,7 +196,7 @@ class ScriptedAdapter implements HttpClientAdapter {
 
 Map<String, Object?> problem(int status, String code) => {'status': status, 'title': 'Refused', 'code': code};
 
-/// Plans held in memory, answering as the API would. [failWith] makes the next call fail; [gate] holds the next build.
+/// Plans held in memory, answering as the API would. [failWith] makes the next call other than a list fail; [gate] holds the next build.
 class FakePlanRepository implements PlanRepository {
   FakePlanRepository({List<Plan>? plans}) {
     for (final plan in plans ?? [Plan.fromJson(planJson())]) {
@@ -207,12 +207,18 @@ class FakePlanRepository implements PlanRepository {
   final _plans = <String, Plan>{};
   final calls = <String>[];
   Exception? failWith;
+
+  /// Makes the next list fail. My plans loads under every plan route, so lists don't use [failWith].
+  Exception? failListWith;
   Completer<void>? gate;
   TripSettings? builtWith;
   String? builtFrom;
   int _next = 2;
 
   Plan saved(String id) => _plans[id]!;
+
+  /// The calls other than the list My plans loads under every plan route.
+  List<String> get asked => calls.where((c) => c != 'list').toList();
 
   void _fail() {
     final error = failWith;
@@ -248,7 +254,11 @@ class FakePlanRepository implements PlanRepository {
   @override
   Future<PlanList> list() async {
     calls.add('list');
-    _fail();
+    final error = failListWith;
+    if (error != null) {
+      failListWith = null;
+      throw error;
+    }
     final items = _plans.values
         .map(
           (p) => PlanSummary.fromJson(

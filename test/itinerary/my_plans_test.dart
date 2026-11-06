@@ -65,7 +65,7 @@ void main() {
     testWidgets('a failed list shows Try again over still placeholders', (tester) async {
       usePhoneSize(tester);
       final plans = _three()
-        ..failWith = DioException(requestOptions: RequestOptions(), type: DioExceptionType.connectionError);
+        ..failListWith = DioException(requestOptions: RequestOptions(), type: DioExceptionType.connectionError);
       final app = PlanApp(tester, plans: plans);
       await app.open('/plans');
 
