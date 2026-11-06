@@ -1,0 +1,245 @@
+import 'package:chocomousse/app/app.dart';
+import 'package:chocomousse/app/router.dart';
+import 'package:chocomousse/core/links/link_opener.dart';
+import 'package:chocomousse/core/network/api_client.dart';
+import 'package:chocomousse/features/destination/data/destination_repository.dart';
+import 'package:chocomousse/features/destination/presentation/place_details_screen.dart';
+import 'package:chocomousse/features/itinerary/data/plan_models.dart';
+import 'package:chocomousse/features/itinerary/data/plan_repository.dart';
+import 'package:chocomousse/features/itinerary/presentation/widgets/day_view.dart';
+import 'package:chocomousse/features/system/data/system_api.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import '../account/fakes.dart';
+import '../destination/fakes.dart';
+import '../helpers.dart';
+import 'fakes.dart';
+
+/// The whole app with a fake plan API, opened at a location.
+class PlanApp {
+  PlanApp(this.tester, {FakePlanRepository? plans}) : plans = plans ?? FakePlanRepository();
+
+  final WidgetTester tester;
+  final FakePlanRepository plans;
+  final opened = <String>[];
+  late ProviderContainer container;
+
+  String get location => container.read(routerProvider).routerDelegate.currentConfiguration.uri.toString();
+
+  Future<void> open(String location) async {
+    await tester.pumpWidget(
+      ProviderScope(
+        retry: noRetry,
+        overrides: [
+          ...signedIn(),
+          destinationRepositoryProvider.overrideWithValue(FakeDestinationRepository()),
+          planRepositoryProvider.overrideWithValue(plans),
+          linkOpenerProvider.overrideWithValue((url) async {
+            opened.add(url);
+            return true;
+          }),
+          pingProvider.overrideWith(
+            (ref) async =>
+                PingInfo(name: 'pamplemousse', version: '1.0.0', environment: 'Test', utcNow: DateTime.utc(2026)),
+          ),
+        ],
+        child: const TravelGenieApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    container = ProviderScope.containerOf(tester.element(find.byType(TravelGenieApp)));
+    container.read(routerProvider).go(location);
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> tap(Finder target) async {
+    await tester.ensureVisible(target.first);
+    await tester.pumpAndSettle();
+    await tester.tap(target.first);
+    await tester.pumpAndSettle();
+  }
+
+  Future<void> tapText(String text) => tap(find.text(text));
+}
+
+void useDesktopSize(WidgetTester tester) {
+  tester.view
+    ..physicalSize = const Size(1440, 1400)
+    ..devicePixelRatio = 1;
+  addTearDown(tester.view.reset);
+}
+
+void main() {
+  group('Itinerary on a phone (I1, I2)', () {
+    testWidgets('shows the plan, the trip card and the first day with its notes', (tester) async {
+      usePhoneSize(tester, height: 2000);
+      final app = PlanApp(tester);
+      await app.open('/plans/p1');
+
+      expect(find.text('Rome, 5 days'), findsOneWidget);
+      expect(find.text('10 – 14 Apr · 1 adult · Draft, saved'), findsOneWidget);
+      expect(find.text('91% match'), findsOneWidget);
+      expect(find.text('Your trip'), findsOneWidget);
+      expect(find.text(r'$939 · Why 91%?'), findsOneWidget);
+      expect(find.text('HOTEL · 4★'), findsOneWidget);
+      expect(find.text('Hotel Artemide'), findsOneWidget);
+      expect(find.text(r'$612'), findsOneWidget);
+      expect(find.text(r'$289'), findsOneWidget);
+      expect(find.text('No car'), findsOneWidget);
+      expect(find.text('Add'), findsOneWidget);
+      expect(find.byType(ChoiceChip), findsNWidgets(5));
+
+      expect(find.text('Day 1 · Rome'), findsOneWidget);
+      expect(find.textContaining('45 minutes'), findsOneWidget);
+      expect(find.text('Land at FCO, then to the hotel'), findsOneWidget);
+      expect(find.text('Arrival · 1h 45'), findsOneWidget);
+      expect(find.text('Sight · 2h · 0.4 km walk'), findsOneWidget);
+      expect(app.plans.calls, ['plan p1']);
+    });
+
+    testWidgets('a day chip shows that day in time order, without the notes', (tester) async {
+      usePhoneSize(tester, height: 2000);
+      final app = PlanApp(tester);
+      await app.open('/plans/p1');
+
+      await app.tapText('Day 2');
+
+      expect(app.location, '/plans/p1?day=2');
+      expect(find.text('Day 2 · Colosseum area'), findsOneWidget);
+      expect(find.text('Sun 11 Apr · Sunny, 21° / 12° · walking 6.4 km'), findsOneWidget);
+      expect(find.text('Sight · 2h · 1.1 km walk from the hotel'), findsOneWidget);
+      expect(find.text('Free time'), findsOneWidget);
+      expect(find.text('Back at the hotel or wander nearby'), findsOneWidget);
+      expect(find.text(r'Event · 2h · 0.4 km walk · from $38'), findsOneWidget);
+      expect(find.textContaining('45 minutes'), findsNothing);
+      final times = tester.widgetList<TripItemRow>(find.byType(TripItemRow)).map((r) => r.item.start).toList();
+      expect(times, ['09:00', '11:15', '13:00', '16:00', '20:00']);
+    });
+
+    testWidgets('items open place details, the sight page or the event tickets', (tester) async {
+      usePhoneSize(tester, height: 2000);
+      final app = PlanApp(tester);
+      await app.open('/plans/p1?day=2');
+
+      await app.tapText('Colosseum');
+      expect(app.opened, ['https://www.wikidata.org/wiki/Q10285']);
+
+      await app.tapText('Opera at the Baths');
+      expect(app.opened.last, 'https://www.ticketmaster.it/e/1');
+
+      await app.tapText('Free time');
+      expect(app.location, '/plans/p1?day=2');
+
+      await app.tapText('Roman Forum');
+      expect(find.byType(PlaceDetailsScreen), findsOneWidget);
+      expect(find.byType(DayCard), findsNothing);
+    });
+
+    testWidgets('a plan with no departure city says to choose one', (tester) async {
+      usePhoneSize(tester, height: 2000);
+      final app = PlanApp(tester, plans: FakePlanRepository(plans: [Plan.fromJson(planJson(withFlight: false))]));
+      await app.open('/plans/p1');
+
+      expect(find.text('No flight'), findsOneWidget);
+      expect(find.text('Choose where you fly from on Plan your trip to add one'), findsOneWidget);
+    });
+
+    testWidgets('warnings show above the day', (tester) async {
+      usePhoneSize(tester, height: 2000);
+      final plan = Plan.fromJson(planJson(warnings: ["The places couldn't be loaded, so the days were kept."]));
+      final app = PlanApp(tester, plans: FakePlanRepository(plans: [plan]));
+      await app.open('/plans/p1?day=3');
+
+      expect(find.text("The places couldn't be loaded, so the days were kept."), findsOneWidget);
+    });
+  });
+
+  group('Why the match and the cost (I3)', () {
+    testWidgets('shows the parts, the days fit and the cost lines in a sheet', (tester) async {
+      usePhoneSize(tester, height: 2000);
+      final app = PlanApp(tester);
+      await app.open('/plans/p1');
+
+      await app.tapText(r'$939 · Why 91%?');
+
+      expect(find.byType(BottomSheet), findsOneWidget);
+      expect(find.text('Why 91%'), findsOneWidget);
+      expect(find.text('All six'), findsOneWidget);
+      expect(find.text('Budget + Comfort'), findsOneWidget);
+      expect(find.text('Your days'), findsOneWidget);
+      expect(find.text('2 interests'), findsOneWidget);
+      expect(find.text('Culture & history 100% · Nature 67%'), findsOneWidget);
+      expect(find.text('Hotel · 4 nights'), findsOneWidget);
+      expect(find.text('Events · 4'), findsOneWidget);
+      expect(find.text('Total'), findsOneWidget);
+      expect(
+        find.text(r"Not included: 8 items with no known ticket price. Your budget was $1,200, so you're $261 under."),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('says how far over the budget the plan is', (tester) async {
+      usePhoneSize(tester, height: 2000);
+      final plan = Plan.fromJson(planJson(overBudgetBy: 40));
+      final app = PlanApp(tester, plans: FakePlanRepository(plans: [plan]));
+      await app.open('/plans/p1');
+
+      await app.tapText(r'$939 · Why 91%?');
+
+      expect(find.textContaining(r"you're $40 over."), findsOneWidget);
+    });
+  });
+
+  group('Opening a plan', () {
+    testWidgets('shows placeholders, then the error with Try again', (tester) async {
+      usePhoneSize(tester);
+      final plans = FakePlanRepository()
+        ..failWith = DioException(requestOptions: RequestOptions(), type: DioExceptionType.connectionError);
+      final app = PlanApp(tester, plans: plans);
+      await app.open('/plans/p1');
+
+      expect(find.text('Cannot reach the TravelGenie server.'), findsOneWidget);
+      expect(find.byType(DayPlaceholders), findsOneWidget);
+
+      await app.tapText('Try again');
+
+      expect(find.text('Rome, 5 days'), findsOneWidget);
+      expect(plans.calls, ['plan p1', 'plan p1']);
+    });
+
+    testWidgets("a plan that isn't the traveller's links to My plans", (tester) async {
+      usePhoneSize(tester);
+      final app = PlanApp(tester);
+      await app.open('/plans/gone');
+
+      expect(find.text("This plan doesn't exist or isn't yours."), findsOneWidget);
+
+      await app.tapText('My plans');
+      expect(app.location, '/plans');
+    });
+  });
+
+  group('Itinerary on the web (W4)', () {
+    testWidgets('lists the days on the left and shows the chosen one on the right', (tester) async {
+      useDesktopSize(tester);
+      final app = PlanApp(tester);
+      await app.open('/plans/p1?day=2');
+
+      expect(find.byType(DayList), findsOneWidget);
+      expect(find.byType(ChoiceChip), findsNothing);
+      expect(find.text('Day 2 · Sun 11 Apr'), findsOneWidget);
+      expect(find.text('Colosseum area'), findsOneWidget);
+      expect(find.text('Day 2 · Colosseum area'), findsOneWidget);
+
+      await app.tapText('Day 3 · Mon 12 Apr');
+      expect(app.location, '/plans/p1?day=3');
+
+      await app.tapText(r'$939 · Why 91%?');
+      expect(find.byType(Dialog), findsOneWidget);
+      expect(find.text('Why 91%'), findsOneWidget);
+    });
+  });
+}

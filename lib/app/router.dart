@@ -15,6 +15,7 @@ import 'package:chocomousse/features/discover/presentation/discover_screen.dart'
 import 'package:chocomousse/features/flights/presentation/flights_screen.dart';
 import 'package:chocomousse/features/hotels/presentation/hotel_details_screen.dart';
 import 'package:chocomousse/features/hotels/presentation/hotels_screen.dart';
+import 'package:chocomousse/features/itinerary/presentation/itinerary_screen.dart';
 import 'package:chocomousse/features/plans/presentation/plans_screen.dart';
 import 'package:chocomousse/features/ranking/data/ranking_models.dart';
 import 'package:chocomousse/features/ranking/presentation/best_for_you_screen.dart';
@@ -134,7 +135,28 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
           StatefulShellBranch(
-            routes: [GoRoute(path: AppTab.plans.path, builder: (context, state) => const PlansScreen())],
+            routes: [
+              GoRoute(
+                path: AppTab.plans.path,
+                builder: (context, state) => const PlansScreen(),
+                routes: [
+                  GoRoute(
+                    path: ':planId',
+                    builder: (context, state) => ItineraryScreen(
+                      id: state.pathParameters['planId']!,
+                      day: int.tryParse(state.uri.queryParameters['day'] ?? ''),
+                    ),
+                    routes: [
+                      // Place details inside the Plans tab, so Back returns to the day (plan decision 6).
+                      GoRoute(
+                        path: 'place/:placeId',
+                        builder: (context, state) => PlaceDetailsScreen(placeId: state.pathParameters['placeId']!),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
           ),
           StatefulShellBranch(
             routes: [GoRoute(path: AppTab.assistant.path, builder: (context, state) => const AssistantScreen())],
