@@ -1,8 +1,12 @@
+import 'dart:async';
+
 import 'package:chocomousse/app/app.dart';
 import 'package:chocomousse/app/router.dart';
 import 'package:chocomousse/core/links/link_opener.dart';
 import 'package:chocomousse/core/network/api_client.dart';
+import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/destination/data/destination_repository.dart';
+import 'package:chocomousse/features/destination/data/preferences.dart';
 import 'package:chocomousse/features/destination/presentation/place_details_screen.dart';
 import 'package:chocomousse/features/itinerary/data/plan_models.dart';
 import 'package:chocomousse/features/itinerary/data/plan_repository.dart';
@@ -219,6 +223,102 @@ void main() {
 
       await app.tapText('My plans');
       expect(app.location, '/plans');
+    });
+  });
+
+  group('Build my plan', () {
+    const overview = '/discover/destination/3169070';
+
+    testWidgets('shows placeholder days, then opens the saved plan with the pace', (tester) async {
+      usePhoneSize(tester, height: 2400);
+      final plans = FakePlanRepository()..gate = Completer<void>();
+      final app = PlanApp(tester, plans: plans);
+      await app.open(overview);
+      app.container.read(tripSettingsProvider.notifier).setPace(Pace.packed);
+
+      final button = find.text('Build my plan');
+      await tester.ensureVisible(button);
+      await tester.pumpAndSettle();
+      await tester.tap(button);
+      await tester.pump();
+      await tester.pump();
+
+      expect(find.text('Building your plan for Rome…'), findsOneWidget);
+      expect(find.byType(DayPlaceholders), findsOneWidget);
+      expect(plans.calls, ['build']);
+
+      plans.gate!.complete();
+      await tester.pumpAndSettle();
+
+      expect(app.location, '/plans/p2');
+      expect(find.text('Rome, 5 days'), findsOneWidget);
+      expect(plans.builtWith!.pace, Pace.packed);
+      expect(plans.calls, ['build'], reason: 'the built plan opens without asking the API again');
+    });
+
+    testWidgets('at 50 plans, says so with a link to My plans', (tester) async {
+      usePhoneSize(tester, height: 2400);
+      final app = PlanApp(tester, plans: FakePlanRepository()..failWith = const PlanLimitReached());
+      await app.open(overview);
+
+      await app.tapText('Build my plan');
+
+      expect(find.text('You can keep up to 50 plans. Delete one to make room.'), findsOneWidget);
+      await app.tapText('My plans');
+      expect(app.location, '/plans');
+    });
+
+    testWidgets('with no places, says so with Back to where it started', (tester) async {
+      usePhoneSize(tester, height: 2400);
+      final app = PlanApp(tester, plans: FakePlanRepository()..failWith = const NoPlaces('Rome'));
+      await app.open(overview);
+
+      await app.tapText('Build my plan');
+
+      expect(
+        find.text('No places could be found for Rome right now, so no plan can be made. Try again later.'),
+        findsOneWidget,
+      );
+      await app.tapText('Back');
+      expect(app.location, overview);
+    });
+
+    testWidgets('a refused value links to Plan your trip', (tester) async {
+      usePhoneSize(tester, height: 2400);
+      final plans = FakePlanRepository()
+        ..failWith = const PlanFieldError('from', 'The trip must start today or later.');
+      final app = PlanApp(tester, plans: plans);
+      await app.open(overview);
+
+      await app.tapText('Build my plan');
+
+      expect(find.text('The trip must start today or later.'), findsOneWidget);
+      await app.tapText('Plan your trip');
+      expect(app.location, '$overview/plan');
+    });
+
+    testWidgets('a network failure shows Try again, which builds again', (tester) async {
+      usePhoneSize(tester, height: 2400);
+      final plans = FakePlanRepository()
+        ..failWith = DioException(requestOptions: RequestOptions(), type: DioExceptionType.connectionError);
+      final app = PlanApp(tester, plans: plans);
+      await app.open(overview);
+
+      await app.tapText('Build my plan');
+      expect(find.text('Cannot reach the TravelGenie server.'), findsOneWidget);
+
+      await app.tapText('Try again');
+      expect(app.location, '/plans/p2');
+      expect(plans.calls, ['build', 'build']);
+    });
+
+    testWidgets('a reload of /plans/new opens My plans instead of building again', (tester) async {
+      usePhoneSize(tester);
+      final app = PlanApp(tester);
+      await app.open('/plans/new');
+
+      expect(app.location, '/plans');
+      expect(app.plans.calls, isNot(contains('build')));
     });
   });
 

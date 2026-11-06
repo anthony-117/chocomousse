@@ -10,6 +10,7 @@ import 'package:chocomousse/features/destination/presentation/widgets/place_tile
 import 'package:chocomousse/features/destination/presentation/widgets/trip_chips.dart';
 import 'package:chocomousse/features/flights/presentation/widgets/flights_entry.dart';
 import 'package:chocomousse/features/hotels/presentation/widgets/hotels_entry.dart';
+import 'package:chocomousse/features/itinerary/presentation/build_plan_screen.dart';
 import 'package:chocomousse/features/ranking/presentation/widgets/plan_entry.dart';
 import 'package:chocomousse/features/shell/floating_nav.dart';
 import 'package:flutter/material.dart';
@@ -197,6 +198,8 @@ class _OverviewBody extends StatelessWidget {
         const SectionTitle('Plan your trip'),
         const SizedBox(height: AppSpacing.sm),
         PlanEntry(destinationId: id, destinationName: data.destination.name),
+        const SizedBox(height: AppSpacing.sm),
+        BuildPlanButton(destinationId: id, destinationName: data.destination.name),
         const SizedBox(height: AppSpacing.xl),
         SectionTitle(
           'Top attractions',

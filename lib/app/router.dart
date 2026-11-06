@@ -15,6 +15,7 @@ import 'package:chocomousse/features/discover/presentation/discover_screen.dart'
 import 'package:chocomousse/features/flights/presentation/flights_screen.dart';
 import 'package:chocomousse/features/hotels/presentation/hotel_details_screen.dart';
 import 'package:chocomousse/features/hotels/presentation/hotels_screen.dart';
+import 'package:chocomousse/features/itinerary/presentation/build_plan_screen.dart';
 import 'package:chocomousse/features/itinerary/presentation/itinerary_screen.dart';
 import 'package:chocomousse/features/plans/presentation/plans_screen.dart';
 import 'package:chocomousse/features/ranking/data/ranking_models.dart';
@@ -140,6 +141,13 @@ final routerProvider = Provider<GoRouter>((ref) {
                 path: AppTab.plans.path,
                 builder: (context, state) => const PlansScreen(),
                 routes: [
+                  GoRoute(
+                    path: 'new',
+                    // A build starts from Best for you or the overview; opened without one (a reload), it goes to
+                    // My plans instead of building again.
+                    redirect: (context, state) => state.extra is BuildPlanRequest ? null : AppTab.plans.path,
+                    builder: (context, state) => BuildPlanScreen(request: state.extra! as BuildPlanRequest),
+                  ),
                   GoRoute(
                     path: ':planId',
                     builder: (context, state) => ItineraryScreen(
