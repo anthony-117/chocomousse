@@ -7,6 +7,7 @@ import 'package:chocomousse/features/system/data/system_api.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../account/fakes.dart';
 import '../assistant/fakes.dart';
 import '../destination/fakes.dart';
 import '../helpers.dart';
@@ -27,6 +28,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          ...signedIn(),
           destinationRepositoryProvider.overrideWithValue(FakeDestinationRepository()),
           assistantRepositoryProvider.overrideWithValue(assistant),
           hotelRepositoryProvider.overrideWithValue(hotels),

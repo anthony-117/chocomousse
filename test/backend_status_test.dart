@@ -1,6 +1,6 @@
 import 'package:chocomousse/app/theme/app_theme.dart';
-import 'package:chocomousse/features/profile/presentation/profile_screen.dart';
 import 'package:chocomousse/features/system/data/system_api.dart';
+import 'package:chocomousse/features/system/presentation/backend_status_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';

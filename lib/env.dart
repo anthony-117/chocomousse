@@ -18,6 +18,16 @@ abstract final class Env {
   /// Currency prices are converted from until the traveller picks one (ISO 4217).
   static String get defaultCurrency => get('DEFAULT_CURRENCY', 'USD');
 
+  // Firebase sign-in (ADR 0020). Public app settings from the Firebase console (Project settings → Your apps), not
+  // secrets (constitution 1.1.0). Any blank value turns sign-in off, and Welcome names the missing setting.
+  static String get firebaseProjectId => get('FIREBASE_PROJECT_ID', '');
+  static String get firebaseAuthDomain => get('FIREBASE_AUTH_DOMAIN', '');
+  static String get firebaseMessagingSenderId => get('FIREBASE_MESSAGING_SENDER_ID', '');
+  static String get firebaseWebAppId => get('FIREBASE_WEB_APP_ID', '');
+  static String get firebaseWebApiKey => get('FIREBASE_WEB_API_KEY', '');
+  static String get firebaseAndroidAppId => get('FIREBASE_ANDROID_APP_ID', '');
+  static String get firebaseAndroidApiKey => get('FIREBASE_ANDROID_API_KEY', '');
+
   static final Map<String, String> _values = {};
 
   /// Returns the value of [name] when it is set and not blank, otherwise [defaultValue].

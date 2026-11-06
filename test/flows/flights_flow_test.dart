@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../account/fakes.dart';
 import '../destination/fakes.dart';
 import '../flights/fakes.dart';
 import '../helpers.dart';
@@ -23,6 +24,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
+          ...signedIn(),
           destinationRepositoryProvider.overrideWithValue(FakeDestinationRepository()),
           flightRepositoryProvider.overrideWithValue(flights),
           linkOpenerProvider.overrideWithValue((url) async {

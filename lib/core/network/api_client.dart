@@ -1,3 +1,4 @@
+import 'package:chocomousse/core/network/auth_interceptor.dart';
 import 'package:chocomousse/env.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +12,7 @@ final dioProvider = Provider<Dio>((ref) {
       headers: {'Accept': 'application/json'},
     ),
   );
+  dio.interceptors.add(AuthInterceptor(ref.watch(apiSessionProvider), dio));
   ref.onDispose(dio.close);
   return dio;
 });
@@ -25,9 +27,15 @@ String describeApiError(Object error) {
     return switch (error.type) {
       DioExceptionType.connectionError || DioExceptionType.connectionTimeout => 'Cannot reach the TravelGenie server.',
       DioExceptionType.receiveTimeout => 'The server took too long to answer.',
+      DioExceptionType.badResponse when error.response?.statusCode == 401 => 'Sign in again to continue.',
+      DioExceptionType.badResponse when error.response?.statusCode == 403 => 'Confirm your email first.',
       DioExceptionType.badResponse when error.response?.statusCode == 404 => 'Not found.',
       DioExceptionType.badResponse when error.response?.statusCode == 429 =>
         'Too many messages. Wait a minute and try again.',
+      DioExceptionType.badResponse when problemCode(error.response) == 'sign-in-not-configured' =>
+        "The server's sign-in isn't set up.",
+      DioExceptionType.badResponse when error.response?.statusCode == 503 =>
+        "The server can't do this right now. Try again in a moment.",
       DioExceptionType.badResponse => 'The server could not handle this request.',
       _ => 'Something went wrong. Please try again.',
     };

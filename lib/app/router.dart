@@ -1,3 +1,9 @@
+import 'package:chocomousse/app/auth_guard.dart';
+import 'package:chocomousse/features/account/application/session.dart';
+import 'package:chocomousse/features/account/data/auth_repository.dart';
+import 'package:chocomousse/features/account/presentation/auth_screens.dart';
+import 'package:chocomousse/features/account/presentation/edit_profile_screen.dart';
+import 'package:chocomousse/features/account/presentation/profile_screen.dart';
 import 'package:chocomousse/features/assistant/presentation/assistant_screen.dart';
 import 'package:chocomousse/features/cars/presentation/car_details_screen.dart';
 import 'package:chocomousse/features/cars/presentation/cars_screen.dart';
@@ -10,11 +16,11 @@ import 'package:chocomousse/features/flights/presentation/flights_screen.dart';
 import 'package:chocomousse/features/hotels/presentation/hotel_details_screen.dart';
 import 'package:chocomousse/features/hotels/presentation/hotels_screen.dart';
 import 'package:chocomousse/features/plans/presentation/plans_screen.dart';
-import 'package:chocomousse/features/profile/presentation/profile_screen.dart';
 import 'package:chocomousse/features/ranking/data/ranking_models.dart';
 import 'package:chocomousse/features/ranking/presentation/best_for_you_screen.dart';
 import 'package:chocomousse/features/ranking/presentation/plan_trip_screen.dart';
 import 'package:chocomousse/features/shell/app_shell.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -32,9 +38,22 @@ enum AppTab {
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
+  // The router asks again where to go whenever the traveller signs in or out (spec FR-003).
+  final session = ValueNotifier<AsyncValue<AuthUser?>>(ref.read(authUserProvider));
+  ref
+    ..listen(authUserProvider, (_, next) => session.value = next)
+    ..onDispose(session.dispose);
   return GoRouter(
     initialLocation: AppTab.discover.path,
+    refreshListenable: session,
+    redirect: (context, state) => authRedirect(session.value, state.uri),
     routes: [
+      GoRoute(path: AuthPaths.starting, builder: (context, state) => const StartingScreen()),
+      GoRoute(path: AuthPaths.welcome, builder: (context, state) => const WelcomeScreen()),
+      GoRoute(path: AuthPaths.signIn, builder: (context, state) => const SignInScreen()),
+      GoRoute(path: AuthPaths.signUp, builder: (context, state) => const SignUpScreen()),
+      GoRoute(path: AuthPaths.forgotPassword, builder: (context, state) => const ForgotPasswordScreen()),
+      GoRoute(path: AuthPaths.checkEmail, builder: (context, state) => const CheckEmailScreen()),
       StatefulShellRoute.indexedStack(
         builder: (context, state, shell) => AppShell(shell: shell),
         branches: [
@@ -121,7 +140,13 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [GoRoute(path: AppTab.assistant.path, builder: (context, state) => const AssistantScreen())],
           ),
           StatefulShellBranch(
-            routes: [GoRoute(path: AppTab.profile.path, builder: (context, state) => const ProfileScreen())],
+            routes: [
+              GoRoute(
+                path: AppTab.profile.path,
+                builder: (context, state) => const ProfileScreen(),
+                routes: [GoRoute(path: 'edit', builder: (context, state) => const EditProfileScreen())],
+              ),
+            ],
           ),
         ],
       ),
