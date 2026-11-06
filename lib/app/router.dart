@@ -15,7 +15,9 @@ import 'package:chocomousse/features/discover/presentation/discover_screen.dart'
 import 'package:chocomousse/features/flights/presentation/flights_screen.dart';
 import 'package:chocomousse/features/hotels/presentation/hotel_details_screen.dart';
 import 'package:chocomousse/features/hotels/presentation/hotels_screen.dart';
+import 'package:chocomousse/features/itinerary/data/plan_models.dart';
 import 'package:chocomousse/features/itinerary/presentation/build_plan_screen.dart';
+import 'package:chocomousse/features/itinerary/presentation/change_offer_screen.dart';
 import 'package:chocomousse/features/itinerary/presentation/itinerary_screen.dart';
 import 'package:chocomousse/features/plans/presentation/plans_screen.dart';
 import 'package:chocomousse/features/ranking/data/ranking_models.dart';
@@ -155,6 +157,16 @@ final routerProvider = Provider<GoRouter>((ref) {
                       day: int.tryParse(state.uri.queryParameters['day'] ?? ''),
                     ),
                     routes: [
+                      GoRoute(
+                        path: 'change/:kind',
+                        redirect: (context, state) => OfferKind.parse(state.pathParameters['kind']) == null
+                            ? '/plans/${state.pathParameters['planId']}'
+                            : null,
+                        builder: (context, state) => ChangeOfferScreen(
+                          planId: state.pathParameters['planId']!,
+                          kind: OfferKind.parse(state.pathParameters['kind'])!,
+                        ),
+                      ),
                       // Place details inside the Plans tab, so Back returns to the day (plan decision 6).
                       GoRoute(
                         path: 'place/:placeId',

@@ -10,6 +10,7 @@ import 'package:chocomousse/features/destination/presentation/widgets/offers.dar
 import 'package:chocomousse/features/itinerary/application/plan_providers.dart';
 import 'package:chocomousse/features/itinerary/data/plan_models.dart';
 import 'package:chocomousse/features/itinerary/data/plan_repository.dart';
+import 'package:chocomousse/features/itinerary/presentation/change_offer_screen.dart';
 import 'package:chocomousse/features/itinerary/presentation/plan_why_view.dart';
 import 'package:chocomousse/features/itinerary/presentation/widgets/day_view.dart';
 import 'package:chocomousse/features/itinerary/presentation/widgets/plan_texts.dart';
@@ -87,8 +88,6 @@ class PlanView extends ConsumerWidget {
     }
   }
 
-  void _change(BuildContext context, OfferKind kind) => context.push('/plans/${plan.id}/change/${kind.name}');
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final wide = MediaQuery.sizeOf(context).width >= kWideLayoutBreakpoint;
@@ -99,7 +98,7 @@ class PlanView extends ConsumerWidget {
     final header = PlanHeader(plan: plan);
     final trip = TripCard(
       plan: plan,
-      onChange: (kind) => _change(context, kind),
+      onChange: (kind) => openChange(context, plan, kind),
       onWhy: () => unawaited(showPlanWhy(context, plan)),
     );
     final notes = [

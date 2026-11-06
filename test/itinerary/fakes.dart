@@ -74,6 +74,7 @@ Map<String, Object?> planJson({
   bool withCar = false,
   bool withFlight = true,
   String hotelId = 'bk:1',
+  String hotelName = 'Hotel Artemide',
   List<String> notes = const ['The time from the airport to the hotel is estimated at 45 minutes.'],
   List<String> warnings = const [],
   num? overBudgetBy,
@@ -106,7 +107,7 @@ Map<String, Object?> planJson({
     ],
   },
   'hotel': {
-    'offer': {...hotelJson(id: hotelId, total: 612, perNight: 153), 'match': matchJson()},
+    'offer': {...hotelJson(id: hotelId, name: hotelName, total: 612, perNight: 153), 'match': matchJson()},
     'checkedAt': '2027-04-01T10:02:00Z',
   },
   'flight': withFlight
@@ -269,6 +270,7 @@ class FakePlanRepository implements PlanRepository {
         status: current.status.name,
         withCar: current.car != null,
         hotelId: current.hotel?.offer.id ?? 'bk:1',
+        hotelName: current.hotel?.offer.name ?? 'Hotel Artemide',
       ),
     );
     return _plans[id] = Plan.fromJson({...json, 'updatedAt': DateTime.now().toUtc().toIso8601String()});
@@ -341,7 +343,16 @@ class FakePlanRepository implements PlanRepository {
     calls.add('swap $id ${kind.name} $offerId');
     _fail();
     return switch (kind) {
-      OfferKind.hotel => _change(id, (j) => planJson(id: id, hotelId: offerId, name: j['name']! as String)),
+      OfferKind.hotel => _change(
+        id,
+        (j) => planJson(
+          id: id,
+          hotelId: offerId,
+          hotelName: offerId == 'bk:2' ? 'Hotel Santa Maria' : 'Hotel Artemide',
+          withCar: j['car'] != null,
+          name: j['name']! as String,
+        ),
+      ),
       OfferKind.car => _change(id, (j) => {...planJson(id: id, withCar: true, name: j['name']! as String)}),
       OfferKind.flight => _change(id, (j) => j),
     };

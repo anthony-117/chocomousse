@@ -10,6 +10,7 @@ import 'package:chocomousse/features/destination/data/preferences.dart';
 import 'package:chocomousse/features/destination/presentation/place_details_screen.dart';
 import 'package:chocomousse/features/itinerary/data/plan_models.dart';
 import 'package:chocomousse/features/itinerary/data/plan_repository.dart';
+import 'package:chocomousse/features/itinerary/presentation/change_offer_screen.dart';
 import 'package:chocomousse/features/itinerary/presentation/widgets/day_view.dart';
 import 'package:chocomousse/features/system/data/system_api.dart';
 import 'package:dio/dio.dart';
@@ -319,6 +320,108 @@ void main() {
 
       expect(app.location, '/plans');
       expect(app.plans.calls, isNot(contains('build')));
+    });
+  });
+
+  group('Change hotel, flight or car (I4)', () {
+    testWidgets('lists the kept hotels with the plan one marked, and swapping rebuilds the plan', (tester) async {
+      usePhoneSize(tester, height: 2000);
+      final app = PlanApp(tester);
+      await app.open('/plans/p1');
+
+      await app.tap(find.text('Change').at(1));
+
+      expect(find.byType(ChangeOfferScreen), findsOneWidget);
+      expect(find.text('Change hotel'), findsOneWidget);
+      expect(find.text('Ranked by your preferences · 2 hotels'), findsOneWidget);
+      expect(
+        find.text('Choosing a hotel rebuilds the days around it. Same search, so nothing new is searched.'),
+        findsOneWidget,
+      );
+      expect(find.text('HOTEL · 4★ · IN YOUR PLAN'), findsOneWidget);
+      expect(find.text('Cheapest, quiet streets'), findsOneWidget);
+
+      await app.tapText('Hotel Santa Maria');
+
+      expect(app.location, '/plans/p1');
+      expect(find.text('Hotel Santa Maria'), findsOneWidget);
+      expect(app.plans.calls, ['plan p1', 'hotels p1', 'swap p1 hotel bk:2']);
+    });
+
+    testWidgets('picking the plan own hotel changes nothing', (tester) async {
+      usePhoneSize(tester, height: 2000);
+      final app = PlanApp(tester);
+      await app.open('/plans/p1/change/hotel');
+
+      await app.tapText('Hotel Artemide');
+
+      expect(app.plans.calls, isNot(contains(startsWith('swap'))));
+    });
+
+    testWidgets('adds a car, then removes it', (tester) async {
+      usePhoneSize(tester, height: 2000);
+      final app = PlanApp(tester);
+      await app.open('/plans/p1');
+
+      await app.tapText('Add');
+      expect(find.text('Add a car'), findsOneWidget);
+      await app.tapText('Fiat 600 · Budget');
+
+      expect(app.location, '/plans/p1');
+      expect(find.text('No car'), findsNothing);
+      expect(find.text('Fiat 600 · Budget'), findsOneWidget);
+
+      await app.tap(find.text('Change').last);
+      expect(find.text('Change car'), findsOneWidget);
+      await app.tapText('Remove car');
+
+      expect(find.text('No car'), findsOneWidget);
+      expect(app.plans.calls, containsAllInOrder(['swap p1 car bk:car:1', 'remove car p1']));
+    });
+
+    testWidgets('a failed swap shows Try again and keeps the plan', (tester) async {
+      usePhoneSize(tester, height: 2000);
+      final app = PlanApp(tester);
+      await app.open('/plans/p1/change/hotel');
+
+      app.plans.failWith = DioException(requestOptions: RequestOptions(), type: DioExceptionType.connectionError);
+      await app.tapText('Hotel Santa Maria');
+
+      expect(find.text('Cannot reach the TravelGenie server.'), findsOneWidget);
+      expect(app.plans.saved('p1').hotel!.offer.name, 'Hotel Artemide');
+
+      await app.tapText('Try again');
+      expect(app.plans.saved('p1').hotel!.offer.name, 'Hotel Santa Maria');
+    });
+
+    testWidgets('a failed list shows Try again', (tester) async {
+      usePhoneSize(tester, height: 2000);
+      final plans = FakePlanRepository();
+      final app = PlanApp(tester, plans: plans);
+      await app.open('/plans/p1');
+      plans.failWith = DioException(requestOptions: RequestOptions(), type: DioExceptionType.connectionError);
+
+      await app.tap(find.text('Change').first);
+
+      expect(find.text('Cannot reach the TravelGenie server.'), findsOneWidget);
+      await app.tapText('Try again');
+      expect(find.text('Change flight'), findsOneWidget);
+      expect(find.text('FLIGHT · DIRECT · IN YOUR PLAN'), findsOneWidget);
+    });
+
+    testWidgets('opens as a dialog on wide screens', (tester) async {
+      useDesktopSize(tester);
+      final app = PlanApp(tester);
+      await app.open('/plans/p1');
+
+      await app.tap(find.text('Change').at(1));
+
+      expect(find.byType(Dialog), findsOneWidget);
+      expect(app.location, '/plans/p1');
+      await app.tapText('Hotel Santa Maria');
+
+      expect(find.byType(Dialog), findsNothing);
+      expect(find.text('Hotel Santa Maria'), findsOneWidget);
     });
   });
 
