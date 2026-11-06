@@ -19,7 +19,7 @@ import 'package:chocomousse/features/itinerary/data/plan_models.dart';
 import 'package:chocomousse/features/itinerary/presentation/build_plan_screen.dart';
 import 'package:chocomousse/features/itinerary/presentation/change_offer_screen.dart';
 import 'package:chocomousse/features/itinerary/presentation/itinerary_screen.dart';
-import 'package:chocomousse/features/plans/presentation/plans_screen.dart';
+import 'package:chocomousse/features/itinerary/presentation/my_plans_screen.dart';
 import 'package:chocomousse/features/ranking/data/ranking_models.dart';
 import 'package:chocomousse/features/ranking/presentation/best_for_you_screen.dart';
 import 'package:chocomousse/features/ranking/presentation/plan_trip_screen.dart';
@@ -141,7 +141,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             routes: [
               GoRoute(
                 path: AppTab.plans.path,
-                builder: (context, state) => const PlansScreen(),
+                builder: (context, state) => const MyPlansScreen(),
                 routes: [
                   GoRoute(
                     path: 'new',
