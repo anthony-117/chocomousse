@@ -10,6 +10,7 @@ import 'package:chocomousse/features/destination/data/preferences.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/trip_chips.dart';
 import 'package:chocomousse/features/flights/presentation/widgets/departure_city_field.dart';
+import 'package:chocomousse/features/ranking/presentation/widgets/pace_choice.dart';
 import 'package:chocomousse/features/ranking/presentation/widgets/preferences_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -49,6 +50,7 @@ class _EditProfileFormState extends ConsumerState<_EditProfileForm> {
   late String _currency = widget.profile.homeCurrency;
   late HomeCity? _city = widget.profile.homeCity;
   late Preferences _preferences = widget.profile.preferences;
+  late Pace _pace = widget.profile.pace;
   Map<String, String> _fieldErrors = const {};
   String? _error;
   bool _saving = false;
@@ -79,6 +81,7 @@ class _EditProfileFormState extends ConsumerState<_EditProfileForm> {
               homeCurrency: _currency,
               homeCityId: _city?.id,
               preferences: _preferences,
+              pace: _pace,
             ),
           );
       ref.read(profileSeederProvider).apply(saved);
@@ -167,6 +170,8 @@ class _EditProfileFormState extends ConsumerState<_EditProfileForm> {
             level: _preferences.of(criterion),
             onChanged: (level) => setState(() => _preferences = _preferences.withLevel(criterion, level)),
           ),
+        const SizedBox(height: AppSpacing.md),
+        PaceChoice(value: _pace, onChanged: (pace) => setState(() => _pace = pace)),
         const SizedBox(height: AppSpacing.xl),
         FilledButton(
           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52), shape: const StadiumBorder()),

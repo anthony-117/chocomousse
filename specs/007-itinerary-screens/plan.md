@@ -2,7 +2,7 @@
 
 **Branch**: `007-itinerary-screens` | **Date**: 2026-11-06 | **Spec**: [spec.md](spec.md)
 
-**Status**: Draft, for the owner's approval
+**Status**: Approved by the owner on 2026-11-06
 
 ## Summary
 

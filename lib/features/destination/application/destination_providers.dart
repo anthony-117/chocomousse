@@ -15,6 +15,7 @@ class TripSettings {
     this.adults = defaultAdults,
     this.driverAge = defaultDriverAge,
     this.preferences = const Preferences(),
+    this.pace = Pace.balanced,
   });
 
   /// The hotels API's default; flights always search for one adult.
@@ -38,6 +39,9 @@ class TripSettings {
   /// What matters to the traveller, for weighted search (spec 005).
   final Preferences preferences;
 
+  /// How full the itinerary's days are (spec 007).
+  final Pace pace;
+
   int get nights => to.difference(from).inDays;
 
   TripSettings copyWith({
@@ -48,6 +52,7 @@ class TripSettings {
     int? adults,
     int? driverAge,
     Preferences? preferences,
+    Pace? pace,
   }) => TripSettings(
     passport: passport ?? this.passport,
     currency: currency ?? this.currency,
@@ -56,6 +61,7 @@ class TripSettings {
     adults: adults ?? this.adults,
     driverAge: driverAge ?? this.driverAge,
     preferences: preferences ?? this.preferences,
+    pace: pace ?? this.pace,
   );
 }
 
@@ -87,6 +93,8 @@ class TripSettingsNotifier extends Notifier<TripSettings> {
       state = state.copyWith(driverAge: age.clamp(TripSettings.minDriverAge, TripSettings.maxDriverAge));
 
   void setPreferences(Preferences preferences) => state = state.copyWith(preferences: preferences);
+
+  void setPace(Pace pace) => state = state.copyWith(pace: pace);
 }
 
 final tripSettingsProvider = NotifierProvider<TripSettingsNotifier, TripSettings>(TripSettingsNotifier.new);

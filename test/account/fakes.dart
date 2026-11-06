@@ -17,13 +17,20 @@ const confirmedUser = AuthUser(
 );
 
 /// A profile matching the app's defaults, so seeding it changes nothing in tests about other features.
-Profile defaultProfile({String? passport, String? currency, HomeCity? city, Preferences? preferences}) => Profile(
+Profile defaultProfile({
+  String? passport,
+  String? currency,
+  HomeCity? city,
+  Preferences? preferences,
+  Pace pace = Pace.balanced,
+}) => Profile(
   displayName: 'Sam Haddad',
   email: 'sam@example.com',
   passport: passport ?? Env.defaultPassport,
   homeCurrency: currency ?? Env.defaultCurrency,
   homeCity: city,
   preferences: preferences ?? const Preferences(),
+  pace: pace,
 );
 
 /// Sign-in that answers from memory. [failWith] makes the next call fail.

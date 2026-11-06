@@ -30,6 +30,7 @@ class Profile {
     required this.homeCurrency,
     required this.homeCity,
     required this.preferences,
+    this.pace = Pace.balanced,
   });
 
   /// The API's weights are read as levels; one the app never sends reads as Medium.
@@ -48,6 +49,7 @@ class Profile {
       homeCurrency: json['homeCurrency']! as String,
       homeCity: city == null ? null : HomeCity.fromJson(city),
       preferences: preferences,
+      pace: Pace.parse(json['pace'] as String?),
     );
   }
 
@@ -57,6 +59,7 @@ class Profile {
   final String homeCurrency;
   final HomeCity? homeCity;
   final Preferences preferences;
+  final Pace pace;
 
   String get initial => displayName.trim().isEmpty ? '?' : displayName.trim()[0].toUpperCase();
 }
@@ -70,6 +73,7 @@ class ProfileForm {
     required this.homeCurrency,
     required this.homeCityId,
     required this.preferences,
+    this.pace = Pace.balanced,
   });
 
   factory ProfileForm.of(Profile p) => ProfileForm(
@@ -78,6 +82,7 @@ class ProfileForm {
     homeCurrency: p.homeCurrency,
     homeCityId: p.homeCity?.id,
     preferences: p.preferences,
+    pace: p.pace,
   );
 
   final String displayName;
@@ -85,6 +90,7 @@ class ProfileForm {
   final String homeCurrency;
   final String? homeCityId;
   final Preferences preferences;
+  final Pace pace;
 
   Map<String, Object?> toJson() => {
     'displayName': displayName.trim(),
@@ -92,6 +98,7 @@ class ProfileForm {
     'homeCurrency': homeCurrency,
     'homeCityId': homeCityId,
     'preferences': {for (final c in Criterion.values) c.name: preferences.of(c).weight},
+    'pace': pace.name,
   };
 }
 

@@ -4,7 +4,7 @@
 
 **Created**: 2026-11-06
 
-**Status**: Draft, for the owner's approval. Design: Figma page "Sprint 4 — Accounts & itinerary", I0–I6 and W4, approved 2026-11-06
+**Status**: Approved by the owner on 2026-11-06. Design: Figma page "Sprint 4 — Accounts & itinerary", I0–I6 and W4, approved 2026-11-06
 
 **Input**: User description: "TG-10: As Fares, I want a complete day-by-day plan built from my preferences, so I can see my whole trip, change the hotel, flight or car, and keep my plans." The API is built in `pamplemousse` on `008-itinerary` (PR #20): [spec](https://github.com/anthony-117/pamplemousse/blob/008-itinerary/specs/008-itinerary/spec.md), [contract](https://github.com/anthony-117/pamplemousse/blob/008-itinerary/specs/008-itinerary/contracts/itinerary-api.md).
 
@@ -15,7 +15,7 @@ only shows them and sends the traveller's choices. This spec says how the app do
 
 ### Session 2026-11-06
 
-Proposed with the spec; the owner confirms or changes each one.
+Confirmed by the owner with the spec on 2026-11-06.
 
 - Q: Where does a plan start? → A: A "Build my plan" button at the bottom of Best for you (on each of its tabs) and on the overview's Plan your trip row (Figma note under I1). It sends the trip settings as they are: destination, dates, adults, currency, departure city, the six preferences, pace and trip budget.
 - Q: Where is Pace set? → A: On Plan your trip (I0), below the six sliders, and in Edit profile (P2) under Default preferences. It is part of the trip settings, filled once from the profile after sign-in, like the preferences. It changes the itinerary only, never the rankings.

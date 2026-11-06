@@ -6,6 +6,7 @@ import 'package:chocomousse/features/destination/application/destination_provide
 import 'package:chocomousse/features/destination/data/preferences.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
 import 'package:chocomousse/features/ranking/data/ranking_models.dart';
+import 'package:chocomousse/features/ranking/presentation/widgets/pace_choice.dart';
 import 'package:chocomousse/features/ranking/presentation/widgets/preferences_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,10 +27,13 @@ class PlanTripScreen extends ConsumerStatefulWidget {
 
 class _PlanTripScreenState extends ConsumerState<PlanTripScreen> {
   late Preferences _draft = ref.read(tripSettingsProvider).preferences;
+  late Pace _pace = ref.read(tripSettingsProvider).pace;
   bool _budgetValid = true;
 
   void _find() {
-    ref.read(tripSettingsProvider.notifier).setPreferences(_draft);
+    ref.read(tripSettingsProvider.notifier)
+      ..setPreferences(_draft)
+      ..setPace(_pace);
     final returnTo = widget.returnTo;
     if (returnTo != null && context.canPop()) {
       context.pop();
@@ -80,6 +84,8 @@ class _PlanTripScreenState extends ConsumerState<PlanTripScreen> {
                     _budgetValid = budgetValid;
                   }),
                 ),
+                const SizedBox(height: AppSpacing.xl),
+                PaceChoice(value: _pace, onChanged: (pace) => setState(() => _pace = pace)),
                 const SizedBox(height: AppSpacing.xl),
                 SizedBox(
                   width: double.infinity,

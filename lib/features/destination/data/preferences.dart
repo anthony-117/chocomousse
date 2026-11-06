@@ -15,6 +15,21 @@ enum Level {
   static Level? ofWeight(int weight) => values.where((l) => l.weight == weight).firstOrNull;
 }
 
+/// How full the itinerary's days are (API spec 008, FR-006). It shapes the plan only; rankings ignore it.
+enum Pace {
+  relaxed('Relaxed', 2),
+  balanced('Balanced', 3),
+  packed('Packed', 4);
+
+  Pace(this.label, this.placesPerDay);
+
+  final String label;
+  final int placesPerDay;
+
+  /// The API's value, "relaxed", "balanced" or "packed"; anything else is Balanced.
+  static Pace parse(String? value) => values.asNameMap()[value] ?? balanced;
+}
+
 /// The six preferences weighted search ranks on. The names are the API's values.
 enum Criterion {
   budget('Budget'),

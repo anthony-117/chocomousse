@@ -72,7 +72,8 @@ class ProfileSeeder {
     trip
       ..setPassport(profile.passport)
       ..setCurrency(profile.homeCurrency)
-      ..setPreferences(Preferences(levels: profile.preferences.levels, tripBudget: budget));
+      ..setPreferences(Preferences(levels: profile.preferences.levels, tripBudget: budget))
+      ..setPace(profile.pace);
 
     final city = profile.homeCity;
     if (city != null && _ref.read(departureCityProvider)?.id != city.id) {
