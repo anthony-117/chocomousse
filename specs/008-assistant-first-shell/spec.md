@@ -56,6 +56,7 @@ This spec is the app side of step 1. The backend side is a new pamplemousse spec
 - Q: Where do a card's details open? → A: In a right-hand **side panel** with an icon bar on top, one icon per pane, modelled on the Claude Code desktop side panel. Panes: **Trip** (the chat's trip, preferences, pace and budget, each editable, and the chat's outputs: plans built, items found, items saved), **Plan** (W2's plan panel), **Details** (the tapped hotel, flight, car, place or event, with Add to plan and bookmark), **Map** (everything found in this chat and the plan's days) and **Saved** (the account's saved items). On narrow screens the same panes open in a sheet. The chat stays visible on web.
 - Q: The approved v1.0 Figma only has the Plan pane (W2, M3); who designs the other panes? → A: Claude drafts the side panel's frames (Trip, Details, Map, Saved; web and mobile; light and dark) in the v1.0 Figma file; the owner reviews and approves them before this spec's plan (constitution IV).
 - Q: What can be saved? → A: Hotels, places and events. Flights and cars are not saved (their prices change by the hour); they are kept in plans.
+- Q: The approved Trip pane has "Rebuild plan"; is it in this spec? → A: Yes (owner, 2026-11-10): it rebuilds the open plan in place with the Trip pane's values, through the rebuild route of pamplemousse spec 010.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -286,7 +287,7 @@ dark; switch Appearance and check it is kept after a restart.
 - **FR-017**: The app MUST render these card kinds from the data in the reply, without another request: plan (PlanCard), flight (ResultRow), hotel (MediaCard), car (ResultRow), place (MediaCard), event (MediaCard), travel facts (rows). Each ranked item MUST show its match badge ("92% match"); its reason MUST show on tap or hover.
 - **FR-018**: Each card MUST open its details in the side panel's Details pane (FR-019); each group MUST offer "See all N" into the existing list screen with the same search.
 - **FR-019**: The app MUST have a side panel to the right of the chat on wide screens, and the same content in a sheet over the chat on narrow screens (and on web below the wide breakpoint). An icon bar at its top MUST switch between five panes, with close; the chat MUST stay visible and scrollable beside it on wide screens. The panel opens on the pane the traveller asked for (a card → Details, a plan card → Plan) and remembers the last pane per chat.
-  - **Trip**: the chat's trip (city, dates, adults, departure city), preferences, pace and trip budget, each editable in place (the same values as the composer chips, FR-012); below them, this chat's outputs: plans built, items found by kind with their counts, and items saved, each opening its pane.
+  - **Trip**: the chat's trip (city, dates, adults, departure city), preferences, pace and trip budget, each editable in place (the same values as the composer chips, FR-012), and "Rebuild plan", which rebuilds the open plan in place with the values shown (pamplemousse spec 010 FR-012a); below them, this chat's outputs: plans built, items found by kind with their counts, and items saved, each opening its pane.
   - **Plan**: the plan as spec 007's itinerary shows it and as W2 draws it (summary tiles, Days/Hotel/Flight/Car/Map/Costs tabs, day chips, day items with their swap icon), with Share, ⋯, "Ask to change this day…" and Mark as planned.
   - **Details**: the tapped hotel, flight, car, place or event, with the content of today's details screens, its match and reason, the bookmark (hotels, places and events only, FR-027), and "Add to plan" (or "Swap into plan").
   - **Map**: everything found in this chat and the open plan's days, as pins by kind; tapping a pin opens it in Details.
@@ -329,7 +330,10 @@ dark; switch Appearance and check it is kept after a restart.
 
 ## Backend dependencies
 
-This spec needs a pamplemousse "assistant v2" spec, approved before this spec's plan. What each card needs:
+This spec needs a pamplemousse "assistant v2" spec, approved before this spec's plan. It is pamplemousse spec 010,
+approved by the owner on 2026-11-10: [spec](https://github.com/anthony-117/pamplemousse/blob/010-assistant-v2/specs/010-assistant-v2/spec.md)
+(PR anthony-117/pamplemousse#23). It answers every row below, and adds a rebuild route with a `rebuild_plan` tool,
+`save_item`, and the model provider as a setting. What each card needs:
 
 | App card / feature | Assistant tool it needs | Data in the reply | Exists today? |
 |---|---|---|---|
@@ -370,7 +374,7 @@ than per IP, and the hotels quota when many chats search hotels.
 
 - The traveller is signed in (spec 006); the shell, chats and Saved are per account.
 - The Plan and Details panes reuse the itinerary screens of spec 007 (branch `007-itinerary-screens`), which merges before this is built, and the details screens of specs 001–005.
-- The assistant v2 backend spec is written next and approved before this spec's plan; the reply contract is defined there, and this spec only says what the app shows.
+- The assistant v2 backend spec (pamplemousse spec 010) was approved on 2026-11-10. Its reply contract (the streamed steps, the card payloads and the chat routes) is defined in its plan; this spec only says what the app shows.
 - Newsreader is bundled like Plus Jakarta Sans (both open-source, no cost).
 - Icons follow the design's Lucide-style set; the exact icon source is a plan decision.
 - English only, as today.
