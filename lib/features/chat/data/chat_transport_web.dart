@@ -59,7 +59,7 @@ class FetchChatTransport implements ChatTransport {
     final reader = response.body?.getReader();
     return RawAnswer(
       status: response.status,
-      header: response.headers.get,
+      header: (name) => response.headers.get(name),
       body: reader == null ? const Stream.empty() : _chunks(reader),
     );
   });
