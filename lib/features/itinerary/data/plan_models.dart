@@ -387,6 +387,12 @@ class PlanSummary {
     this.matchPercent,
     this.imageUrl,
     this.updatedAt,
+    this.destinationId,
+    this.adults,
+    this.tripBudget,
+    this.pace = Pace.balanced,
+    this.lat,
+    this.lng,
   });
 
   factory PlanSummary.fromJson(Map<String, dynamic> json) => PlanSummary(
@@ -401,6 +407,12 @@ class PlanSummary {
     matchPercent: json['matchPercent'] as int?,
     imageUrl: json['imageUrl'] as String?,
     updatedAt: _time(json['updatedAt']),
+    destinationId: json['destinationId'] as String?,
+    adults: json['adults'] as int?,
+    tripBudget: json['tripBudget'] as num?,
+    pace: Pace.parse(json['pace'] as String?),
+    lat: (json['lat'] as num?)?.toDouble(),
+    lng: (json['lng'] as num?)?.toDouble(),
   );
 
   final String id;
@@ -414,6 +426,14 @@ class PlanSummary {
   final int? matchPercent;
   final String? imageUrl;
   final DateTime? updatedAt;
+
+  // Added by API spec 010 (plan cards and `GET /plans`); older answers leave them out.
+  final String? destinationId;
+  final int? adults;
+  final num? tripBudget;
+  final Pace pace;
+  final double? lat;
+  final double? lng;
 }
 
 @immutable

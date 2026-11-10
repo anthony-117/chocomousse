@@ -105,10 +105,10 @@ feature's widget tests to pump with `AppTheme.light()`. Commit one feature per t
 
 ### Chat data layer (used by US1, US2, US3, US5, US7)
 
-- [ ] T018 [P] Create `lib/features/chat/data/sse_decoder.dart`:
+- [X] T018 [P] Create `lib/features/chat/data/sse_decoder.dart`:
   - `SseDecoder` is a `StreamTransformer<List<int>, SseEvent>`. It decodes UTF-8 across chunk boundaries, reads `event:` and `data:` lines, joins multi-line data with `\n`, ends an event at a blank line, ignores lines starting with `:`, and accepts `\r\n`.
   - `SseEvent(name, data)`.
-- [ ] T019 [P] Unit tests in `test/features/chat/data/sse_decoder_test.dart`:
+- [X] T019 [P] Unit tests in `test/features/chat/data/sse_decoder_test.dart`:
   - one event per chunk;
   - an event split across 3 chunks;
   - a 2-byte UTF-8 character split across chunks;
@@ -116,39 +116,39 @@ feature's widget tests to pump with `AppTheme.light()`. Commit one feature per t
   - `\r\n`;
   - multi-line data;
   - a trailing event with no blank line is dropped.
-- [ ] T020 Create `lib/features/chat/data/chat_transport.dart`:
+- [X] T020 Create `lib/features/chat/data/chat_transport.dart`:
   - `abstract interface class ChatTransport { Stream<List<int>> post(String path, Map<String, Object?> body); }`.
   - It throws `ChatRefused(statusCode, Map<String,Object?>? problem, Duration? retryAfter)` when the answer is not `200 text/event-stream`.
   - `chatTransportProvider` picks the implementation through the conditional import `chat_transport_io.dart` / `chat_transport_web.dart`.
   - `test/features/chat/fake_chat_transport.dart` yields scripted SSE text, or throws a scripted refusal.
-- [ ] T021 [P] Create `lib/features/chat/data/chat_transport_io.dart`:
+- [X] T021 [P] Create `lib/features/chat/data/chat_transport_io.dart`:
   - It uses `ref.read(dioProvider)` with `Options(responseType: ResponseType.stream, receiveTimeout: Duration.zero, headers: {'Accept': 'text/event-stream'})` and yields `response.data.stream`.
   - A non-200 `DioException` becomes `ChatRefused`, reading the Problem Details body and `Retry-After`.
-- [ ] T022 [P] Create `lib/features/chat/data/chat_transport_web.dart` with `dart:js_interop` (no `package:web`):
+- [X] T022 [P] Create `lib/features/chat/data/chat_transport_web.dart` with `dart:js_interop` (no `package:web`):
   - Declare `@JS('fetch')` external bindings for `Response.status`, `Response.headers.get`, `Response.body.getReader()` and `ReadableStreamDefaultReader.read()` (`{done, value: Uint8Array}`).
   - POST to `'${Env.apiBaseUrl}/api/v1$path'` with headers `Authorization: Bearer ${await ref.read(apiSessionProvider).token()}`, `Content-Type: application/json` and `Accept: text/event-stream`. On a 401 with `code: sign-in-required`, renew the token once (`token(refresh: true)`) and retry, as `AuthInterceptor` does.
   - Yield each chunk's bytes. A non-200 answer becomes `ChatRefused`, from the JSON body.
   - Cancelling the Dart stream calls `reader.cancel()`.
-- [ ] T023 Create `lib/features/chat/data/chat_models.dart` (data-model "Chats"):
+- [X] T023 Create `lib/features/chat/data/chat_models.dart` (data-model "Chats"):
   - `ChatTrip`, `ChatListItem`, `ChatPage` (`items`, `next`, `keepDays`), `Chat` (with `busy` and `expiresAt`), `ChatMessage` (role traveller or assistant, `text`, `about`, `steps`, `cards`, `suggestions`, `warnings`, `planChanged`, `at`, and app-only `notSent`), `MessageAbout` (`planId`, `day?`, `itemId?`), `ToolStep` (`tool`, `summary`, `ok`, `total?`, `cards`), `ChatSearchResult` (`chats`, `plans`) and `ChatRequest` (`text`, "1–1,000 characters after trimming", `trip?`, `preferences?`, `pace?`, `about?`, with `toJson` omitting nulls).
   - Every model gets a hand-written `fromJson`.
-- [ ] T024 Create `lib/features/chat/data/cards.dart`:
+- [X] T024 Create `lib/features/chat/data/cards.dart`:
   - `sealed class AssistantCard` with the envelope fields (`id`, `lat`, `lng`, `approximate`, `foundAt`) and `raw` (the card's JSON, kept for saving).
   - Subclasses: `PlanCard(PlanSummary)`, `FlightCard(FlightFare, Match?)`, `HotelCard(HotelOffer, Match?)`, `CarCard(CarOffer, Match?)`, `PlaceCard(Place)`, `EventCard(TravelEvent, location?)` and `FactsCard(TravelFacts)`.
   - `static AssistantCard? fromJson`. It returns null for an unknown `kind`, or when the item fails to parse (catch the `TypeError` and `FormatException` only).
   - Create `TravelFacts` with `destination`, `from`, `to`, `weather?`, `visa?`, `currency?`, `safety?` and `holidays`, reusing the destination feature's `ExchangeRate`, `VisaRequirement`, `TravelAdvisory` and `Holiday` where their fields match the contract, else small new classes in the same file.
   - Add `PlanSummary`'s new fields (`destinationId`, `adults`, `tripBudget?`, `pace`, `lat`, `lng`) in `lib/features/itinerary/data/plan_models.dart`.
-- [ ] T025 Create `lib/features/chat/data/chat_events.dart`: `sealed ChatEvent` with `ChatStarted(chatId, title?, messageId)`, `StepDone(ToolStep)`, `AnswerDone(ChatMessage)` and `AnswerFailed(warning)`. `ChatEvent? fromSse(SseEvent)` returns null for an unknown name.
-- [ ] T026 Create `lib/features/chat/data/chat_repository.dart` (`chatRepositoryProvider`):
+- [X] T025 Create `lib/features/chat/data/chat_events.dart`: `sealed ChatEvent` with `ChatStarted(chatId, title?, messageId)`, `StepDone(ToolStep)`, `AnswerDone(ChatMessage)` and `AnswerFailed(warning)`. `ChatEvent? fromSse(SseEvent)` returns null for an unknown name.
+- [X] T026 Create `lib/features/chat/data/chat_repository.dart` (`chatRepositoryProvider`):
   - `list({String? before, int limit = 30})` (limit 1–100), `get(id)`, `rename(id, title)` (title "1–40 characters after trimming"), `delete(id)`, `search(q)` ("q is 2–100 characters"), and `send({String? chatId, required ChatRequest request}) → Stream<ChatEvent>`. `send` posts `/assistant/chats` without an id, and `/assistant/chats/{id}/messages` with one.
   - It maps refusals to `ChatFailure` subclasses: `ChatBusy` (409 `chat-busy`), `ChatFull` (409 `chat-full`, with the API's message), `ChatNotFound` (404), `TooManyMessages(retryAfter)` (429) and `FieldError(field)` (400).
   - A 30 s watchdog with no byte ends the stream with `AnswerFailed('The connection was lost. Try again.')`. So does a stream that ends without `final` or `error`.
-- [ ] T027 [P] Unit tests in `test/features/chat/data/chat_models_test.dart` and `cards_test.dart`:
+- [X] T027 [P] Unit tests in `test/features/chat/data/chat_models_test.dart` and `cards_test.dart`:
   - every field of every model and card kind, using the contract's examples;
   - an unknown `kind` and a broken item are skipped;
   - a null `match` stays null;
   - `approximate` is read.
-- [ ] T028 [P] Unit tests in `test/features/chat/data/chat_repository_test.dart`:
+- [X] T028 [P] Unit tests in `test/features/chat/data/chat_repository_test.dart`:
   - each route's path and body;
   - each failure code;
   - the event order chat → steps → final;
