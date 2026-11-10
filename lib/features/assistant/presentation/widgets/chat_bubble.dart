@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/assistant/data/assistant_models.dart';
 import 'package:flutter/material.dart';
@@ -28,8 +29,8 @@ class ChatBubble extends StatelessWidget {
         constraints: BoxConstraints(maxWidth: maxWidth),
         child: DecoratedBox(
           decoration: BoxDecoration(
-            color: traveller ? AppColors.primary : AppColors.surface,
-            border: traveller ? null : Border.all(color: AppColors.border),
+            color: traveller ? context.palette.brandPrimary : context.palette.bgSurface,
+            border: traveller ? null : Border.all(color: context.palette.borderDefault),
             borderRadius: BorderRadius.only(
               topLeft: corner,
               topRight: corner,
@@ -55,8 +56,10 @@ class _BubbleText extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.bodyMedium
-        ?.copyWith(color: role == ChatRole.traveller ? AppColors.onPrimary : AppColors.text, height: 1.4);
+    final style = Theme.of(context).textTheme.bodyMedium?.copyWith(
+      color: role == ChatRole.traveller ? context.palette.brandOnPrimary : context.palette.textPrimary,
+      height: 1.4,
+    );
     return SelectableText(text, style: style);
   }
 }
@@ -85,10 +88,10 @@ class _Dot extends StatelessWidget {
   const _Dot();
 
   @override
-  Widget build(BuildContext context) => const SizedBox.square(
+  Widget build(BuildContext context) => SizedBox.square(
     dimension: 6,
     child: DecoratedBox(
-      decoration: BoxDecoration(color: AppColors.muted, shape: BoxShape.circle),
+      decoration: BoxDecoration(color: context.palette.textSecondary, shape: BoxShape.circle),
     ),
   );
 }
@@ -123,7 +126,7 @@ class ReplyWarnings extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.muted);
+    final style = Theme.of(context).textTheme.bodySmall?.copyWith(color: context.palette.textSecondary);
     return Padding(
       padding: const EdgeInsets.only(left: AppSpacing.sm),
       child: Column(
@@ -133,7 +136,7 @@ class ReplyWarnings extends StatelessWidget {
             Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Icon(Icons.info_outline, size: 14, color: AppColors.muted),
+                Icon(Icons.info_outline, size: 14, color: context.palette.textSecondary),
                 const SizedBox(width: AppSpacing.xs),
                 Flexible(child: Text(warning, style: style)),
               ],
@@ -153,7 +156,7 @@ class NotSentNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.danger);
+    final style = Theme.of(context).textTheme.bodySmall?.copyWith(color: context.palette.statusDanger);
     return Align(
       alignment: Alignment.centerRight,
       child: Wrap(

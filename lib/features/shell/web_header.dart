@@ -1,4 +1,5 @@
 import 'package:chocomousse/app/router.dart';
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/app_logo.dart';
 import 'package:flutter/material.dart';
@@ -16,9 +17,9 @@ class WebHeader extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 18),
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        border: Border(bottom: BorderSide(color: AppColors.border)),
+      decoration: BoxDecoration(
+        color: context.palette.bgSurface,
+        border: Border(bottom: BorderSide(color: context.palette.borderDefault)),
       ),
       child: Row(
         children: [
@@ -42,10 +43,12 @@ class WebHeader extends StatelessWidget {
               onTap: () => onSelect(AppTab.profile),
               child: CircleAvatar(
                 radius: 20,
-                backgroundColor: current == AppTab.profile ? AppColors.primary : AppColors.primarySoft,
+                backgroundColor: current == AppTab.profile
+                    ? context.palette.brandPrimary
+                    : context.palette.brandPrimarySoft,
                 child: Icon(
                   Icons.person_outline,
-                  color: current == AppTab.profile ? AppColors.onPrimary : AppColors.primary,
+                  color: current == AppTab.profile ? context.palette.brandOnPrimary : context.palette.brandPrimary,
                 ),
               ),
             ),
@@ -72,10 +75,13 @@ class _HeaderLink extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: 10),
         decoration: BoxDecoration(
-          color: selected ? AppColors.primarySoft : Colors.transparent,
+          color: selected ? context.palette.brandPrimarySoft : Colors.transparent,
           borderRadius: BorderRadius.circular(AppRadius.full),
         ),
-        child: Text(label, style: style?.copyWith(color: selected ? AppColors.primary : AppColors.muted)),
+        child: Text(
+          label,
+          style: style?.copyWith(color: selected ? context.palette.brandPrimary : context.palette.textSecondary),
+        ),
       ),
     );
   }

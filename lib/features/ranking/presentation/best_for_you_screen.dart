@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
@@ -111,9 +112,9 @@ class _BestForYouScreenState extends ConsumerState<BestForYouScreen> {
                 width: 360,
                 padding: const EdgeInsets.all(AppSpacing.xl),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: context.palette.bgSurface,
                   borderRadius: BorderRadius.circular(AppRadius.lg),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: context.palette.borderDefault),
                 ),
                 child: PreferencesForm(
                   value: _draft ?? trip.preferences,

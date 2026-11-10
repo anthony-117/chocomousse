@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/shell/floating_nav.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +43,7 @@ class SoftCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.xl),
-      decoration: BoxDecoration(color: AppColors.canvas, borderRadius: BorderRadius.circular(AppRadius.lg)),
+      decoration: BoxDecoration(color: context.palette.bgApp, borderRadius: BorderRadius.circular(AppRadius.lg)),
       child: child,
     );
   }
@@ -65,8 +66,8 @@ class EmptyState extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 28,
-            backgroundColor: AppColors.primarySoft,
-            child: Icon(icon, color: AppColors.primary, size: 28),
+            backgroundColor: context.palette.brandPrimarySoft,
+            child: Icon(icon, color: context.palette.brandPrimary, size: 28),
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(title, style: textTheme.titleMedium, textAlign: TextAlign.center),

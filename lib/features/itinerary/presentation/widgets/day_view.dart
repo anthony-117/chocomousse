@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/skeleton.dart';
 import 'package:chocomousse/features/itinerary/data/plan_models.dart';
@@ -53,7 +54,7 @@ class DayList extends StatelessWidget {
         children: [
           for (final day in days)
             Material(
-              color: day.number == selected ? AppColors.primarySoft : Colors.transparent,
+              color: day.number == selected ? context.palette.brandPrimarySoft : Colors.transparent,
               borderRadius: BorderRadius.circular(AppRadius.md),
               child: InkWell(
                 borderRadius: BorderRadius.circular(AppRadius.md),
@@ -69,7 +70,9 @@ class DayList extends StatelessWidget {
                             Text(
                               dayLabel(day),
                               style: textTheme.labelSmall?.copyWith(
-                                color: day.number == selected ? AppColors.primary : AppColors.muted,
+                                color: day.number == selected
+                                    ? context.palette.brandPrimary
+                                    : context.palette.textSecondary,
                               ),
                             ),
                             Text(dayTopic(day), style: textTheme.titleSmall),
@@ -148,13 +151,13 @@ class TripItemRow extends StatelessWidget {
                   Positioned(
                     top: first ? 6 : 0,
                     bottom: 0,
-                    child: Container(width: 2, color: AppColors.border),
+                    child: Container(width: 2, color: context.palette.borderDefault),
                   ),
                   Container(
                     margin: const EdgeInsets.only(top: 2),
                     width: 10,
                     height: 10,
-                    decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: context.palette.brandPrimary, shape: BoxShape.circle),
                   ),
                 ],
               ),
@@ -168,7 +171,7 @@ class TripItemRow extends StatelessWidget {
                   children: [
                     Text(
                       item.name,
-                      style: textTheme.titleSmall?.copyWith(color: onTap == null ? null : AppColors.text),
+                      style: textTheme.titleSmall?.copyWith(color: onTap == null ? null : context.palette.textPrimary),
                     ),
                     const SizedBox(height: 2),
                     Text(itemDetails(item, first: first), style: textTheme.bodySmall),
@@ -176,7 +179,7 @@ class TripItemRow extends StatelessWidget {
                 ),
               ),
             ),
-            if (onTap != null) const Icon(Icons.chevron_right, size: 18, color: AppColors.muted),
+            if (onTap != null) Icon(Icons.chevron_right, size: 18, color: context.palette.textSecondary),
           ],
         ),
       ),

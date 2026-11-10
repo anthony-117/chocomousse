@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/skeleton.dart';
 import 'package:chocomousse/features/ranking/data/ranking_models.dart';
@@ -50,10 +51,13 @@ class RankedCard extends StatelessWidget {
     final over = match?.overBudget ?? false;
 
     return Material(
-      color: AppColors.surface,
+      color: context.palette.bgSurface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.md),
-        side: BorderSide(color: selected ? AppColors.primary : AppColors.border, width: selected ? 2 : 1),
+        side: BorderSide(
+          color: selected ? context.palette.brandPrimary : context.palette.borderDefault,
+          width: selected ? 2 : 1,
+        ),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.md),
@@ -66,7 +70,7 @@ class RankedCard extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: Text(data.kind, style: textTheme.labelSmall?.copyWith(color: AppColors.muted)),
+                    child: Text(data.kind, style: textTheme.labelSmall?.copyWith(color: context.palette.textSecondary)),
                   ),
                   if (match != null) MatchBadge(percent: match.percent, overBudget: over),
                 ],
@@ -84,7 +88,9 @@ class RankedCard extends StatelessWidget {
                         ? const SizedBox.shrink()
                         : Text(
                             match.reason,
-                            style: textTheme.bodySmall?.copyWith(color: over ? AppColors.danger : AppColors.primary),
+                            style: textTheme.bodySmall?.copyWith(
+                              color: over ? context.palette.statusDanger : context.palette.brandPrimary,
+                            ),
                           ),
                   ),
                   const SizedBox(width: AppSpacing.md),
@@ -111,12 +117,12 @@ class MatchBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
       decoration: BoxDecoration(
-        color: overBudget ? AppColors.muted : AppColors.success,
+        color: overBudget ? context.palette.textSecondary : context.palette.statusSuccess,
         borderRadius: BorderRadius.circular(AppRadius.full),
       ),
       child: Text(
         '$percent% match',
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.onPrimary),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: context.palette.brandOnPrimary),
       ),
     );
   }

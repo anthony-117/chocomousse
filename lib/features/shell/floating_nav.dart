@@ -1,4 +1,5 @@
 import 'package:chocomousse/app/router.dart';
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:flutter/material.dart';
 
@@ -25,10 +26,10 @@ class FloatingNav extends StatelessWidget {
       height: height,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.palette.bgSurface,
         borderRadius: BorderRadius.circular(AppRadius.full),
-        border: Border.all(color: AppColors.border),
-        boxShadow: kSoftShadow,
+        border: Border.all(color: context.palette.borderDefault),
+        boxShadow: context.palette.raisedShadow,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -65,8 +66,15 @@ class _NavButton extends StatelessWidget {
             duration: const Duration(milliseconds: 200),
             width: 48,
             height: 48,
-            decoration: BoxDecoration(color: selected ? AppColors.primary : Colors.transparent, shape: BoxShape.circle),
-            child: Icon(icon, size: 24, color: selected ? AppColors.onPrimary : AppColors.muted),
+            decoration: BoxDecoration(
+              color: selected ? context.palette.brandPrimary : Colors.transparent,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              icon,
+              size: 24,
+              color: selected ? context.palette.brandOnPrimary : context.palette.textSecondary,
+            ),
           ),
         ),
       ),

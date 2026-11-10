@@ -36,10 +36,10 @@ Story map (spec.md):
 
 ## Phase 1: Setup
 
-- [ ] T001 Rebase `008-assistant-first-shell` on main after PR #18 merges; check `lib/features/itinerary/` exists, and that `flutter test` passes before any change
-- [ ] T002 Add `shared_preferences` (latest stable) to `pubspec.yaml` dependencies, with a comment "Appearance choice on the device (spec 008 FR-008, approved 2026-11-10)"; run `flutter pub get`
-- [ ] T003 [P] Download Newsreader Medium (OFL, Google Fonts) to `assets/fonts/Newsreader-Medium.ttf`; append its OFL notice to `assets/fonts/OFL.txt`; declare family `Newsreader` (weight 500) in `pubspec.yaml`
-- [ ] T004 [P] Export the 37 icon symbols of Figma "v1 / Icons" (file `s52ShmznT28QgNN6u6Wddu`, node 2301:923) as 24×24 SVG, stroke `currentColor`, to `assets/icons/<name>.svg` (plus, arrow-up, mic, search, new-chat, compass, map, plane, bed, car, landmark, ticket, globe, sliders, sparkles, chevron-down, chevron-right, check, swap, calendar, users, menu, panel-left, paperclip, sun, bookmark, pin, share, x, clock, wallet, more, user, thumbs-up, copy, filter, bookmark-filled); register `assets/icons/` in `pubspec.yaml`
+- [X] T001 Rebase `008-assistant-first-shell` on main after PR #18 merges; check `lib/features/itinerary/` exists, and that `flutter test` passes before any change
+- [X] T002 Add `shared_preferences` (latest stable) to `pubspec.yaml` dependencies, with a comment "Appearance choice on the device (spec 008 FR-008, approved 2026-11-10)"; run `flutter pub get`
+- [X] T003 [P] Download Newsreader Medium (OFL, Google Fonts) to `assets/fonts/Newsreader-Medium.ttf`; append its OFL notice to `assets/fonts/OFL.txt`; declare family `Newsreader` (weight 500) in `pubspec.yaml`
+- [X] T004 [P] Export the 37 icon symbols of Figma "v1 / Icons" (file `s52ShmznT28QgNN6u6Wddu`, node 2301:923) as 24×24 SVG, stroke `currentColor`, to `assets/icons/<name>.svg` (plus, arrow-up, mic, search, new-chat, compass, map, plane, bed, car, landmark, ticket, globe, sliders, sparkles, chevron-down, chevron-right, check, swap, calendar, users, menu, panel-left, paperclip, sun, bookmark, pin, share, x, clock, wallet, more, user, thumbs-up, copy, filter, bookmark-filled); register `assets/icons/` in `pubspec.yaml`
 
 ---
 
@@ -47,22 +47,22 @@ Story map (spec.md):
 
 ### Theme tokens and text (needed by every widget)
 
-- [ ] T005 Create `lib/app/theme/palette.dart`:
+- [X] T005 Create `lib/app/theme/palette.dart`:
   - `AppPalette extends ThemeExtension<AppPalette>` with fields `bgApp`, `bgSidebar`, `bgSurface`, `bgSubtle`, `bgHover`, `borderDefault`, `textPrimary`, `textSecondary`, `textTertiary`, `brandPrimary`, `brandPrimarySoft`, `brandOnPrimary`, `brandAccent`, `brandAccentSoft`, `statusSuccess`, `statusSuccessSoft`, `statusWarning`, `statusWarningSoft`, `statusDanger`, `statusDangerSoft` and `raisedShadow` (`List<BoxShadow>`), with `copyWith` and `lerp`.
   - `static const light`: `#FAF9F6`, `#F2F0EA`, `#FFFFFF`, `#EFEDE6`, `#E8E5DD`, `#E5E2DA`, `#1D1C1A`, `#6F6B63`, `#9A968D`, `#4338CA`, `#ECEBFA`, `#FFFFFF`, `#FF7A59`, `#FFEFE9`, `#1F9D6B`, `#E3F4EC`, `#B7791F`, `#FBF1DE`, danger `#D64545`, danger-soft `#FBE7E7`.
   - `static const dark`: `#1F1E1C`, `#181816`, `#2A2926`, `#33312D`, `#3A3834`, `#3B3935`, `#F3F1EC`, `#A9A59D`, `#7D7973`, `#8E88F2`, `#2D2A50`, `#14132B`, `#FF8F73`, `#45291F`, `#3CC48E`, `#1D3A2E`, `#E8B04B`, `#3F3220`, danger `#F07A7A`, danger-soft `#3D2222`.
   - `raisedShadow`: `#1C1A140F` at 0,4 blur 16 plus `#1C1A140D` at 0,1 blur 2.
   - An extension `context.palette`.
-- [ ] T006 Create `lib/app/theme/app_text.dart`. `AppText` (const `TextStyle`s, no colour) holds:
+- [X] T006 Create `lib/app/theme/app_text.dart`. `AppText` (const `TextStyle`s, no colour) holds:
   - Newsreader: `serifTitle` (500, 22/28, −0.5) and `greeting` (500, size and line height from Figma W1 node 2305:2, the "Where to next" text).
   - Plus Jakarta Sans: `title` (600, 17/24), `body` (400, 15/24), `bodyStrong` (600, 15/22), `small` (400, 13/18), `smallStrong` (600, 13/18) and `micro` (600, 11/14, letterSpacing 2).
-- [ ] T007 Rewrite `lib/app/theme/app_theme.dart`:
+- [X] T007 Rewrite `lib/app/theme/app_theme.dart`:
   - `AppTheme.light()` and `AppTheme.dark()` from `AppPalette.light` and `.dark`. Put the palette in `extensions`, and set `scaffoldBackgroundColor = bgApp`.
   - The `TextTheme` maps `AppText` to the slots: displaySmall=greeting, headlineSmall=serifTitle, titleMedium=title, bodyLarge=body, bodyMedium=body, labelLarge=bodyStrong, bodySmall=small, labelMedium=smallStrong, labelSmall=micro. Colours: textPrimary, and textSecondary for small and micro.
   - Button, input, chip, dialog, bottom-sheet and snack-bar themes use the palette.
-- [ ] T008 Edit `lib/app/theme/tokens.dart`: remove `AppColors` and `kSoftShadow`. Check `AppSpacing` and `AppRadius` against the v1 Figma dimension variables (node 2301:17), and add any missing radius (e.g. `xl = 16`). Keep `kWideLayoutBreakpoint = 900`.
-- [ ] T009 [P] Create `lib/app/theme/app_icons.dart`: an enum `AppIcons` with the T004 names and their asset paths, and an `AppIcon(icon, {size = 20, color})` widget using `SvgPicture.asset` with `ColorFilter.mode(color ?? IconTheme.of(context).color, BlendMode.srcIn)`
-- [ ] T010 [P] Unit tests in `test/app/theme/palette_test.dart`:
+- [X] T008 Edit `lib/app/theme/tokens.dart`: remove `AppColors` and `kSoftShadow`. Check `AppSpacing` and `AppRadius` against the v1 Figma dimension variables (node 2301:17), and add any missing radius (e.g. `xl = 16`). Keep `kWideLayoutBreakpoint = 900`.
+- [X] T009 [P] Create `lib/app/theme/app_icons.dart`: an enum `AppIcons` with the T004 names and their asset paths, and an `AppIcon(icon, {size = 20, color})` widget using `SvgPicture.asset` with `ColorFilter.mode(color ?? IconTheme.of(context).color, BlendMode.srcIn)`
+- [X] T010 [P] Unit tests in `test/app/theme/palette_test.dart`:
   - every light and dark value matches T005;
   - `lerp` at 0 and 1;
   - the contrast of textPrimary, textSecondary and brandPrimary on bgApp and bgSurface is ≥ 4.5:1 in both modes (SC-007).
@@ -89,16 +89,16 @@ Each task replaces `AppColors.x` with `context.palette.<token>`:
 `kSoftShadow` becomes `context.palette.raisedShadow`. A `const` that can no longer be const loses `const`. Update the
 feature's widget tests to pump with `AppTheme.light()`. Commit one feature per task.
 
-- [ ] T011 [P] Migrate `lib/core/widgets/` and `lib/features/account/` and their tests
-- [ ] T012 [P] Migrate `lib/features/destination/` and `lib/features/discover/` and their tests
-- [ ] T013 [P] Migrate `lib/features/flights/` and `lib/features/hotels/` and their tests
-- [ ] T014 [P] Migrate `lib/features/cars/` and `lib/features/ranking/` and their tests
-- [ ] T015 [P] Migrate `lib/features/itinerary/`, `lib/features/plans/` and `lib/features/system/` and their tests
-- [ ] T016 Check `grep -rn "AppColors\|kSoftShadow" lib test` returns nothing; run all tests
+- [X] T011 [P] Migrate `lib/core/widgets/` and `lib/features/account/` and their tests
+- [X] T012 [P] Migrate `lib/features/destination/` and `lib/features/discover/` and their tests
+- [X] T013 [P] Migrate `lib/features/flights/` and `lib/features/hotels/` and their tests
+- [X] T014 [P] Migrate `lib/features/cars/` and `lib/features/ranking/` and their tests
+- [X] T015 [P] Migrate `lib/features/itinerary/`, `lib/features/plans/` and `lib/features/system/` and their tests
+- [X] T016 Check `grep -rn "AppColors\|kSoftShadow" lib test` returns nothing; run all tests
 
 ### Shared test helpers
 
-- [ ] T017 Extend `test/helpers.dart`:
+- [X] T017 Extend `test/helpers.dart`:
   - `pumpApp(tester, widget, {Size size = const Size(390, 844), ThemeMode mode = ThemeMode.light, List<Override> overrides})`, which wraps the widget in `MaterialApp` with both themes;
   - constants `phone = Size(390, 844)` and `desktop = Size(1440, 900)`;
   - `forBothModes(description, body)`, which runs a widget test in light and dark.

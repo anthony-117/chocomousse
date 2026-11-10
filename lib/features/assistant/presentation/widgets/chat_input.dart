@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,7 +44,7 @@ class _ChatInputState extends State<ChatInput> {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.only(left: AppSpacing.xl, right: AppSpacing.sm),
-      decoration: BoxDecoration(color: AppColors.canvas, borderRadius: BorderRadius.circular(AppRadius.full)),
+      decoration: BoxDecoration(color: context.palette.bgApp, borderRadius: BorderRadius.circular(AppRadius.full)),
       child: Row(
         children: [
           Expanded(

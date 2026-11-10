@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
 import 'package:chocomousse/env.dart';
@@ -24,7 +25,7 @@ class BackendStatusCard extends ConsumerWidget {
             loading: () => const LinearProgressIndicator(),
             data: (info) => Row(
               children: [
-                const Icon(Icons.check_circle, color: AppColors.success, size: 20),
+                Icon(Icons.check_circle, color: context.palette.statusSuccess, size: 20),
                 const SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text(
@@ -39,7 +40,7 @@ class BackendStatusCard extends ConsumerWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.error_outline, color: AppColors.danger, size: 20),
+                    Icon(Icons.error_outline, color: context.palette.statusDanger, size: 20),
                     const SizedBox(width: AppSpacing.sm),
                     Expanded(child: Text('Cannot reach ${Env.apiBaseUrl}', style: textTheme.bodyLarge)),
                   ],

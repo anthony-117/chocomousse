@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
 import 'package:chocomousse/core/widgets/skeleton.dart';
@@ -150,10 +151,10 @@ class PlanCard extends StatelessWidget {
     final match = plan.matchPercent;
 
     return Material(
-      color: AppColors.surface,
+      color: context.palette.bgSurface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.palette.borderDefault),
       ),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
@@ -177,7 +178,10 @@ class PlanCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(planStatusLine(plan), style: textTheme.labelSmall?.copyWith(color: AppColors.muted)),
+                    Text(
+                      planStatusLine(plan),
+                      style: textTheme.labelSmall?.copyWith(color: context.palette.textSecondary),
+                    ),
                     Text(plan.name, style: textTheme.titleSmall, maxLines: 2, overflow: TextOverflow.ellipsis),
                     Text(
                       '${planDates(plan.from, plan.to)} · ${formatMoney(plan.total, plan.currency)}',
@@ -189,7 +193,7 @@ class PlanCard extends StatelessWidget {
               ),
               IconButton(
                 tooltip: 'Plan actions',
-                icon: const Icon(Icons.more_horiz, color: AppColors.muted),
+                icon: Icon(Icons.more_horiz, color: context.palette.textSecondary),
                 onPressed: () => unawaited(showPlanActions(context, plan)),
               ),
             ],
@@ -204,9 +208,9 @@ class _Pin extends StatelessWidget {
   const _Pin();
 
   @override
-  Widget build(BuildContext context) => const ColoredBox(
-    color: AppColors.primarySoft,
-    child: Center(child: Icon(Icons.place_outlined, color: AppColors.text)),
+  Widget build(BuildContext context) => ColoredBox(
+    color: context.palette.brandPrimarySoft,
+    child: Center(child: Icon(Icons.place_outlined, color: context.palette.textPrimary)),
   );
 }
 

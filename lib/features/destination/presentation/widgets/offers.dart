@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/network/api_client.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
@@ -24,9 +25,9 @@ class OfferPhoto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const placeholder = DecoratedBox(
-      decoration: BoxDecoration(gradient: kPhotoGradient),
-      child: Center(child: Icon(Icons.image_outlined, color: AppColors.onPrimary, size: 32)),
+    final placeholder = DecoratedBox(
+      decoration: BoxDecoration(gradient: photoGradient(context)),
+      child: Center(child: Icon(Icons.image_outlined, color: context.palette.brandOnPrimary, size: 32)),
     );
     final src = url;
     if (src == null) return placeholder;
@@ -50,10 +51,10 @@ class ReviewScore extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(AppRadius.sm)),
+      decoration: BoxDecoration(color: context.palette.brandPrimary, borderRadius: BorderRadius.circular(AppRadius.sm)),
       child: Text(
         score.toStringAsFixed(1),
-        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.onPrimary),
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(color: context.palette.brandOnPrimary),
       ),
     );
   }
@@ -71,15 +72,15 @@ class OfferTag extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
       decoration: BoxDecoration(
-        color: AppColors.success.withValues(alpha: 0.12),
+        color: context.palette.statusSuccess.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppRadius.full),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 12, color: AppColors.success),
+          Icon(icon, size: 12, color: context.palette.statusSuccess),
           const SizedBox(width: AppSpacing.xs),
-          Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.success)),
+          Text(label, style: Theme.of(context).textTheme.labelSmall?.copyWith(color: context.palette.statusSuccess)),
         ],
       ),
     );
@@ -105,16 +106,19 @@ class OfferWarning extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.warning.withValues(alpha: 0.12),
+        color: context.palette.statusWarning.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(AppRadius.md),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.warning_amber_rounded, size: 18, color: AppColors.warning),
+          Icon(Icons.warning_amber_rounded, size: 18, color: context.palette.statusWarning),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
-            child: Text(message, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.text)),
+            child: Text(
+              message,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: context.palette.textPrimary),
+            ),
           ),
         ],
       ),

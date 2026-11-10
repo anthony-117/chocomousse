@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/links/link_opener.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
@@ -119,7 +120,7 @@ class _CarsScreenState extends ConsumerState<CarsScreen> {
       showPassport: false,
       extra: [
         ActionChip(
-          avatar: const Icon(Icons.place_outlined, size: 16, color: AppColors.primary),
+          avatar: Icon(Icons.place_outlined, size: 16, color: context.palette.brandPrimary),
           label: Row(
             mainAxisSize: MainAxisSize.min,
             children: [Text(_place.label), const Icon(Icons.expand_more, size: 16)],
@@ -128,7 +129,7 @@ class _CarsScreenState extends ConsumerState<CarsScreen> {
           onPressed: () => unawaited(_openPickUp(trip)),
         ),
         ActionChip(
-          avatar: const Icon(Icons.person_outline, size: 16, color: AppColors.primary),
+          avatar: Icon(Icons.person_outline, size: 16, color: context.palette.brandPrimary),
           label: Text('Driver ${trip.driverAge}'),
           tooltip: "Driver's age",
           onPressed: () => unawaited(_openPickUp(trip)),
@@ -156,10 +157,10 @@ class _CarsScreenState extends ConsumerState<CarsScreen> {
             children: [
               // A Material rather than a decorated box, so the free-cancellation switch's splash shows.
               Material(
-                color: AppColors.surface,
+                color: context.palette.bgSurface,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(AppRadius.lg),
-                  side: const BorderSide(color: AppColors.border),
+                  side: BorderSide(color: context.palette.borderDefault),
                 ),
                 child: Container(
                   width: 400,
@@ -199,10 +200,10 @@ class _CarsScreenState extends ConsumerState<CarsScreen> {
                 avatar: Icon(
                   Icons.tune,
                   size: 16,
-                  color: _filters.activeCount > 0 ? AppColors.primary : AppColors.text,
+                  color: _filters.activeCount > 0 ? context.palette.brandPrimary : context.palette.textPrimary,
                 ),
                 label: Text(_filters.activeCount > 0 ? 'Filters · ${_filters.activeCount}' : 'Filters'),
-                backgroundColor: _filters.activeCount > 0 ? AppColors.primarySoft : null,
+                backgroundColor: _filters.activeCount > 0 ? context.palette.brandPrimarySoft : null,
                 onPressed: () => unawaited(_openFilters(trip)),
               ),
             ],
@@ -229,7 +230,7 @@ class _SortButton extends StatelessWidget {
       onSelected: onChanged,
       itemBuilder: (context) => [for (final s in CarSort.values) PopupMenuItem(value: s, child: Text(s.label))],
       child: Chip(
-        avatar: const Icon(Icons.swap_vert, size: 16, color: AppColors.text),
+        avatar: Icon(Icons.swap_vert, size: 16, color: context.palette.textPrimary),
         label: Row(
           mainAxisSize: MainAxisSize.min,
           children: [Text(sort.label), const Icon(Icons.expand_more, size: 16)],
@@ -318,10 +319,10 @@ class _ErrorBanner extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.sm, AppSpacing.sm),
-      decoration: BoxDecoration(color: AppColors.canvas, borderRadius: BorderRadius.circular(AppRadius.md)),
+      decoration: BoxDecoration(color: context.palette.bgApp, borderRadius: BorderRadius.circular(AppRadius.md)),
       child: Row(
         children: [
-          const Icon(Icons.cloud_off_outlined, color: AppColors.muted, size: 20),
+          Icon(Icons.cloud_off_outlined, color: context.palette.textSecondary, size: 20),
           const SizedBox(width: AppSpacing.sm),
           Expanded(child: Text(message, style: Theme.of(context).textTheme.bodySmall)),
           TextButton(onPressed: onRetry, child: const Text('Try again')),
@@ -424,10 +425,10 @@ class _MoreOnBookingCom extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.sm, AppSpacing.sm),
-      decoration: BoxDecoration(color: AppColors.canvas, borderRadius: BorderRadius.circular(AppRadius.md)),
+      decoration: BoxDecoration(color: context.palette.bgApp, borderRadius: BorderRadius.circular(AppRadius.md)),
       child: Row(
         children: [
-          const Icon(Icons.info_outline, color: AppColors.muted, size: 18),
+          Icon(Icons.info_outline, color: context.palette.textSecondary, size: 18),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text('Booking.com has more cars than shown here.', style: Theme.of(context).textTheme.bodySmall),
@@ -465,10 +466,10 @@ class _NoCars extends StatelessWidget {
     return SoftCard(
       child: Column(
         children: [
-          const CircleAvatar(
+          CircleAvatar(
             radius: 24,
-            backgroundColor: AppColors.primarySoft,
-            child: Icon(Icons.place_outlined, color: AppColors.primary),
+            backgroundColor: context.palette.brandPrimarySoft,
+            child: Icon(Icons.place_outlined, color: context.palette.brandPrimary),
           ),
           const SizedBox(height: AppSpacing.md),
           Text(

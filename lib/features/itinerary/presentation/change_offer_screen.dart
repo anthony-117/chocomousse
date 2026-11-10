@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
 import 'package:chocomousse/features/cars/data/car_models.dart';
@@ -224,7 +225,7 @@ class _ChangeOfferViewState extends ConsumerState<ChangeOfferView> {
               width: double.infinity,
               child: OutlinedButton(
                 onPressed: _busy ? null : _removeCar,
-                style: OutlinedButton.styleFrom(foregroundColor: AppColors.danger),
+                style: OutlinedButton.styleFrom(foregroundColor: context.palette.statusDanger),
                 child: const Text('Remove car'),
               ),
             ),
@@ -261,8 +262,11 @@ class _ChangeOfferViewState extends ConsumerState<ChangeOfferView> {
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(AppSpacing.md),
-          decoration: BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(AppRadius.md)),
-          child: Text(_info(kind), style: textTheme.bodySmall?.copyWith(color: AppColors.text)),
+          decoration: BoxDecoration(
+            color: context.palette.brandPrimarySoft,
+            borderRadius: BorderRadius.circular(AppRadius.md),
+          ),
+          child: Text(_info(kind), style: textTheme.bodySmall?.copyWith(color: context.palette.textPrimary)),
         ),
         const SizedBox(height: AppSpacing.lg),
         if (_busy) ...[const LinearProgressIndicator(), const SizedBox(height: AppSpacing.md)],

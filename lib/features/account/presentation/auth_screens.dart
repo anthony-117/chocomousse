@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chocomousse/app/auth_guard.dart';
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/app_logo.dart';
 import 'package:chocomousse/features/account/application/session.dart';
@@ -15,9 +16,9 @@ class StartingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      backgroundColor: AppColors.surface,
-      body: Center(
+    return Scaffold(
+      backgroundColor: context.palette.bgSurface,
+      body: const Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -60,7 +61,7 @@ class _WelcomeScreenState extends ConsumerState<WelcomeScreen> with AuthActions 
         Text(
           'By continuing you agree to the Terms and the Privacy Policy.',
           textAlign: TextAlign.center,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.muted),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: context.palette.textSecondary),
         ),
       ],
     );
@@ -225,7 +226,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> with AuthActions {
         const SizedBox(height: AppSpacing.lg),
         Text(
           "We'll email you a link to confirm your address.",
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.muted),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: context.palette.textSecondary),
         ),
         const SizedBox(height: AppSpacing.lg),
         PrimaryAction(label: 'Create account', busy: busy, onPressed: () => unawaited(_submit())),

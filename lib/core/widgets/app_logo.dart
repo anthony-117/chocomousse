@@ -1,4 +1,4 @@
-import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -23,7 +23,7 @@ class AppWordmark extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final base = TextStyle(fontSize: fontSize, fontWeight: FontWeight.w800, color: AppColors.text);
+    final base = TextStyle(fontSize: fontSize, fontWeight: FontWeight.w800, color: context.palette.textPrimary);
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -33,15 +33,15 @@ class AppWordmark extends StatelessWidget {
         Text.rich(
           TextSpan(
             style: base,
-            children: const [
-              TextSpan(text: 'travel'),
+            children: [
+              const TextSpan(text: 'travel'),
               TextSpan(
                 text: 'genie',
-                style: TextStyle(color: AppColors.primary),
+                style: TextStyle(color: context.palette.brandPrimary),
               ),
               TextSpan(
                 text: '.',
-                style: TextStyle(color: AppColors.accent),
+                style: TextStyle(color: context.palette.brandAccent),
               ),
             ],
           ),

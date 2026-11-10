@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/links/link_opener.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
@@ -94,9 +95,9 @@ class _FlightsScreenState extends ConsumerState<FlightsScreen> {
                 width: 400,
                 padding: const EdgeInsets.all(AppSpacing.xl),
                 decoration: BoxDecoration(
-                  color: AppColors.surface,
+                  color: context.palette.bgSurface,
                   borderRadius: BorderRadius.circular(AppRadius.lg),
-                  border: Border.all(color: AppColors.border),
+                  border: Border.all(color: context.palette.borderDefault),
                 ),
                 child: search,
               ),
@@ -186,8 +187,11 @@ class _DatesMessage extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-      decoration: BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(AppRadius.sm)),
-      child: Text(message, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.primary)),
+      decoration: BoxDecoration(
+        color: context.palette.brandPrimarySoft,
+        borderRadius: BorderRadius.circular(AppRadius.sm),
+      ),
+      child: Text(message, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: context.palette.brandPrimary)),
     );
   }
 }

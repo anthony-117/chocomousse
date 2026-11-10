@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/cars/data/car_models.dart';
 import 'package:chocomousse/features/cars/presentation/widgets/car_texts.dart';
@@ -235,7 +236,7 @@ class _CarFiltersFormState extends State<CarFiltersForm> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.info_outline, size: 16, color: AppColors.muted),
+              Icon(Icons.info_outline, size: 16, color: context.palette.textSecondary),
               const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(

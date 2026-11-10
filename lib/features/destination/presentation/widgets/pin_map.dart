@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,7 @@ class PinMap extends StatelessWidget {
         child: SizedBox(
           height: height,
           width: double.infinity,
-          child: CustomPaint(painter: _PinMapPainter(centerLat, centerLng, places)),
+          child: CustomPaint(painter: _PinMapPainter(centerLat, centerLng, places, context.palette)),
         ),
       ),
     );
@@ -31,7 +32,9 @@ class PinMap extends StatelessWidget {
 }
 
 class _PinMapPainter extends CustomPainter {
-  _PinMapPainter(this.centerLat, this.centerLng, this.places);
+  _PinMapPainter(this.centerLat, this.centerLng, this.places, this.palette);
+
+  final AppPalette palette;
 
   final double centerLat;
   final double centerLng;
@@ -39,10 +42,10 @@ class _PinMapPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    canvas.drawRect(Offset.zero & size, Paint()..color = AppColors.canvas);
+    canvas.drawRect(Offset.zero & size, Paint()..color = palette.bgApp);
 
     final grid = Paint()
-      ..color = AppColors.border
+      ..color = palette.borderDefault
       ..strokeWidth = 1;
     for (var x = 0.0; x < size.width; x += 40) {
       canvas.drawLine(Offset(x, 0), Offset(x, size.height), grid);
@@ -65,13 +68,13 @@ class _PinMapPainter extends CustomPainter {
       size.height / 2 - (lat - centerLat) / span * half,
     );
 
-    canvas.drawCircle(project(centerLat, centerLng), 6, Paint()..color = AppColors.text.withValues(alpha: 0.25));
+    canvas.drawCircle(project(centerLat, centerLng), 6, Paint()..color = palette.textPrimary.withValues(alpha: 0.25));
 
     for (final place in places) {
       final at = project(place.lat, place.lng);
-      final color = place.category == PlaceCategory.restaurant ? AppColors.accent : AppColors.primary;
+      final color = place.category == PlaceCategory.restaurant ? palette.brandAccent : palette.brandPrimary;
       canvas
-        ..drawCircle(at, 9, Paint()..color = AppColors.surface)
+        ..drawCircle(at, 9, Paint()..color = palette.bgSurface)
         ..drawCircle(at, 6, Paint()..color = color);
     }
   }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/links/link_opener.dart';
 import 'package:chocomousse/core/network/api_client.dart';
@@ -194,11 +195,11 @@ class PlansBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.canvas,
+      color: context.palette.bgApp,
       shape: const CircleBorder(),
       child: IconButton(
         tooltip: 'Back',
-        icon: const Icon(Icons.chevron_left, color: AppColors.text),
+        icon: Icon(Icons.chevron_left, color: context.palette.textPrimary),
         onPressed: () => context.canPop() ? context.pop() : context.go('/plans'),
       ),
     );
@@ -257,7 +258,7 @@ class PlanProblem extends StatelessWidget {
         SoftCard(
           child: Column(
             children: [
-              const Icon(Icons.map_outlined, size: 32, color: AppColors.muted),
+              Icon(Icons.map_outlined, size: 32, color: context.palette.textSecondary),
               const SizedBox(height: AppSpacing.md),
               Text(message, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: AppSpacing.md),

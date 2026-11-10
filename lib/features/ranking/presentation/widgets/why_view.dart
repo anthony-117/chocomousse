@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/ranking/data/ranking_models.dart';
 import 'package:chocomousse/features/ranking/presentation/widgets/ranked_card.dart';
@@ -38,7 +39,7 @@ class WhyView extends StatelessWidget {
         Text(data.priceLine, style: textTheme.bodySmall),
         if (match.overBudget) ...[
           const SizedBox(height: AppSpacing.xs),
-          Text(match.reason, style: textTheme.bodySmall?.copyWith(color: AppColors.danger)),
+          Text(match.reason, style: textTheme.bodySmall?.copyWith(color: context.palette.statusDanger)),
         ],
         const SizedBox(height: AppSpacing.md),
         for (final part in match.parts) MeasureRow(part: part),
@@ -46,7 +47,7 @@ class WhyView extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.info_outline, size: 16, color: AppColors.muted),
+            Icon(Icons.info_outline, size: 16, color: context.palette.textSecondary),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
@@ -87,7 +88,7 @@ class MeasureRow extends StatelessWidget {
               Expanded(child: Text(part.label, style: textTheme.bodyMedium)),
               Text(part.levelLabel, style: textTheme.bodySmall),
               const SizedBox(width: AppSpacing.sm),
-              Text('${part.percent}%', style: textTheme.labelLarge?.copyWith(color: AppColors.primary)),
+              Text('${part.percent}%', style: textTheme.labelLarge?.copyWith(color: context.palette.brandPrimary)),
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -96,8 +97,8 @@ class MeasureRow extends StatelessWidget {
             child: LinearProgressIndicator(
               value: part.percent.clamp(0, 100) / 100,
               minHeight: 6,
-              backgroundColor: AppColors.border,
-              color: part.known ? AppColors.primary : AppColors.muted,
+              backgroundColor: context.palette.borderDefault,
+              color: part.known ? context.palette.brandPrimary : context.palette.textSecondary,
               semanticsLabel: '${part.label} ${part.percent}%',
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:chocomousse/app/auth_guard.dart';
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/app_logo.dart';
 import 'package:chocomousse/features/account/data/auth_repository.dart';
@@ -61,7 +62,7 @@ class AuthFrame extends StatelessWidget {
               ],
               if (subtitle != null) ...[
                 const SizedBox(height: AppSpacing.xs),
-                Text(subtitle!, style: textTheme.bodyMedium?.copyWith(color: AppColors.muted)),
+                Text(subtitle!, style: textTheme.bodyMedium?.copyWith(color: context.palette.textSecondary)),
               ],
               const SizedBox(height: AppSpacing.xl),
               ...children,
@@ -72,7 +73,7 @@ class AuthFrame extends StatelessWidget {
     );
 
     return Scaffold(
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.palette.bgSurface,
       body: SafeArea(
         child: wide
             ? Row(
@@ -106,7 +107,7 @@ class BrandPanel extends StatelessWidget {
           headline,
           style: (compact ? textTheme.headlineMedium : textTheme.displaySmall)?.copyWith(
             fontWeight: FontWeight.w800,
-            color: AppColors.text,
+            color: context.palette.textPrimary,
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
@@ -117,8 +118,8 @@ class BrandPanel extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 16,
-                  backgroundColor: AppColors.surface,
-                  child: Icon(icon, size: 18, color: AppColors.primary),
+                  backgroundColor: context.palette.bgSurface,
+                  child: Icon(icon, size: 18, color: context.palette.brandPrimary),
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(child: Text(text, style: textTheme.bodyMedium)),
@@ -129,7 +130,7 @@ class BrandPanel extends StatelessWidget {
     );
     if (compact) return content;
     return Container(
-      color: AppColors.primarySoft,
+      color: context.palette.brandPrimarySoft,
       padding: const EdgeInsets.all(64),
       alignment: Alignment.centerLeft,
       child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 520), child: content),
@@ -151,8 +152,8 @@ class GoogleButton extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         minimumSize: const Size.fromHeight(52),
         shape: const StadiumBorder(),
-        side: const BorderSide(color: AppColors.border),
-        foregroundColor: AppColors.text,
+        side: BorderSide(color: context.palette.borderDefault),
+        foregroundColor: context.palette.textPrimary,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -186,9 +187,9 @@ class PrimaryAction extends StatelessWidget {
       onPressed: busy ? null : onPressed,
       style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52), shape: const StadiumBorder()),
       child: busy
-          ? const SizedBox.square(
+          ? SizedBox.square(
               dimension: 20,
-              child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.onPrimary),
+              child: CircularProgressIndicator(strokeWidth: 2, color: context.palette.brandOnPrimary),
             )
           : Text(label),
     );
@@ -226,7 +227,7 @@ class NoticeBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colour = error ? AppColors.danger : AppColors.primary;
+    final colour = error ? context.palette.statusDanger : context.palette.brandPrimary;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       margin: const EdgeInsets.only(bottom: AppSpacing.lg),
@@ -239,7 +240,10 @@ class NoticeBox extends StatelessWidget {
           Icon(error ? Icons.error_outline : Icons.mark_email_read_outlined, color: colour, size: 20),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
-            child: Text(message, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.text)),
+            child: Text(
+              message,
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: context.palette.textPrimary),
+            ),
           ),
           ?action,
         ],

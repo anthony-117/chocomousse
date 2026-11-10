@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
@@ -54,9 +55,9 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                 autofocus: true,
                 textInputAction: TextInputAction.search,
                 onChanged: _onChanged,
-                decoration: const InputDecoration(
+                decoration: InputDecoration(
                   hintText: 'Search a city',
-                  prefixIcon: Icon(Icons.search, color: AppColors.primary),
+                  prefixIcon: Icon(Icons.search, color: context.palette.brandPrimary),
                 ),
               ),
             ),
@@ -82,7 +83,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
                       for (final d in items)
                         ListTile(
                           contentPadding: EdgeInsets.zero,
-                          leading: const Icon(Icons.place_outlined, color: AppColors.primary),
+                          leading: Icon(Icons.place_outlined, color: context.palette.brandPrimary),
                           title: Text(d.name, style: textTheme.labelLarge),
                           subtitle: Text('${d.subtitle} ${d.flag ?? ''}'.trim(), style: textTheme.bodySmall),
                           onTap: () => context.push('/discover/destination/${d.id}'),

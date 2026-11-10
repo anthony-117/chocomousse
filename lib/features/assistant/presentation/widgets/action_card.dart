@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/assistant/data/assistant_models.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,7 @@ class ActionCard extends StatelessWidget {
     return ConstrainedBox(
       constraints: const BoxConstraints(maxWidth: 340),
       child: Material(
-        color: AppColors.primarySoft,
+        color: context.palette.brandPrimarySoft,
         borderRadius: BorderRadius.circular(AppRadius.md),
         child: InkWell(
           borderRadius: BorderRadius.circular(AppRadius.md),
@@ -31,18 +32,18 @@ class ActionCard extends StatelessWidget {
                     children: [
                       Text(
                         card.label,
-                        style: textTheme.labelSmall?.copyWith(color: AppColors.primary, letterSpacing: 0.6),
+                        style: textTheme.labelSmall?.copyWith(color: context.palette.brandPrimary, letterSpacing: 0.6),
                       ),
                       const SizedBox(height: AppSpacing.xs),
                       Text(card.title, style: textTheme.titleSmall),
                       if (card.subtitle.isNotEmpty) ...[
                         const SizedBox(height: AppSpacing.xs),
-                        Text(card.subtitle, style: textTheme.bodySmall?.copyWith(color: AppColors.success)),
+                        Text(card.subtitle, style: textTheme.bodySmall?.copyWith(color: context.palette.statusSuccess)),
                       ],
                     ],
                   ),
                 ),
-                const Icon(Icons.chevron_right, color: AppColors.primary),
+                Icon(Icons.chevron_right, color: context.palette.brandPrimary),
               ],
             ),
           ),

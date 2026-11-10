@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:flutter/material.dart';
 
@@ -7,7 +8,7 @@ class SkeletonBox extends StatefulWidget {
     this.width,
     this.height = 16,
     this.radius = AppRadius.sm,
-    this.color = AppColors.border,
+    this.color,
     this.animate = true,
     super.key,
   });
@@ -15,7 +16,9 @@ class SkeletonBox extends StatefulWidget {
   final double? width;
   final double height;
   final double radius;
-  final Color color;
+
+  /// Defaults to the palette's border colour.
+  final Color? color;
   final bool animate;
 
   @override
@@ -62,7 +65,10 @@ class _SkeletonBoxState extends State<SkeletonBox> with SingleTickerProviderStat
       child: Container(
         width: widget.width,
         height: widget.height,
-        decoration: BoxDecoration(color: widget.color, borderRadius: BorderRadius.circular(widget.radius)),
+        decoration: BoxDecoration(
+          color: widget.color ?? context.palette.borderDefault,
+          borderRadius: BorderRadius.circular(widget.radius),
+        ),
       ),
     );
   }

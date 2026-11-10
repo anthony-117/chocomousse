@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/links/link_opener.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
@@ -94,7 +95,7 @@ class _Details extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 ColoredBox(
-                  color: AppColors.surface,
+                  color: context.palette.bgSurface,
                   child: Padding(
                     padding: const EdgeInsets.all(AppSpacing.xl),
                     child: OfferPhoto(url: car.photoUrl, fit: BoxFit.contain),
@@ -114,7 +115,7 @@ class _Details extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.place_outlined, size: 16, color: AppColors.muted),
+            Icon(Icons.place_outlined, size: 16, color: context.palette.textSecondary),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(
@@ -133,7 +134,7 @@ class _Details extends StatelessWidget {
           runSpacing: AppSpacing.sm,
           children: [
             Chip(
-              avatar: const Icon(Icons.directions_car_outlined, size: 16, color: AppColors.primary),
+              avatar: Icon(Icons.directions_car_outlined, size: 16, color: context.palette.brandPrimary),
               label: Text(car.size),
             ),
             if (car.freeCancellation ?? false) const OfferTag(icon: Icons.check, label: 'Free cancellation'),
@@ -162,7 +163,7 @@ class _Details extends StatelessWidget {
             children: [
               for (final (icon, label) in specs)
                 Chip(
-                  avatar: Icon(icon, size: 16, color: AppColors.muted),
+                  avatar: Icon(icon, size: 16, color: context.palette.textSecondary),
                   label: Text(label),
                 ),
             ],
@@ -179,7 +180,7 @@ class _Details extends StatelessWidget {
               children: [
                 SizedBox(width: 120, child: Text(label, style: textTheme.labelLarge)),
                 Expanded(
-                  child: Text(value, style: textTheme.bodyMedium?.copyWith(color: AppColors.muted)),
+                  child: Text(value, style: textTheme.bodyMedium?.copyWith(color: context.palette.textSecondary)),
                 ),
               ],
             ),
@@ -203,18 +204,18 @@ class _DayTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.palette.bgSurface,
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.palette.borderDefault),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.schedule, size: 14, color: AppColors.muted),
+              Icon(Icons.schedule, size: 14, color: context.palette.textSecondary),
               const SizedBox(width: AppSpacing.xs),
-              Text(label, style: textTheme.labelSmall?.copyWith(color: AppColors.muted)),
+              Text(label, style: textTheme.labelSmall?.copyWith(color: context.palette.textSecondary)),
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -241,9 +242,9 @@ class _PriceBox extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.palette.bgSurface,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.palette.borderDefault),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/flights/application/flight_providers.dart';
@@ -21,10 +22,10 @@ class FlightsEntry extends ConsumerWidget {
     final day = DateFormat('d MMM');
 
     return Material(
-      color: AppColors.surface,
+      color: context.palette.bgSurface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.md),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.palette.borderDefault),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.md),
@@ -33,7 +34,7 @@ class FlightsEntry extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Row(
             children: [
-              const Icon(Icons.flight_takeoff, color: AppColors.primary),
+              Icon(Icons.flight_takeoff, color: context.palette.brandPrimary),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
@@ -50,7 +51,7 @@ class FlightsEntry extends ConsumerWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: AppColors.muted),
+              Icon(Icons.chevron_right, color: context.palette.textSecondary),
             ],
           ),
         ),

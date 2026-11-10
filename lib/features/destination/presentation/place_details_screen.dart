@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/skeleton.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
@@ -49,14 +50,14 @@ class _DetailsPlaceholder extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Stack(
+              Stack(
                 children: [
                   SizedBox(
                     height: 280,
                     width: double.infinity,
-                    child: DecoratedBox(decoration: BoxDecoration(gradient: kPhotoGradient)),
+                    child: DecoratedBox(decoration: BoxDecoration(gradient: photoGradient(context))),
                   ),
-                  SafeArea(
+                  const SafeArea(
                     child: Padding(padding: EdgeInsets.all(AppSpacing.lg), child: BackCircleButton(onDark: true)),
                   ),
                 ],
@@ -111,12 +112,12 @@ class _Details extends StatelessWidget {
                     height: 280,
                     width: double.infinity,
                     child: place.imageUrl == null
-                        ? const DecoratedBox(decoration: BoxDecoration(gradient: kPhotoGradient))
+                        ? DecoratedBox(decoration: BoxDecoration(gradient: photoGradient(context)))
                         : Image.network(
                             place.imageUrl!,
                             fit: BoxFit.cover,
                             errorBuilder: (_, _, _) =>
-                                const DecoratedBox(decoration: BoxDecoration(gradient: kPhotoGradient)),
+                                DecoratedBox(decoration: BoxDecoration(gradient: photoGradient(context))),
                           ),
                   ),
                   const SafeArea(
@@ -134,7 +135,10 @@ class _Details extends StatelessWidget {
                     if (place.rating != null) RatingLine(rating: place.rating!, count: place.ratingCount),
                     if (place.description != null) ...[
                       const SizedBox(height: AppSpacing.lg),
-                      Text(place.description!, style: textTheme.bodyLarge?.copyWith(color: AppColors.muted)),
+                      Text(
+                        place.description!,
+                        style: textTheme.bodyLarge?.copyWith(color: context.palette.textSecondary),
+                      ),
                     ],
                     const SizedBox(height: AppSpacing.lg),
                     _InfoCard(place: place),
@@ -170,7 +174,7 @@ class _InfoCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(color: AppColors.canvas, borderRadius: BorderRadius.circular(AppRadius.lg)),
+      decoration: BoxDecoration(color: context.palette.bgApp, borderRadius: BorderRadius.circular(AppRadius.lg)),
       child: DefaultTextStyle(
         style: textTheme.bodyLarge!,
         child: Column(children: rows),
@@ -185,10 +189,10 @@ class _InfoCard extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(icon, size: 18, color: AppColors.muted),
+          Icon(icon, size: 18, color: context.palette.textSecondary),
           const SizedBox(width: AppSpacing.sm),
           Expanded(child: Text(text)),
-          if (onTap != null) const Icon(Icons.copy_outlined, size: 16, color: AppColors.muted),
+          if (onTap != null) Icon(Icons.copy_outlined, size: 16, color: context.palette.textSecondary),
         ],
       ),
     ),

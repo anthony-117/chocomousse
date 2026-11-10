@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/network/api_client.dart';
 import 'package:chocomousse/core/network/auth_interceptor.dart';
@@ -99,24 +100,24 @@ class _DeleteAccountSheetState extends ConsumerState<DeleteAccountSheet> {
             const SizedBox(height: AppSpacing.sm),
             Text(
               "If you signed in a while ago, you'll be asked to sign in again first.",
-              style: textTheme.bodySmall?.copyWith(color: AppColors.muted),
+              style: textTheme.bodySmall?.copyWith(color: context.palette.textSecondary),
             ),
             if (_error != null) ...[
               const SizedBox(height: AppSpacing.lg),
-              Text(_error!, style: textTheme.bodyMedium?.copyWith(color: AppColors.danger)),
+              Text(_error!, style: textTheme.bodyMedium?.copyWith(color: context.palette.statusDanger)),
             ],
             const SizedBox(height: AppSpacing.xl),
             FilledButton(
               style: FilledButton.styleFrom(
-                backgroundColor: AppColors.danger,
+                backgroundColor: context.palette.statusDanger,
                 minimumSize: const Size.fromHeight(52),
                 shape: const StadiumBorder(),
               ),
               onPressed: _busy ? null : () => unawaited(_delete()),
               child: _busy
-                  ? const SizedBox.square(
+                  ? SizedBox.square(
                       dimension: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.onPrimary),
+                      child: CircularProgressIndicator(strokeWidth: 2, color: context.palette.brandOnPrimary),
                     )
                   : const Text('Delete my account'),
             ),

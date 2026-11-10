@@ -1,4 +1,5 @@
 import 'package:chocomousse/app/router.dart';
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/assistant/application/chat_controller.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ class AssistantEntry extends ConsumerWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Material(
-      color: AppColors.primarySoft,
+      color: context.palette.brandPrimarySoft,
       borderRadius: BorderRadius.circular(AppRadius.md),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.md),
@@ -29,7 +30,7 @@ class AssistantEntry extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Row(
             children: [
-              const Icon(Icons.auto_awesome_outlined, color: AppColors.primary),
+              Icon(Icons.auto_awesome_outlined, color: context.palette.brandPrimary),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
@@ -44,7 +45,7 @@ class AssistantEntry extends ConsumerWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: AppColors.primary),
+              Icon(Icons.chevron_right, color: context.palette.brandPrimary),
             ],
           ),
         ),
