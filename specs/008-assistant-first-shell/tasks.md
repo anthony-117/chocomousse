@@ -158,7 +158,7 @@ feature's widget tests to pump with `AppTheme.light()`. Commit one feature per t
 
 ### Chat state and the side panel skeleton (used by US1, US2, US3, US5, US6)
 
-- [ ] T029 Create `lib/features/chat/application/chat_controller.dart`:
+- [X] T029 Create `lib/features/chat/application/chat_controller.dart`:
   - `chatProvider` is a `NotifierProvider.family<ChatController, ChatState, String?>`, keyed by chat id (null for a new chat). `ChatState` holds `chatId`, `title`, `messages`, `pending` (`PendingTurn(message, steps)`), `status` (idle, loading, sending, busyElsewhere, failed) and `failure`.
   - `load()` for an existing id: `get`. A `busy` chat is polled every 5 s for at most 60 s.
   - `send(text, {about})`: append the traveller's message at once, then run the stream.
@@ -168,14 +168,14 @@ feature's widget tests to pump with `AppTheme.light()`. Commit one feature per t
     - `AnswerFailed` and refusals set `failed`, mark the message `notSent` and keep the steps.
   - `retry()` resends the last unsent message as a new message.
   - Use `retry: noRetry`.
-- [ ] T030 Create `lib/features/chat/application/chat_trip.dart`:
+- [X] T030 Create `lib/features/chat/application/chat_trip.dart`:
   - `chatTripProvider` is a `Notifier` holding the composer's `ChatTrip`, preferences (six values 0–100) and `Pace`. It starts from the latest `recentsProvider` item's trip, else the latest plan (`plansProvider`), else empty. The preferences and pace start from the profile (`profileProvider`).
   - Setters `setTrip`, `setPreferences` and `setPace`.
   - `toRequestParts()` for `ChatRequest`.
-- [ ] T031 Create `lib/features/side_panel/application/side_panel_controller.dart`:
+- [X] T031 Create `lib/features/side_panel/application/side_panel_controller.dart`:
   - `sidePanelProvider` is a `NotifierProvider.family<SidePanelController, SidePanelState, String>`, keyed by chat id or `'home'`. `SidePanelState` holds `open`, `pane` (trip, plan, details, map, saved), `selected?` (`AssistantCard`) and `planId?`.
   - Methods `openCard(card)` (a `PlanCard` → pane plan with planId; others → details), `openPane(pane)`, `openPlan(id)` and `close()`.
-- [ ] T032 [P] Unit tests in `test/features/chat/application/chat_controller_test.dart` (fake transport):
+- [X] T032 [P] Unit tests in `test/features/chat/application/chat_controller_test.dart` (fake transport):
   - send in a new chat: the id is set and the callback fires;
   - steps append in order;
   - `final` moves them into a message;
@@ -186,7 +186,7 @@ feature's widget tests to pump with `AppTheme.light()`. Commit one feature per t
   - load a chat; busy polling stops after 60 s.
 
   Also `chat_trip_test.dart` (each start source) and `side_panel_controller_test.dart` (each method).
-- [ ] T033 Create `lib/features/side_panel/presentation/side_panel.dart`:
+- [X] T033 Create `lib/features/side_panel/presentation/side_panel.dart`:
   - `SidePanel(chatKey)` with `PanelIconBar` (Trip, Plan, Details, Map and Saved icons, the active one highlighted, and close) and an `IndexedStack` of pane placeholders. Each story fills its pane.
   - `showSidePanelSheet(context, chatKey)` shows the same panel in a modal `DraggableScrollableSheet` (initial 0.9, min 0.5).
   - Layout rule (research R-6): from 900 px the panel sits in the row at 520 px; when the window is under 1200 px with the panel open, the sidebar collapses to its rail.
