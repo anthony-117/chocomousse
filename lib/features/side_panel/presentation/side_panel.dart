@@ -3,6 +3,7 @@ import 'package:chocomousse/app/theme/app_text.dart';
 import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/side_panel/application/side_panel_controller.dart';
+import 'package:chocomousse/features/side_panel/presentation/plan_pane.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -34,7 +35,7 @@ extension PanelPaneLook on PanelPane {
 typedef PaneBuilder = Widget Function(BuildContext context, String chatKey);
 
 /// The panes' content, by pane. Stories register theirs here (spec 008 US2, US3, US6).
-final Map<PanelPane, PaneBuilder> panelPanes = {};
+final Map<PanelPane, PaneBuilder> panelPanes = {PanelPane.plan: (context, chatKey) => PlanPane(chatKey: chatKey)};
 
 /// The side panel of a chat (or of the home, key `home`): the icon bar and the active pane. The same widget sits
 /// beside the chat on wide screens and in a sheet on phones.

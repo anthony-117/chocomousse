@@ -1,4 +1,5 @@
 import 'package:chocomousse/app/theme/app_theme.dart';
+import 'package:chocomousse/core/network/api_client.dart';
 import 'package:chocomousse/features/destination/data/destination_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,6 +43,8 @@ Future<void> pumpApp(
   addTearDown(tester.view.reset);
   await tester.pumpWidget(
     ProviderScope(
+      // As in main.dart: a failed load waits for Try again.
+      retry: noRetry,
       overrides: overrides,
       child: MaterialApp(
         theme: AppTheme.light(),

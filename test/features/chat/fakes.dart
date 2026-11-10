@@ -1,7 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:chocomousse/features/chat/application/recents.dart';
+import 'package:chocomousse/features/chat/data/chat_repository.dart';
 import 'package:chocomousse/features/chat/data/chat_transport.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 
 import '../../cars/fakes.dart';
 import '../../flights/fakes.dart';
@@ -146,4 +150,19 @@ class FakeChatTransport implements ChatTransport {
       _ => throw next as Exception,
     };
   }
+}
+
+/// Recents with no chats, so nothing asks the API for the list.
+class EmptyRecents extends RecentsController {
+  @override
+  Future<RecentsState> build() async => const RecentsState(items: [], keepDays: 90);
+}
+
+/// The chat API answered by [transport] (messages) and [answers] (every other call), with empty Recents.
+List<Override> chatOverrides(FakeChatTransport transport, {List<(int, Object?)> answers = const []}) {
+  final dio = Dio(BaseOptions(baseUrl: 'https://api.test/api/v1'))..httpClientAdapter = ScriptedAdapter([...answers]);
+  return [
+    chatRepositoryProvider.overrideWithValue(ChatRepository(dio, transport)),
+    recentsProvider.overrideWith(EmptyRecents.new),
+  ];
 }

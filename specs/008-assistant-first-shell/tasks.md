@@ -266,30 +266,30 @@ cards, at 390 px and 1440 px.
 
 ### Card widgets (shared; US2 adds the rest)
 
-- [ ] T046 [P] [US1] Create `lib/core/widgets/cards/match_badge.dart`: `MatchBadge(Match?)`: nothing when null; otherwise a sparkles icon and "{percent}% match" on `statusSuccessSoft` / `statusSuccess` (Figma 2302:24). A tap or hover shows `match.reason` in a tooltip.
-- [ ] T047 [P] [US1] Create `lib/core/widgets/cards/plan_card_tile.dart` (Figma 2304:143):
+- [X] T046 [P] [US1] Create `lib/core/widgets/cards/match_badge.dart`: `MatchBadge(Match?)`: nothing when null; otherwise a sparkles icon and "{percent}% match" on `statusSuccessSoft` / `statusSuccess` (Figma 2302:24). A tap or hover shows `match.reason` in a tooltip.
+- [X] T047 [P] [US1] Create `lib/core/widgets/cards/plan_card_tile.dart` (Figma 2304:143):
   - photo, name, "Itinerary · {matchPercent}% match · ${total} of ${tripBudget} · {Draft|Planned}" (without "of …" when there's no budget), and an Open plan button;
   - the border `brandPrimary` when it is the plan open in the panel;
   - "This plan was deleted", with the button disabled, when `planProvider` answers 404.
-- [ ] T048 [P] [US1] Create `lib/core/widgets/cards/result_row.dart` (Figma 2304:114): a leading icon tile, title, subtitle, a trailing price and `MatchBadge`. Used for flights here and for cars in US2. Add `FlightCard.toRow()` text: "Beirut → Rome · ITA Airways" and "Thu 10 Apr · 08:40 → 11:15 · Direct · 3 h 35".
-- [ ] T049 [P] [US1] Create `lib/core/widgets/cards/media_card.dart` (Figma 2304:92): 232×248, a photo with `MatchBadge` top-left and a bookmark slot top-right, then title, subtitle, a price line and a "+" slot. It's used for hotels here (`HotelCard`: "★ 4.7 · area · 0.9 km to centre", "$132 / night").
+- [X] T048 [P] [US1] Create `lib/core/widgets/cards/result_row.dart` (Figma 2304:114): a leading icon tile, title, subtitle, a trailing price and `MatchBadge`. Used for flights here and for cars in US2. Add `FlightCard.toRow()` text: "Beirut → Rome · ITA Airways" and "Thu 10 Apr · 08:40 → 11:15 · Direct · 3 h 35".
+- [X] T049 [P] [US1] Create `lib/core/widgets/cards/media_card.dart` (Figma 2304:92): 232×248, a photo with `MatchBadge` top-left and a bookmark slot top-right, then title, subtitle, a price line and a "+" slot. It's used for hotels here (`HotelCard`: "★ 4.7 · area · 0.9 km to centre", "$132 / night").
 
 ### Chat UI
 
-- [ ] T050 [US1] Create the widgets in `lib/features/chat/presentation/widgets/`:
+- [X] T050 [US1] Create the widgets in `lib/features/chat/presentation/widgets/`:
   - `user_bubble.dart` (Figma 2302:51);
   - `tool_step_line.dart` (Figma 2302:41): the tool icon (`toolIcon(String tool)`, a map of the contract's tool names with `sparkles` as fallback), the summary, a chevron that expands to the step's cards when it has any, and a failed style in `statusWarning` when `ok` is false;
   - `working_indicator.dart`: shown after the last step while `sending`;
   - `card_group.dart`: a Micro label, at most 6 cards (MediaCards in a horizontal scroll; rows and plan cards stacked), and "See all {total}" when `total` > the shown count;
   - `suggestion_chips.dart` (Figma 2302:20);
   - `answer_view.dart`: steps, then text, then the card groups in the order plan, flight, hotel, car, place, event, facts.
-- [ ] T051 [US1] Create `lib/features/chat/presentation/composer.dart` (Figma 2302:111, Web and Mobile variants):
+- [X] T051 [US1] Create `lib/features/chat/presentation/composer.dart` (Figma 2302:111, Web and Mobile variants):
   - a multiline field (1–1,000 characters, Enter sends on the web and Shift+Enter makes a new line);
   - "+", the trip chip ("Rome · 10–14 Apr · 2 adults", or "Add trip") and the preferences chip (the top two interests by weight, then the pace, e.g. "Culture · Food · Balanced", or "Add preferences");
   - send (disabled while empty or sending). No mic.
   - The trip chip opens `TripEditorSheet`, which reuses the ranking feature's city, date and adults controls and writes `chatTripProvider.setTrip`. The preferences chip opens `PreferencesSheet`, which reuses the six sliders and the pace choice.
   - Under it, the notice (research R-8): "Messages are answered by an AI service and may be used to improve it. Don't share personal details."
-- [ ] T052 [US1] Create `lib/features/chat/presentation/assistant_home.dart` (W1, M1):
+- [X] T052 [US1] Create `lib/features/chat/presentation/assistant_home.dart` (W1, M1):
   - centred `AppIcon`-mark, `greeting` "Where to next, {first name}?" (just "Where to next?" without a name), and on phones the line "Plan a trip, find flights, hotels and cars, or ask anything about where you're going.";
   - `Composer`;
   - the suggestions: seven chips on wide screens, four cards that scroll sideways on phones. Each sends its text.
@@ -305,19 +305,19 @@ cards, at 390 px and 1440 px.
   - the top-right "My preferences" button on wide screens, which opens `PreferencesSheet`.
   - Sending creates `chatProvider(null)` with `onChatCreated: (id) => context.replace('/chat/$id')`.
   - `openSaved: true` opens the side panel on Saved.
-- [ ] T053 [US1] Create `lib/features/chat/presentation/chat_screen.dart` (W2, M2):
+- [X] T053 [US1] Create `lib/features/chat/presentation/chat_screen.dart` (W2, M2):
   - a header (wide screens: the title with chevron menu and share; phones: `MobileTopBar` shows the title);
   - the message list: `UserBubble`s, `AnswerView` for assistant messages, and for the pending turn its steps and `WorkingIndicator`;
   - the last answer's `SuggestionChips` above `Composer`;
   - the failure row under the unsent message (the warning and Try again → `retry()`);
   - from 900 px, `Row(chat (flex), SidePanel)` when the panel is open; on phones, `showSidePanelSheet` on open;
   - auto-scroll to the newest step or answer unless the user scrolled up.
-- [ ] T054 [US1] Fill the Plan pane in `lib/features/side_panel/presentation/plan_pane.dart`:
+- [X] T054 [US1] Fill the Plan pane in `lib/features/side_panel/presentation/plan_pane.dart`:
   - Refactor `lib/features/itinerary/presentation/itinerary_screen.dart` into `ItineraryView(planId, {embedded})` plus the screen that wraps it. The `/plans/:id` route is unchanged.
   - The pane shows `ItineraryView(embedded: true)`: the header (name, status pill, dates · adults · from, share, ⋯), the three summary tiles (match with its parts, total of budget, pace with places a day), the tabs Days, Hotel, Flight, Car, Map (the T064 `PinPreview` of the plan's items; a placeholder until US2) and Costs (the 007 cost lines), and the day chips and `DayItemTile`s.
   - The bottom bar has "Ask to change this day…" (wired in US3) and Mark as planned (`PATCH /plans/{id}` `{status: planned}`; the button reads "Mark as draft" when planned).
-- [ ] T055 [US1] Wire the plan card: `PlanCardTile` Open plan → `sidePanelProvider(chatKey).openCard(card)`. Open the sheet on phones.
-- [ ] T056 [P] [US1] Widget tests:
+- [X] T055 [US1] Wire the plan card: `PlanCardTile` Open plan → `sidePanelProvider(chatKey).openCard(card)`. Open the sheet on phones.
+- [X] T056 [P] [US1] Widget tests:
   - `test/features/chat/presentation/assistant_home_test.dart`: greeting with and without a name; chips; suggestions at both widths; Pick up where you left off (loading, data, empty, error);
   - `composer_test.dart`: limits, Enter vs Shift+Enter, chips open their sheets, the notice;
   - `chat_screen_test.dart`: steps appear one by one, the working indicator, the answer's groups and order, suggestion chips send, the failure row and retry, refusal messages for each `ChatFailure`;
@@ -327,7 +327,7 @@ cards, at 390 px and 1440 px.
   - `plan_card_tile_test.dart`.
 
   All at `phone` and `desktop`, with `forBothModes`.
-- [ ] T057 [US1] Flow test `test/flows/assistant_first_flow_test.dart`:
+- [X] T057 [US1] Flow test `test/flows/assistant_first_flow_test.dart`:
   - sign in → home;
   - type the Rome message → the three step lines appear in order before the answer;
   - the plan, flight and hotel cards show;

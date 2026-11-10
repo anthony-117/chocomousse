@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:chocomousse/features/account/application/session.dart';
 import 'package:chocomousse/features/account/data/profile_models.dart';
 import 'package:chocomousse/features/chat/application/recents.dart';
@@ -51,10 +53,16 @@ class ChatTripController extends Notifier<ChatTripState> {
 
   @override
   ChatTripState build() {
+    // The sources can change while a screen builds; the chips follow just after, never during it.
+    void later(ChatTripState Function(ChatTripState current) change) => scheduleMicrotask(() {
+      if (!ref.mounted) return;
+      final next = change(state);
+      if (!identical(next, state)) state = next;
+    });
     ref
-      ..listen(recentsProvider, (_, _) => state = _seeded(state))
-      ..listen(plansProvider, (_, _) => state = _seeded(state))
-      ..listen(profileProvider, (_, next) => state = _withProfile(state, next.value));
+      ..listen(recentsProvider, (_, _) => later(_seeded))
+      ..listen(plansProvider, (_, _) => later(_seeded))
+      ..listen(profileProvider, (_, next) => later((current) => _withProfile(current, next.value)));
     return _seeded(_withProfile(const ChatTripState(), ref.read(profileProvider).value));
   }
 

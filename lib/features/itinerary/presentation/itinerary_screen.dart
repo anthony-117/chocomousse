@@ -12,6 +12,7 @@ import 'package:chocomousse/features/itinerary/application/plan_providers.dart';
 import 'package:chocomousse/features/itinerary/data/plan_models.dart';
 import 'package:chocomousse/features/itinerary/data/plan_repository.dart';
 import 'package:chocomousse/features/itinerary/presentation/change_offer_screen.dart';
+import 'package:chocomousse/features/itinerary/presentation/embedded_plan_view.dart';
 import 'package:chocomousse/features/itinerary/presentation/plan_why_view.dart';
 import 'package:chocomousse/features/itinerary/presentation/widgets/day_view.dart';
 import 'package:chocomousse/features/itinerary/presentation/widgets/plan_texts.dart';
@@ -26,7 +27,7 @@ import 'package:go_router/go_router.dart';
 String describePlanError(Object error) => error is PlanFailure ? error.message : describeApiError(error);
 
 /// The itinerary (I1, I2 on phones; W4 from [kWideLayoutBreakpoint]): the trip card, the days and their items.
-class ItineraryScreen extends ConsumerWidget {
+class ItineraryScreen extends StatelessWidget {
   const ItineraryScreen({required this.id, this.day, super.key});
 
   final String id;
@@ -35,22 +36,46 @@ class ItineraryScreen extends ConsumerWidget {
   final int? day;
 
   @override
+  Widget build(BuildContext context) => ItineraryView(planId: id, day: day);
+}
+
+/// A saved plan, loaded: the full page, or [embedded] in the chat's side panel (spec 008 US1, the Plan pane).
+class ItineraryView extends ConsumerWidget {
+  const ItineraryView({required this.planId, this.day, this.embedded = false, super.key});
+
+  final String planId;
+  final int? day;
+  final bool embedded;
+
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ref
-        .watch(planProvider(id))
-        .when(
-          skipLoadingOnRefresh: false,
-          loading: () => const PlanLoading(),
-          error: (e, _) => e is PlanNotFound
-              ? const PlanProblem(message: "This plan doesn't exist or isn't yours.")
-              : PlanLoading(
-                  banner: ErrorRetryBanner(
-                    message: describePlanError(e),
-                    onRetry: () => ref.invalidate(planProvider(id)),
-                  ),
-                ),
-          data: (plan) => PlanView(plan: plan, day: day),
-        );
+    final plan = ref.watch(planProvider(planId));
+    if (embedded) {
+      return plan.when(
+        skipLoadingOnRefresh: false,
+        loading: () => const Padding(padding: EdgeInsets.all(AppSpacing.xl), child: DayPlaceholders()),
+        error: (e, _) => Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: e is PlanNotFound
+              ? const WarningNote('This plan was deleted.')
+              : ErrorRetryBanner(message: describePlanError(e), onRetry: () => ref.invalidate(planProvider(planId))),
+        ),
+        data: (plan) => EmbeddedPlanView(plan: plan),
+      );
+    }
+    return plan.when(
+      skipLoadingOnRefresh: false,
+      loading: () => const PlanLoading(),
+      error: (e, _) => e is PlanNotFound
+          ? const PlanProblem(message: "This plan doesn't exist or isn't yours.")
+          : PlanLoading(
+              banner: ErrorRetryBanner(
+                message: describePlanError(e),
+                onRetry: () => ref.invalidate(planProvider(planId)),
+              ),
+            ),
+      data: (plan) => PlanView(plan: plan, day: day),
+    );
   }
 }
 

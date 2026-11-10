@@ -4,9 +4,10 @@ import 'package:chocomousse/features/account/data/auth_repository.dart';
 import 'package:chocomousse/features/account/presentation/auth_screens.dart';
 import 'package:chocomousse/features/account/presentation/edit_profile_screen.dart';
 import 'package:chocomousse/features/account/presentation/profile_screen.dart';
-import 'package:chocomousse/features/assistant/presentation/assistant_screen.dart';
 import 'package:chocomousse/features/cars/presentation/car_details_screen.dart';
 import 'package:chocomousse/features/cars/presentation/cars_screen.dart';
+import 'package:chocomousse/features/chat/presentation/assistant_home.dart';
+import 'package:chocomousse/features/chat/presentation/chat_screen.dart';
 import 'package:chocomousse/features/destination/presentation/overview_screen.dart';
 import 'package:chocomousse/features/destination/presentation/place_details_screen.dart';
 import 'package:chocomousse/features/destination/presentation/places_screen.dart';
@@ -24,7 +25,6 @@ import 'package:chocomousse/features/ranking/data/ranking_models.dart';
 import 'package:chocomousse/features/ranking/presentation/best_for_you_screen.dart';
 import 'package:chocomousse/features/ranking/presentation/plan_trip_screen.dart';
 import 'package:chocomousse/features/shell/app_shell.dart';
-import 'package:chocomousse/features/shell/chat_placeholder.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -63,12 +63,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state, child) => AppShell(location: state.uri.path, child: child),
         routes: [
           // The v0.2 assistant stays the home until the v1 home is built (spec 008 T051).
-          GoRoute(path: AppPaths.home, builder: (context, state) => const AssistantScreen()),
+          GoRoute(path: AppPaths.home, builder: (context, state) => const AssistantHome()),
           GoRoute(
             path: '/chat/:chatId',
-            builder: (context, state) => ChatPlaceholder(chatId: state.pathParameters['chatId']!),
+            builder: (context, state) {
+              final id = state.pathParameters['chatId']!;
+              return ChatScreen(key: ValueKey(id), chatId: id);
+            },
           ),
-          GoRoute(path: AppPaths.saved, builder: (context, state) => const AssistantScreen()),
+          GoRoute(path: AppPaths.saved, builder: (context, state) => const AssistantHome(openSaved: true)),
           GoRoute(
             path: AppPaths.explore,
             builder: (context, state) => const DiscoverScreen(),

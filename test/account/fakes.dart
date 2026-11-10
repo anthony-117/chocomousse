@@ -23,8 +23,9 @@ Profile defaultProfile({
   HomeCity? city,
   Preferences? preferences,
   Pace pace = Pace.balanced,
+  String displayName = 'Sam Haddad',
 }) => Profile(
-  displayName: 'Sam Haddad',
+  displayName: displayName,
   email: 'sam@example.com',
   passport: passport ?? Env.defaultPassport,
   homeCurrency: currency ?? Env.defaultCurrency,
