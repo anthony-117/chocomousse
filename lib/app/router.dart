@@ -15,7 +15,11 @@ import 'package:chocomousse/features/discover/presentation/discover_screen.dart'
 import 'package:chocomousse/features/flights/presentation/flights_screen.dart';
 import 'package:chocomousse/features/hotels/presentation/hotel_details_screen.dart';
 import 'package:chocomousse/features/hotels/presentation/hotels_screen.dart';
-import 'package:chocomousse/features/plans/presentation/plans_screen.dart';
+import 'package:chocomousse/features/itinerary/data/plan_models.dart';
+import 'package:chocomousse/features/itinerary/presentation/build_plan_screen.dart';
+import 'package:chocomousse/features/itinerary/presentation/change_offer_screen.dart';
+import 'package:chocomousse/features/itinerary/presentation/itinerary_screen.dart';
+import 'package:chocomousse/features/itinerary/presentation/my_plans_screen.dart';
 import 'package:chocomousse/features/ranking/data/ranking_models.dart';
 import 'package:chocomousse/features/ranking/presentation/best_for_you_screen.dart';
 import 'package:chocomousse/features/ranking/presentation/plan_trip_screen.dart';
@@ -134,7 +138,45 @@ final routerProvider = Provider<GoRouter>((ref) {
             ],
           ),
           StatefulShellBranch(
-            routes: [GoRoute(path: AppTab.plans.path, builder: (context, state) => const PlansScreen())],
+            routes: [
+              GoRoute(
+                path: AppTab.plans.path,
+                builder: (context, state) => const MyPlansScreen(),
+                routes: [
+                  GoRoute(
+                    path: 'new',
+                    // A build starts from Best for you or the overview; opened without one (a reload), it goes to
+                    // My plans instead of building again.
+                    redirect: (context, state) => state.extra is BuildPlanRequest ? null : AppTab.plans.path,
+                    builder: (context, state) => BuildPlanScreen(request: state.extra! as BuildPlanRequest),
+                  ),
+                  GoRoute(
+                    path: ':planId',
+                    builder: (context, state) => ItineraryScreen(
+                      id: state.pathParameters['planId']!,
+                      day: int.tryParse(state.uri.queryParameters['day'] ?? ''),
+                    ),
+                    routes: [
+                      GoRoute(
+                        path: 'change/:kind',
+                        redirect: (context, state) => OfferKind.parse(state.pathParameters['kind']) == null
+                            ? '/plans/${state.pathParameters['planId']}'
+                            : null,
+                        builder: (context, state) => ChangeOfferScreen(
+                          planId: state.pathParameters['planId']!,
+                          kind: OfferKind.parse(state.pathParameters['kind'])!,
+                        ),
+                      ),
+                      // Place details inside the Plans tab, so Back returns to the day (plan decision 6).
+                      GoRoute(
+                        path: 'place/:placeId',
+                        builder: (context, state) => PlaceDetailsScreen(placeId: state.pathParameters['placeId']!),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
           ),
           StatefulShellBranch(
             routes: [GoRoute(path: AppTab.assistant.path, builder: (context, state) => const AssistantScreen())],

@@ -12,6 +12,7 @@ import 'package:chocomousse/features/destination/data/preferences.dart';
 import 'package:chocomousse/features/flights/application/flight_providers.dart';
 import 'package:chocomousse/features/hotels/data/hotel_repository.dart';
 import 'package:chocomousse/features/ranking/data/ranking_repository.dart';
+import 'package:chocomousse/features/ranking/presentation/widgets/pace_choice.dart';
 import 'package:chocomousse/features/ranking/presentation/widgets/preferences_form.dart';
 import 'package:chocomousse/features/ranking/presentation/widgets/ranked_card.dart';
 import 'package:chocomousse/features/system/data/system_api.dart';
@@ -129,6 +130,22 @@ void main() {
       expect(app.saved.of(Criterion.food), Level.high);
       expect(app.ranking.hotelQueries.single.preferences.of(Criterion.food), Level.high);
       expect(app.ranking.carQueries, isEmpty);
+    });
+
+    testWidgets('Pace is chosen with the preferences and saved by Find my best plans', (tester) async {
+      usePhoneSize(tester, height: 2000);
+      final app = _App(tester);
+      await app.open(_plan);
+
+      expect(find.byType(PaceChoice), findsOneWidget);
+      expect(find.textContaining('3 places a day'), findsOneWidget);
+
+      await app.tapText('Packed');
+      expect(find.textContaining('4 places a day'), findsOneWidget);
+      expect(app.container.read(tripSettingsProvider).pace, Pace.balanced);
+
+      await app.tapText('Find my best plans');
+      expect(app.container.read(tripSettingsProvider).pace, Pace.packed);
     });
 
     testWidgets('a budget that is not a whole amount above 0 holds the button', (tester) async {

@@ -5,6 +5,7 @@ import 'package:chocomousse/core/widgets/page_frame.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/destination/data/preferences.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
+import 'package:chocomousse/features/itinerary/presentation/build_plan_screen.dart';
 import 'package:chocomousse/features/ranking/data/ranking_models.dart';
 import 'package:chocomousse/features/ranking/presentation/widgets/preferences_form.dart';
 import 'package:chocomousse/features/ranking/presentation/widgets/ranked_tabs.dart';
@@ -88,7 +89,15 @@ class _BestForYouScreenState extends ConsumerState<BestForYouScreen> {
           ),
       ],
     );
-    final body = RankedTab(kind: widget.tab, query: query, wide: wide);
+    final name = ref.watch(destinationProvider(widget.id)).value?.name ?? 'this city';
+    final body = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RankedTab(kind: widget.tab, query: query, wide: wide),
+        const SizedBox(height: AppSpacing.xl),
+        BuildPlanButton(destinationId: widget.id, destinationName: name),
+      ],
+    );
 
     if (wide) {
       return PageFrame(

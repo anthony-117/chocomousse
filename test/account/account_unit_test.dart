@@ -79,13 +79,14 @@ const _unconfirmed = AuthUser(
   method: SignInMethod.password,
 );
 
-Map<String, Object?> _profileJson({Map<String, Object?>? city, Map<String, Object?>? weights}) => {
+Map<String, Object?> _profileJson({Map<String, Object?>? city, Map<String, Object?>? weights, String? pace}) => {
   'displayName': 'Sam',
   'email': 'sam@example.com',
   'passport': 'LB',
   'homeCurrency': 'USD',
   'homeCity': city,
   'preferences': weights ?? {'budget': 90, 'culture': 10, 'food': 50, 'nature': 50, 'nightlife': 50, 'comfort': 50},
+  'pace': ?pace,
 };
 
 void main() {
@@ -231,6 +232,14 @@ void main() {
       expect(json['homeCityId'], 'c1');
       expect((json['preferences']! as Map).length, Criterion.values.length);
       expect((json['preferences']! as Map)['budget'], 90);
+      expect(json['pace'], 'balanced');
+    });
+
+    test('reads the pace; a missing or unknown one is Balanced', () {
+      expect(Profile.fromJson(_profileJson(pace: 'packed')).pace, Pace.packed);
+      expect(Profile.fromJson(_profileJson()).pace, Pace.balanced);
+      expect(Profile.fromJson(_profileJson(pace: 'fast')).pace, Pace.balanced);
+      expect(ProfileForm.of(Profile.fromJson(_profileJson(pace: 'relaxed'))).toJson()['pace'], 'relaxed');
     });
 
     test('the repository gets, updates and deletes /me', () async {
@@ -330,6 +339,7 @@ FIREBASE_AUTH_DOMAIN=demo.firebaseapp.com
           passport: 'FR',
           currency: 'EUR',
           preferences: const Preferences(levels: {Criterion.food: Level.high}),
+          pace: Pace.packed,
         ),
       );
       final c = container(FakeAuthRepository(user: confirmedUser), profiles);
@@ -342,6 +352,7 @@ FIREBASE_AUTH_DOMAIN=demo.firebaseapp.com
       expect(trip.currency, 'EUR');
       expect(trip.preferences.of(Criterion.food), Level.high);
       expect(trip.preferences.tripBudget, 1500);
+      expect(trip.pace, Pace.packed);
     });
 
     test('a profile that fails to load leaves the defaults', () async {

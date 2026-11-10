@@ -117,7 +117,7 @@ class _ProfileCards extends ConsumerWidget {
         const SizedBox(height: AppSpacing.lg),
         _Card(
           title: 'Default preferences',
-          children: [Text(profile.preferences.summary, style: textTheme.bodyMedium)],
+          children: [Text('${profile.preferences.summary} · Pace ${profile.pace.label}', style: textTheme.bodyMedium)],
         ),
       ],
     );
