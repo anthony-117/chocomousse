@@ -8,7 +8,6 @@ import 'package:chocomousse/features/assistant/presentation/widgets/chat_bubble.
 import 'package:chocomousse/features/assistant/presentation/widgets/chat_input.dart';
 import 'package:chocomousse/features/assistant/presentation/widgets/suggestion_chips.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
-import 'package:chocomousse/features/shell/floating_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -95,8 +94,7 @@ class _AssistantScreenState extends ConsumerState<AssistantScreen> {
                   const SizedBox(height: AppSpacing.md),
                 ],
                 ChatInput(enabled: !chat.sending, onSend: controller.send),
-                // Room for the floating nav on phones.
-                SizedBox(height: wide ? AppSpacing.xxl : FloatingNav.height + AppSpacing.xl + AppSpacing.lg),
+                const SizedBox(height: AppSpacing.xxl),
               ],
             ),
           ),

@@ -215,7 +215,7 @@ it's kept.
 **Independent test**: at 1440 px the sidebar shows every item and collapses; at 390 px the drawer opens from the
 menu; Explore, My plans and the profile open; a v0.2 deep link works.
 
-- [ ] T037 [US4] Rewrite the routes in `lib/app/router.dart` (research R-5):
+- [X] T037 [US4] Rewrite the routes in `lib/app/router.dart` (research R-5):
   - Remove `AppTab` and `StatefulShellRoute`. Add one `ShellRoute(builder: AppShell)`, with these routes inside it:
     - `/` → `AssistantHome` (placeholder `Scaffold` until T051);
     - `/chat/:chatId` → `ChatScreen` (placeholder until T052);
@@ -223,30 +223,30 @@ menu; Explore, My plans and the profile open; a v0.2 deep link works.
     - the existing `/discover/...`, `/plans/...` and `/profile/...` routes, unchanged.
   - Redirect `/assistant` to `/`. Set `initialLocation: '/'`.
   - In `lib/app/auth_guard.dart`, change the post-sign-in default from `/discover` to `/`, and allow `/` as before.
-- [ ] T038 [P] [US4] Create `lib/features/shell/widgets/sidebar_item.dart`: `SidebarItem(icon, label, {active, onTap, trailing})`, 36 px high, as the v1 component (Default and Active states, Figma 2302:40), with the hover colour `bgHover`
-- [ ] T039 [US4] Create `lib/features/shell/sidebar.dart` (W1):
+- [X] T038 [P] [US4] Create `lib/features/shell/widgets/sidebar_item.dart`: `SidebarItem(icon, label, {active, onTap, trailing})`, 36 px high, as the v1 component (Default and Active states, Figma 2302:40), with the hover colour `bgHover`
+- [X] T039 [US4] Create `lib/features/shell/sidebar.dart` (W1):
   - Width 272, `bgSidebar`. From the top: brand (`AppLogo` and "TravelGenie"), the panel-left collapse button, New trip chat (→ `/`), Search chats (opens `SearchChatsDialog`, T070), Explore (→ `/discover`), My plans (→ `/plans`), Saved (→ `/saved`), the RECENTS label with `RecentsList` (T069; an empty `SizedBox` until then), and `AccountRow` at the bottom.
   - Collapsed, it is a 64 px rail of icons. The collapsed state is a session `StateProvider`.
   - The active item comes from the current location.
-- [ ] T040 [US4] Create `lib/features/shell/mobile_top_bar.dart` (M1, M2): menu (opens the drawer), centred title ("TravelGenie" on `/`, the chat title with chevron-down on a chat, the screen's own title elsewhere), and the new-chat icon (→ `/`)
-- [ ] T041 [US4] Create `lib/features/shell/app_drawer.dart` (M5): width 312, the "Search chats and plans" field (opens `SearchChatsDialog`), the same items as the sidebar, RECENTS and `AccountRow`. It closes after a choice.
-- [ ] T042 [US4] Create `lib/features/shell/account_row.dart` and `account_menu.dart`:
+- [X] T040 [US4] Create `lib/features/shell/mobile_top_bar.dart` (M1, M2): menu (opens the drawer), centred title ("TravelGenie" on `/`, the chat title with chevron-down on a chat, the screen's own title elsewhere), and the new-chat icon (→ `/`)
+- [X] T041 [US4] Create `lib/features/shell/app_drawer.dart` (M5): width 312, the "Search chats and plans" field (opens `SearchChatsDialog`), the same items as the sidebar, RECENTS and `AccountRow`. It closes after a choice.
+- [X] T042 [US4] Create `lib/features/shell/account_row.dart` and `account_menu.dart`:
   - The row shows the avatar initial, the name and "{Pace} pace" (from `profileProvider`), and chevron.
   - The menu (a `MenuAnchor` on wide screens, a bottom sheet on phones) holds:
     - Preferences and account (→ `/profile`);
     - Appearance, a System, Light and Dark segmented choice (→ `appearanceProvider.set`);
     - Sign out (the existing sign-out action).
-- [ ] T043 [US4] Rewrite `lib/features/shell/app_shell.dart`:
+- [X] T043 [US4] Rewrite `lib/features/shell/app_shell.dart`:
   - From `kWideLayoutBreakpoint`: `Row(Sidebar, Expanded(child))`.
   - Below it: `Scaffold(drawer: AppDrawer, appBar: MobileTopBar, body: child)`. Screens with their own app bar (Discover, list and details screens) hide `MobileTopBar` and get a leading menu button through `ShellScope.of(context).openDrawer`.
   - Delete `lib/features/shell/floating_nav.dart` and `web_header.dart`, and every import and use of them.
-- [ ] T044 [P] [US4] Widget tests:
+- [X] T044 [P] [US4] Widget tests:
   - `test/features/shell/sidebar_test.dart`: every item, active state, collapse to rail, navigation targets, both modes;
   - `app_drawer_test.dart`;
   - `mobile_top_bar_test.dart`;
   - `account_menu_test.dart`: each entry; Appearance writes;
   - rewrite `test/app_shell_test.dart` for both widths.
-- [ ] T045 [US4] Flow test `test/flows/explore_from_shell_flow_test.dart`:
+- [X] T045 [US4] Flow test `test/flows/explore_from_shell_flow_test.dart`:
   - sign in → `/`;
   - Explore → Discover → a city → its hotels;
   - My plans;

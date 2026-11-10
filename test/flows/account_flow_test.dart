@@ -67,7 +67,7 @@ void main() {
       expect(find.text('Continue with Google'), findsOneWidget);
       expect(find.text('Continue with email'), findsOneWidget);
       expect(find.text('I already have an account'), findsOneWidget);
-      expect(find.byTooltip('Profile'), findsNothing);
+      expect(find.byTooltip('Open menu'), findsNothing);
 
       _go(tester, '/plans');
       await tester.pumpAndSettle();
@@ -79,7 +79,7 @@ void main() {
       expect(find.textContaining('Missing setting: FIREBASE_PROJECT_ID'), findsOneWidget);
     });
 
-    testWidgets('Google: signs in and lands on Discover; a closed window says nothing', (tester) async {
+    testWidgets('Google: signs in and lands on the home; a closed window says nothing', (tester) async {
       final auth = FakeAuthRepository()..failWith = AuthFailure.cancelled;
       await _start(tester, auth);
 
@@ -89,7 +89,7 @@ void main() {
 
       await _tap(tester, 'Continue with Google');
       expect(auth.calls, ['google', 'google']);
-      expect(find.byTooltip('Profile'), findsOneWidget);
+      expect(find.byTooltip('Open menu'), findsOneWidget);
     });
 
     testWidgets('A2: a wrong password shows the error; the right one goes where the traveller was going', (
@@ -115,10 +115,10 @@ void main() {
 
       await _tap(tester, 'Sign in');
       expect(auth.calls.last, 'email:sam@example.com');
-      expect(find.text('My plans'), findsOneWidget);
+      expect(find.text('My plans'), findsWidgets);
     });
 
-    testWidgets('A3 → A4: create an account, confirm the email, then Discover', (tester) async {
+    testWidgets('A3 → A4: create an account, confirm the email, then the home', (tester) async {
       final auth = FakeAuthRepository();
       await _start(tester, auth);
 
@@ -156,7 +156,7 @@ void main() {
         method: SignInMethod.password,
       );
       await _tap(tester, "I've confirmed");
-      expect(find.byTooltip('Discover'), findsOneWidget);
+      expect(find.byTooltip('Open menu'), findsOneWidget);
     });
 
     testWidgets('A3: an email that has an account offers Sign in', (tester) async {
@@ -235,8 +235,7 @@ void main() {
   group('signed in', () {
     Future<void> openProfile(WidgetTester tester, FakeAuthRepository auth, FakeProfileRepository profiles) async {
       await _start(tester, auth, profiles);
-      await tester.tap(find.byTooltip('Profile'));
-      await tester.pumpAndSettle();
+      await openProfileFromMenu(tester);
     }
 
     testWidgets('P1: shows the traveller and their travel profile', (tester) async {

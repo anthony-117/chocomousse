@@ -13,7 +13,6 @@ import 'package:chocomousse/features/flights/presentation/widgets/flights_entry.
 import 'package:chocomousse/features/hotels/presentation/widgets/hotels_entry.dart';
 import 'package:chocomousse/features/itinerary/presentation/build_plan_screen.dart';
 import 'package:chocomousse/features/ranking/presentation/widgets/plan_entry.dart';
-import 'package:chocomousse/features/shell/floating_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -135,7 +134,7 @@ class _OverviewFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.only(bottom: wide ? 64 : FloatingNav.height + 48),
+      padding: EdgeInsets.only(bottom: wide ? 64 : 48),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

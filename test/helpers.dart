@@ -59,3 +59,30 @@ void forBothModes(String description, Future<void> Function(WidgetTester tester,
     testWidgets('$description (${mode.name})', (tester) => body(tester, mode));
   }
 }
+
+/// Opens a shell place ("Explore", "My plans", "Saved", "New trip chat") the way a traveller does: through the drawer
+/// on phones, the sidebar on wide screens.
+Future<void> openShellPlace(WidgetTester tester, String label) async {
+  final menu = find.byTooltip('Open menu');
+  if (menu.evaluate().isNotEmpty) {
+    await tester.tap(menu);
+    await tester.pumpAndSettle();
+    await tester.tap(find.descendant(of: find.byType(Drawer), matching: find.bySemanticsLabel(label)));
+  } else {
+    await tester.tap(find.bySemanticsLabel(label).first);
+  }
+  await tester.pumpAndSettle();
+}
+
+/// Opens Preferences and account from the account menu (in the drawer on phones).
+Future<void> openProfileFromMenu(WidgetTester tester) async {
+  final menu = find.byTooltip('Open menu');
+  if (menu.evaluate().isNotEmpty) {
+    await tester.tap(menu);
+    await tester.pumpAndSettle();
+  }
+  await tester.tap(find.bySemanticsLabel(RegExp('^Account')).last);
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Preferences and account'));
+  await tester.pumpAndSettle();
+}

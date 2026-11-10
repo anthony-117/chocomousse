@@ -24,7 +24,7 @@ class AssistantEntry extends ConsumerWidget {
         borderRadius: BorderRadius.circular(AppRadius.md),
         onTap: () {
           ref.read(chatControllerProvider.notifier).startFor((id: destinationId, name: destinationName));
-          context.go(AppTab.assistant.path);
+          context.go(AppPaths.home);
         },
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.lg),

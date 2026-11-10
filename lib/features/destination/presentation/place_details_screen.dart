@@ -5,7 +5,6 @@ import 'package:chocomousse/features/destination/application/destination_provide
 import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/place_tile.dart';
-import 'package:chocomousse/features/shell/floating_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,7 +42,7 @@ class _DetailsPlaceholder extends StatelessWidget {
     final animate = banner == null;
 
     return SingleChildScrollView(
-      padding: EdgeInsets.only(bottom: wide ? 64 : FloatingNav.height + 48),
+      padding: EdgeInsets.only(bottom: wide ? 64 : 48),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 900),
@@ -99,7 +98,7 @@ class _Details extends StatelessWidget {
     final meta = [place.kind, place.priceLevel].whereType<String>().join(' · ');
 
     return SingleChildScrollView(
-      padding: EdgeInsets.only(bottom: wide ? 64 : FloatingNav.height + 48),
+      padding: EdgeInsets.only(bottom: wide ? 64 : 48),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 900),

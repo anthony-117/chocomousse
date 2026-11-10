@@ -41,6 +41,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    await openShellPlace(tester, 'Explore');
 
     await tester.tap(find.text('Rome'));
     await tester.pumpAndSettle();
@@ -69,12 +70,13 @@ void main() {
     );
     expect(find.text('Hotels in Rome'), findsOneWidget);
 
-    // Back from hotels lands on Rome's overview; the chat is still there in the Assistant tab.
+    // Back from hotels lands on Rome's overview; the chat is still there on the home.
     await tester.tap(find.byTooltip('Back').first);
     await tester.pumpAndSettle();
     expect(find.text('Ask the assistant'), findsOneWidget);
-    await tester.tap(find.byTooltip('Assistant'));
+    await tester.tap(find.byTooltip('Back').first);
     await tester.pumpAndSettle();
+    await openShellPlace(tester, 'New trip chat');
     expect(find.text('Hotel Artemide: 612 USD for the stay.'), findsOneWidget);
   });
 }

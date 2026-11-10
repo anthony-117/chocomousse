@@ -35,6 +35,7 @@ void main() {
     usePhoneSize(tester, height: 2000);
     await tester.pumpWidget(_app(_repoWithPlaces()));
     await tester.pumpAndSettle();
+    await openShellPlace(tester, 'Explore');
 
     await tester.tap(find.text('Rome'));
     await tester.pumpAndSettle();
@@ -61,6 +62,7 @@ void main() {
     final repo = _repoWithPlaces();
     await tester.pumpWidget(_app(repo));
     await tester.pumpAndSettle();
+    await openShellPlace(tester, 'Explore');
 
     await tester.tap(find.text('Where to next?'));
     await tester.pumpAndSettle();
@@ -75,17 +77,20 @@ void main() {
     expect(repo.overviewCalls.single, (passport: 'LB', currency: 'USD'));
   });
 
-  testWidgets('overview that fails shows a retry, and the nav still works', (tester) async {
+  testWidgets('overview that fails shows a retry, and the shell still works', (tester) async {
     usePhoneSize(tester, height: 2000);
     await tester.pumpWidget(_app(FakeDestinationRepository(overviewError: StateError('down'))));
     await tester.pumpAndSettle();
+    await openShellPlace(tester, 'Explore');
 
     await tester.tap(find.text('Rome'));
     await tester.pumpAndSettle();
     expect(find.text('Try again'), findsOneWidget);
 
-    await tester.tap(find.byTooltip('Profile'));
+    // Back to Explore, then the profile from the account menu in the drawer.
+    await tester.tap(find.byTooltip('Back').first);
     await tester.pumpAndSettle();
+    await openProfileFromMenu(tester);
     expect(find.text('Connected to pamplemousse 1.0.0 (Test)'), findsOneWidget);
   });
 }
