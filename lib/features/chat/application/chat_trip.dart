@@ -112,6 +112,20 @@ class ChatTripController extends Notifier<ChatTripState> {
 
   void setPace(Pace pace) => state = state.copyWith(pace: pace, paceChanged: true);
 
+  /// A reopened chat: the chips take its stored trip, preferences and pace, so the next message continues it.
+  void fromChat(Chat chat) {
+    var next = state;
+    if (chat.trip case final trip? when !trip.isEmpty) {
+      _tripSet = true;
+      next = next.copyWith(trip: trip);
+    }
+    if (chat.preferences case final preferences?) {
+      next = next.copyWith(preferences: Map.unmodifiable(preferences), preferencesChanged: true);
+    }
+    if (chat.pace case final pace?) next = next.copyWith(pace: pace, paceChanged: true);
+    if (!identical(next, state)) state = next;
+  }
+
   /// The trip when it has anything; the preferences and pace only once changed, so the profile stays the default.
   ChatRequestParts toRequestParts() => (
     trip: state.trip.isEmpty ? null : state.trip,

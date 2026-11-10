@@ -116,14 +116,16 @@ class _ToolStepLineState extends State<ToolStepLine> {
 
 /// Shown under the last step while the answer is being written.
 class WorkingIndicator extends StatelessWidget {
-  const WorkingIndicator({super.key});
+  const WorkingIndicator({this.label = 'Working on it…', super.key});
+
+  final String label;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
     return Semantics(
       liveRegion: true,
-      label: 'Working on it',
+      label: label,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
         child: Row(
@@ -134,7 +136,9 @@ class WorkingIndicator extends StatelessWidget {
               child: CircularProgressIndicator(strokeWidth: 2, color: palette.brandPrimary),
             ),
             const SizedBox(width: AppSpacing.sm),
-            Text('Working on it…', style: AppText.small.copyWith(color: palette.textSecondary)),
+            Flexible(
+              child: Text(label, style: AppText.small.copyWith(color: palette.textSecondary)),
+            ),
           ],
         ),
       ),

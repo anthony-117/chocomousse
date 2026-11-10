@@ -1,16 +1,20 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/router.dart';
 import 'package:chocomousse/app/theme/app_icons.dart';
 import 'package:chocomousse/app/theme/app_text.dart';
 import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/core/widgets/skeleton.dart';
 import 'package:chocomousse/features/chat/application/chat_controller.dart';
+import 'package:chocomousse/features/chat/data/chat_repository.dart';
 import 'package:chocomousse/features/chat/presentation/composer.dart';
 import 'package:chocomousse/features/chat/presentation/widgets/chat_bits.dart';
 import 'package:chocomousse/features/chat/presentation/widgets/chat_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// A chat (spec 008 US1, W2 and M2): the messages, the steps of the answer being written, what to ask next and the
 /// composer, with the side panel beside it on wide screens.
@@ -79,7 +83,27 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     Widget list;
     if (state.messages.isEmpty && state.status == ChatStatus.loading) {
-      list = const Center(child: CircularProgressIndicator());
+      list = const _MessagesSkeleton();
+    } else if (state.messages.isEmpty && state.failure is ChatNotFound) {
+      list = Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('This chat has expired', style: AppText.title.copyWith(color: palette.textPrimary)),
+              const SizedBox(height: AppSpacing.sm),
+              Text(
+                'Chats are deleted some time after their last message.',
+                textAlign: TextAlign.center,
+                style: AppText.body.copyWith(color: palette.textSecondary),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              FilledButton(onPressed: () => context.go(AppPaths.home), child: const Text('New trip chat')),
+            ],
+          ),
+        ),
+      );
     } else if (state.messages.isEmpty && state.status == ChatStatus.failed) {
       list = Center(
         child: Column(
@@ -123,10 +147,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     const SizedBox(height: AppSpacing.xl),
                   ],
                   if (state.status == ChatStatus.busyElsewhere)
-                    Text(
-                      'Still answering on another device…',
-                      style: AppText.small.copyWith(color: palette.textSecondary),
-                    ),
+                    const WorkingIndicator(label: 'Still answering on another device…'),
                 ],
               ),
             ),
@@ -190,6 +211,30 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
 
     return ChatLayout(chatKey: key, child: column);
   }
+}
+
+/// While a chat opens: three message blocks, a question on the right and answers on the left.
+class _MessagesSkeleton extends StatelessWidget {
+  const _MessagesSkeleton();
+
+  @override
+  Widget build(BuildContext context) => ListView(
+    padding: const EdgeInsets.all(AppSpacing.xl),
+    children: const [
+      ChatColumn(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Align(alignment: Alignment.centerRight, child: SkeletonBox(width: 260, height: 44)),
+            SizedBox(height: AppSpacing.xl),
+            SkeletonBox(height: 120),
+            SizedBox(height: AppSpacing.xl),
+            Align(alignment: Alignment.centerRight, child: SkeletonBox(width: 200, height: 44)),
+          ],
+        ),
+      ),
+    ],
+  );
 }
 
 /// Under a message that wasn't answered: why, and Try again.

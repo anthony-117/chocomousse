@@ -114,6 +114,7 @@ class ChatController extends Notifier<ChatState> {
     try {
       final chat = await _repository.get(id);
       if (!ref.mounted) return;
+      ref.read(chatTripProvider.notifier).fromChat(chat);
       state = ChatState(
         chatId: chat.id,
         title: chat.title,

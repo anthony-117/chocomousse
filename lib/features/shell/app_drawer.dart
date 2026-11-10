@@ -3,6 +3,7 @@ import 'package:chocomousse/app/theme/app_text.dart';
 import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/shell/account_row.dart';
+import 'package:chocomousse/features/shell/recents_list.dart';
 import 'package:chocomousse/features/shell/search_chats_dialog.dart';
 import 'package:chocomousse/features/shell/shell_nav.dart';
 import 'package:flutter/material.dart';
@@ -64,8 +65,9 @@ class AppDrawer extends StatelessWidget {
               ),
               const SizedBox(height: AppSpacing.md),
               ShellNavItems(location: location, onChosen: close, skip: const {ShellPlace.search}),
-              // RECENTS and its chats arrive with spec 008 US5 (T069).
-              const Spacer(),
+              Expanded(
+                child: RecentsList(location: location, onChosen: close),
+              ),
               const AccountRow(),
             ],
           ),

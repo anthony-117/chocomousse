@@ -3,6 +3,7 @@ import 'package:chocomousse/app/theme/app_text.dart';
 import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/core/widgets/app_logo.dart';
 import 'package:chocomousse/features/shell/account_row.dart';
+import 'package:chocomousse/features/shell/recents_list.dart';
 import 'package:chocomousse/features/shell/shell_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -80,8 +81,7 @@ class Sidebar extends ConsumerWidget {
                         ),
                         const SizedBox(height: 2),
                         ShellNavItems(location: location),
-                        // RECENTS and its chats arrive with spec 008 US5 (T069).
-                        const Spacer(),
+                        Expanded(child: RecentsList(location: location)),
                         const AccountRow(),
                       ],
                     ),

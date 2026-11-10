@@ -398,32 +398,32 @@ cards, at 390 px and 1440 px.
 **Goal**: Recents, reopening, continuing, Search chats, rename and delete.
 **Independent test**: with the fake API, list, open, continue, search "jazz", rename, delete.
 
-- [ ] T068 [P] [US5] Create `lib/features/chat/application/recents.dart`:
+- [X] T068 [P] [US5] Create `lib/features/chat/application/recents.dart`:
   - `recentsProvider` is an `AsyncNotifier<RecentsState>` (items, `next`, `keepDays`, `loadingMore`). It loads 30, `loadMore()` follows `next`, and `rename(id, title)` and `delete(id)` update the list after the API answers.
   - `chatSearchProvider(q)` debounces 300 ms; q under 2 characters gives an empty result.
-- [ ] T069 [US5] Create `lib/features/shell/recents_list.dart`:
+- [X] T069 [US5] Create `lib/features/shell/recents_list.dart`:
   - `SidebarItem`s by title (no title shows "New chat"), the current chat active, a ⋯ on hover or long-press with Rename (a dialog, "1–40 characters") and Delete (confirm: "Delete this chat? Plans built in it stay.");
   - "Show more" when `next` is set;
   - the footer "Chats are kept for {keepDays} days." (FR-024a);
   - loading: three skeleton rows; error: "Couldn't load your chats · Try again"; empty: hidden.
   - Deleting the open chat goes to `/`.
-- [ ] T070 [US5] Create `lib/features/shell/search_chats_dialog.dart`:
+- [X] T070 [US5] Create `lib/features/shell/search_chats_dialog.dart`:
   - a dialog on wide screens, a full-screen sheet on phones;
   - a field (autofocus) with two groups: Chats (open `/chat/{id}`) and Plans (open the plan in the Plan pane of a new home, through `/` with the panel's `openPlan`);
   - "Type at least 2 letters", "Nothing found for '{q}'", and an error with Try again;
   - before any chat exists, it says "Nothing to search yet."
-- [ ] T071 [US5] Reopening in `chat_screen.dart`:
+- [X] T071 [US5] Reopening in `chat_screen.dart`:
   - `chatProvider(id).load()` with a skeleton of three message blocks;
   - 404 → "This chat has expired" with New trip chat;
   - `busy` → the working state with "Still answering on another device…";
   - the composer continues the chat; the trip chips take the chat's stored trip, preferences and pace.
-- [ ] T072 [US5] Use `RecentsList` in `sidebar.dart` and `app_drawer.dart`, and wire Search chats to `SearchChatsDialog`
-- [ ] T073 [P] [US5] Tests:
+- [X] T072 [US5] Use `RecentsList` in `sidebar.dart` and `app_drawer.dart`, and wire Search chats to `SearchChatsDialog`
+- [X] T073 [P] [US5] Tests:
   - `test/features/chat/application/recents_test.dart`: paging, rename and delete, search debounce, short q;
   - `test/features/shell/recents_list_test.dart`: all states, rename and delete dialogs, the footer;
   - `search_chats_dialog_test.dart`;
   - `chat_screen_reopen_test.dart`: load, 404, busy.
-- [ ] T074 [US5] Flow test `test/flows/chat_recents_search_flow_test.dart`: Recents shows two chats → open one → its messages and cards show → send → the answer appends → Search "jazz" → open the result → rename → delete → Recents updates
+- [X] T074 [US5] Flow test `test/flows/chat_recents_search_flow_test.dart`: Recents shows two chats → open one → its messages and cards show → send → the answer appends → Search "jazz" → open the result → rename → delete → Recents updates
 
 ---
 

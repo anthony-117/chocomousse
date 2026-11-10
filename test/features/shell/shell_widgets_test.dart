@@ -8,6 +8,7 @@ import 'package:chocomousse/features/shell/account_menu.dart';
 import 'package:chocomousse/features/shell/account_row.dart';
 import 'package:chocomousse/features/shell/app_drawer.dart';
 import 'package:chocomousse/features/shell/mobile_top_bar.dart';
+import 'package:chocomousse/features/shell/search_chats_dialog.dart';
 import 'package:chocomousse/features/shell/shell_nav.dart';
 import 'package:chocomousse/features/shell/sidebar.dart';
 import 'package:chocomousse/features/shell/widgets/sidebar_item.dart';
@@ -112,7 +113,7 @@ void main() {
       await _host(tester, (location) => Sidebar(location: location));
       await tester.tap(find.bySemanticsLabel('Search chats'));
       await tester.pumpAndSettle();
-      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.byType(SearchChatsView), findsOneWidget);
     });
 
     testWidgets('collapses to a rail of icons and opens again', (tester) async {

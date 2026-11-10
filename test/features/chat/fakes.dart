@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:chocomousse/features/chat/application/recents.dart';
+import 'package:chocomousse/features/chat/data/chat_models.dart';
 import 'package:chocomousse/features/chat/data/chat_repository.dart';
 import 'package:chocomousse/features/chat/data/chat_transport.dart';
 import 'package:dio/dio.dart';
@@ -166,3 +167,133 @@ List<Override> chatOverrides(FakeChatTransport transport, {List<(int, Object?)> 
     recentsProvider.overrideWith(EmptyRecents.new),
   ];
 }
+
+/// A stored chat as the API sends it.
+Map<String, Object?> chatJson({
+  String id = 'c1',
+  String? title = 'Rome in April',
+  List<Map<String, Object?>>? messages,
+  Map<String, Object?>? trip,
+  Map<String, Object?>? preferences,
+  String? pace,
+  bool busy = false,
+}) => {
+  'id': id,
+  'title': title,
+  'trip': trip,
+  'preferences': preferences,
+  'pace': pace,
+  'createdAt': '2026-11-09T18:40:00Z',
+  'lastMessageAt': '2026-11-10T19:02:11Z',
+  'expiresAt': '2027-02-08T19:02:11Z',
+  'busy': busy,
+  'messages':
+      messages ??
+      [
+        {'id': '0001', 'role': 'traveller', 'text': 'Plan Rome', 'at': '2026-11-10T19:00:00Z'},
+        {
+          'id': '0002',
+          'role': 'assistant',
+          'text': 'Here is a 5-day plan.',
+          'steps': <Object>[],
+          'cards': [planCardJson()],
+          'at': '2026-11-10T19:02:11Z',
+        },
+      ],
+};
+
+/// The chat API held in memory: Recents pages of [pageSize], open, rename, delete and search over titles and texts.
+/// Messages go through [transport].
+class FakeChatApi extends ChatRepository {
+  factory FakeChatApi({FakeChatTransport? transport, List<Map<String, Object?>> chats = const [], int pageSize = 30}) =>
+      FakeChatApi._(transport ?? FakeChatTransport(), [...chats], pageSize);
+
+  FakeChatApi._(this.transport, this.chats, this.pageSize) : super(Dio(), transport);
+
+  final FakeChatTransport transport;
+
+  final List<Map<String, Object?>> chats;
+  final int pageSize;
+  int keepDays = 90;
+  List<Map<String, Object?>> plans = [];
+
+  /// The next call of each kind fails with it, once.
+  Exception? failList;
+  Exception? failSearch;
+  Exception? failRename;
+
+  /// When set, list waits for it.
+  Completer<void>? gate;
+
+  final searches = <String>[];
+
+  static Map<String, Object?> _item(Map<String, Object?> chat) => {
+    'id': chat['id'],
+    'title': chat['title'],
+    'trip': chat['trip'],
+    'createdAt': chat['createdAt'],
+    'lastMessageAt': chat['lastMessageAt'],
+    'messageCount': (chat['messages']! as List).length,
+  };
+
+  @override
+  Future<ChatPage> list({String? before, int limit = 30}) async {
+    await gate?.future;
+    if (failList case final failure?) {
+      failList = null;
+      throw failure;
+    }
+    final start = before == null ? 0 : int.parse(before);
+    final end = (start + pageSize).clamp(0, chats.length);
+    return ChatPage.fromJson({
+      'items': chats.sublist(start, end).map(_item).toList(),
+      'next': end < chats.length ? '$end' : null,
+      'keepDays': keepDays,
+    });
+  }
+
+  @override
+  Future<Chat> get(String id) async {
+    final chat = chats.where((c) => c['id'] == id).firstOrNull;
+    if (chat == null) throw const ChatNotFound();
+    return Chat.fromJson(chat);
+  }
+
+  @override
+  Future<ChatListItem> rename(String id, String title) async {
+    if (failRename case final failure?) {
+      failRename = null;
+      throw failure;
+    }
+    final i = chats.indexWhere((c) => c['id'] == id);
+    chats[i] = {...chats[i], 'title': title.trim()};
+    return ChatListItem.fromJson(_item(chats[i]));
+  }
+
+  @override
+  Future<void> delete(String id) async => chats.removeWhere((c) => c['id'] == id);
+
+  @override
+  Future<ChatSearchResult> search(String q) async {
+    searches.add(q);
+    if (failSearch case final failure?) {
+      failSearch = null;
+      throw failure;
+    }
+    final needle = q.trim().toLowerCase();
+    bool has(Object? text) => text is String && text.toLowerCase().contains(needle);
+    return ChatSearchResult.fromJson({
+      'chats': [
+        for (final chat in chats)
+          if (has(chat['title']) || (chat['messages']! as List).any((m) => has((m as Map)['text']))) _item(chat),
+      ],
+      'plans': [
+        for (final plan in plans)
+          if (has(plan['name'])) plan,
+      ],
+    });
+  }
+}
+
+/// The chat API answered by [api], with the real Recents.
+List<Override> chatApiOverrides(FakeChatApi api) => [chatRepositoryProvider.overrideWithValue(api)];
