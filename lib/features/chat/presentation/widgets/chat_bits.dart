@@ -3,10 +3,12 @@ import 'package:chocomousse/app/theme/app_text.dart';
 import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/cards/media_card.dart';
+import 'package:chocomousse/features/chat/application/chat_trip.dart';
 import 'package:chocomousse/features/chat/data/cards.dart';
 import 'package:chocomousse/features/chat/data/chat_models.dart';
 import 'package:chocomousse/features/chat/presentation/widgets/card_views.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// The traveller's message (Figma 2302:51), on the right.
 class UserBubble extends StatelessWidget {
@@ -142,7 +144,7 @@ class WorkingIndicator extends StatelessWidget {
 
 /// Cards of one kind under a Micro label: at most 6, hotels in a row that scrolls sideways, the others stacked, and
 /// "See all {total}" when there are more.
-class CardGroup extends StatelessWidget {
+class CardGroup extends ConsumerWidget {
   const CardGroup({required this.cards, required this.chatKey, this.total, this.onSeeAll, super.key});
 
   static const maxShown = 6;
@@ -153,16 +155,18 @@ class CardGroup extends StatelessWidget {
   /// How many the tool found.
   final int? total;
 
-  /// Opens the whole list (spec 008 US2); the button is off until then.
+  /// Opens the whole list; by default the kind's list screen for the chat's city ([seeAllRoute]).
   final VoidCallback? onSeeAll;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (cards.isEmpty) return const SizedBox.shrink();
     final palette = context.palette;
     final shown = cards.take(maxShown).toList();
     final total = this.total;
-    final media = shown.first is HotelCard;
+    final media = shown.first is HotelCard || shown.first is PlaceCard || shown.first is EventCard;
+    final route = seeAllRoute(cards, ref.watch(chatTripProvider.select((t) => t.trip.destinationId)));
+    final seeAll = onSeeAll ?? (route == null ? null : () => openSeeAll(context, ref, route));
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -171,7 +175,7 @@ class CardGroup extends StatelessWidget {
             Expanded(
               child: Text(CardKind.of(shown.first).label, style: AppText.micro.copyWith(color: palette.textSecondary)),
             ),
-            if (total != null && total > shown.length) TextButton(onPressed: onSeeAll, child: Text('See all $total')),
+            if (total != null && total > shown.length) TextButton(onPressed: seeAll, child: Text('See all $total')),
           ],
         ),
         const SizedBox(height: AppSpacing.sm),

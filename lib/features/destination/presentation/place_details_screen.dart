@@ -10,8 +10,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Place details (design 13): photo, description, address, opening hours, website.
-class PlaceDetailsScreen extends ConsumerWidget {
+class PlaceDetailsScreen extends StatelessWidget {
   const PlaceDetailsScreen({required this.placeId, super.key});
+
+  final String placeId;
+
+  @override
+  Widget build(BuildContext context) => PlaceDetailsView(placeId: placeId);
+}
+
+/// A place's details, for the screen and for the side panel's Details pane.
+class PlaceDetailsView extends ConsumerWidget {
+  const PlaceDetailsView({required this.placeId, super.key});
 
   final String placeId;
 

@@ -22,10 +22,31 @@ class CarDetailsArgs {
 }
 
 /// One car, with the way to find it on Booking.com (design C4).
-class CarDetailsScreen extends ConsumerWidget {
+class CarDetailsScreen extends StatelessWidget {
   const CarDetailsScreen({required this.args, super.key});
 
   final CarDetailsArgs args;
+
+  @override
+  Widget build(BuildContext context) => PageFrame(
+    children: [
+      Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: CarDetailsView(car: args.car, results: args.results),
+        ),
+      ),
+    ],
+  );
+}
+
+/// The car's details, for the screen and for the side panel's Details pane. A car from a chat card has no
+/// [results]: the days, the driver and the search's warnings are then left out.
+class CarDetailsView extends ConsumerWidget {
+  const CarDetailsView({required this.car, this.results, super.key});
+
+  final CarOffer car;
+  final CarResults? results;
 
   Future<void> _open(BuildContext context, WidgetRef ref, String url) async {
     final messenger = ScaffoldMessenger.of(context);
@@ -34,30 +55,15 @@ class CarDetailsScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final car = args.car;
-    return PageFrame(
-      children: [
-        Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
-            child: _Details(
-              car: car,
-              results: args.results,
-              onBook: () => unawaited(_open(context, ref, car.bookingUrl)),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  Widget build(BuildContext context, WidgetRef ref) =>
+      _Details(car: car, results: results, onBook: () => unawaited(_open(context, ref, car.bookingUrl)));
 }
 
 class _Details extends StatelessWidget {
   const _Details({required this.car, required this.results, required this.onBook});
 
   final CarOffer car;
-  final CarResults results;
+  final CarResults? results;
   final VoidCallback onBook;
 
   @override
@@ -107,7 +113,10 @@ class _Details extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
-        for (final warning in results.warnings) ...[OfferWarning(warning), const SizedBox(height: AppSpacing.md)],
+        for (final warning in results?.warnings ?? const <String>[]) ...[
+          OfferWarning(warning),
+          const SizedBox(height: AppSpacing.md),
+        ],
         Text(carTitle(car), style: textTheme.headlineSmall),
         const SizedBox(height: AppSpacing.md),
         CompanyLine(company: car.company),
@@ -141,18 +150,20 @@ class _Details extends StatelessWidget {
             if (mileage != null) OfferTag(icon: Icons.speed, label: mileage),
           ],
         ),
-        const SizedBox(height: AppSpacing.lg),
-        Row(
-          children: [
-            Expanded(
-              child: _DayTile(label: 'Pick-up', value: rentalDay(results.from)),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: _DayTile(label: 'Return', value: rentalDay(results.to)),
-            ),
-          ],
-        ),
+        if (results case final results?) ...[
+          const SizedBox(height: AppSpacing.lg),
+          Row(
+            children: [
+              Expanded(
+                child: _DayTile(label: 'Pick-up', value: rentalDay(results.from)),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: _DayTile(label: 'Return', value: rentalDay(results.to)),
+              ),
+            ],
+          ),
+        ],
         if (specs.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.xl),
           Text('The car', style: textTheme.titleMedium),
@@ -230,14 +241,15 @@ class _PriceBox extends StatelessWidget {
   const _PriceBox({required this.car, required this.results, required this.onBook});
 
   final CarOffer car;
-  final CarResults results;
+  final CarResults? results;
   final VoidCallback onBook;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final price = car.price;
-    final checkedAt = results.pricesFetchedAt;
+    final results = this.results;
+    final checkedAt = results?.pricesFetchedAt;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
@@ -262,7 +274,10 @@ class _PriceBox extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${daysLabel(results.days)} · ${formatMoney(price.perDay, price.currency)} a day',
+                    [
+                      if (results != null) daysLabel(results.days),
+                      '${formatMoney(price.perDay, price.currency)} a day',
+                    ].join(' · '),
                     style: textTheme.bodySmall,
                   ),
                 ],
@@ -288,9 +303,9 @@ class _PriceBox extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'Driver ${results.driverAge}.'
-            '${checkedAt == null ? '' : ' ${results.isSavedPrice ? 'Saved' : 'Checked'} ${describeCheckedAt(checkedAt)}.'}'
-            ' Booking.com opens its search for these dates and this place; find this car there, then book and pay '
+            '${results == null ? '' : 'Driver ${results.driverAge}. '}'
+            '${checkedAt == null || results == null ? '' : '${results.isSavedPrice ? 'Saved' : 'Checked'} ${describeCheckedAt(checkedAt)}. '}'
+            'Booking.com opens its search for these dates and this place; find this car there, then book and pay '
             'on Booking.com.',
             style: textTheme.bodySmall,
           ),

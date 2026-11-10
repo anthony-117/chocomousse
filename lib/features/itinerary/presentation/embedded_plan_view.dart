@@ -5,6 +5,7 @@ import 'package:chocomousse/app/theme/app_text.dart';
 import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/network/api_client.dart';
+import 'package:chocomousse/core/widgets/cards/pin_preview.dart';
 import 'package:chocomousse/core/widgets/cards/result_row.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/offers.dart';
 import 'package:chocomousse/features/itinerary/application/plan_providers.dart';
@@ -17,6 +18,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+
+/// The items of a plan's days that have a place, numbered by day. Their ids are `day:{n}:{i}`.
+List<MapPin> planPins(Plan plan) => [
+  for (final day in plan.days)
+    for (final (i, item) in day.items.indexed)
+      if (item.ref case ItemRef(:final lat?, :final lng?))
+        MapPin(
+          id: 'day:${day.number}:$i',
+          lat: lat,
+          lng: lng,
+          kind: PinKind.planDay,
+          label: 'Day ${day.number} · ${item.name}',
+          number: day.number,
+        ),
+];
 
 /// The plan in the chat's side panel (spec 008 US1, Figma "Side panel / Plan"): the header, three summary tiles,
 /// the tabs Days, Hotel, Flight, Car, Map and Costs, and the bottom bar.
@@ -171,10 +187,13 @@ class _EmbeddedPlanViewState extends ConsumerState<EmbeddedPlanView> {
                 _scroll([_offer(context, OfferKind.flight)]),
                 _scroll([_offer(context, OfferKind.car)]),
                 _scroll([
-                  Text(
-                    'The map of this plan arrives soon.',
-                    style: AppText.body.copyWith(color: palette.textSecondary),
-                  ),
+                  if (planPins(plan) case final pins when pins.isNotEmpty)
+                    PinPreview(pins: pins, onSelect: (id) => setState(() => _day = int.tryParse(id.split(':')[1])))
+                  else
+                    Text(
+                      'No place of this plan has a position yet.',
+                      style: AppText.body.copyWith(color: palette.textSecondary),
+                    ),
                 ]),
                 _scroll([PlanWhyView(plan: plan)]),
               ],

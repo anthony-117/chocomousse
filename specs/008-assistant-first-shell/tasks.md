@@ -344,11 +344,11 @@ cards, at 390 px and 1440 px.
 "See all N" opens the list.
 **Independent test**: one fake answer per card kind; tap each card → Details; See all → the list route.
 
-- [ ] T058 [P] [US2] Card bodies:
+- [X] T058 [P] [US2] Card bodies:
   - In `media_card.dart`, add `PlaceCard` (photo, name, kind label "Sight", "Restaurant", "Nature" or "Nightlife", rating or price level when known) and `EventCard` (photo, name, "Sat 12 Apr · 21:30", venue, price when known).
   - In `result_row.dart`, add `CarCard` ("Fiat 500 · Hertz", "Pick-up Lisbon airport · 10–14 Apr", total price, match).
-- [ ] T059 [P] [US2] Create `lib/core/widgets/cards/facts_rows.dart`: rows with icons for weather ("22° / 12° · Sunny most days"), visa ("Visa needed · Schengen · Lebanese passport"), currency ("1 USD = 0.92 EUR"), safety (the level label) and holidays (the first one with "+n more"). A null part is left out.
-- [ ] T060 [US2] "See all N" in `card_group.dart`: build the existing list route from the card's destination and the chat's trip:
+- [X] T059 [P] [US2] Create `lib/core/widgets/cards/facts_rows.dart`: rows with icons for weather ("22° / 12° · Sunny most days"), visa ("Visa needed · Schengen · Lebanese passport"), currency ("1 USD = 0.92 EUR"), safety (the level label) and holidays (the first one with "+n more"). A null part is left out.
+- [X] T060 [US2] "See all N" in `card_group.dart`: build the existing list route from the card's destination and the chat's trip:
   - hotels → `/discover/destination/{id}/hotels`;
   - flights → `.../flights`;
   - cars → `.../cars`;
@@ -356,13 +356,13 @@ cards, at 390 px and 1440 px.
   - events → `.../` overview.
 
   Set the trip settings (dates, adults, preferences) the list screens read before navigating. Reuse the setters the ranking feature already uses.
-- [ ] T061 [US2] Split the details screens into embeddable views, keeping the screens and routes:
+- [X] T061 [US2] Split the details screens into embeddable views, keeping the screens and routes:
   - `HotelDetailsView(hotelId, {offer})` from `lib/features/hotels/presentation/hotel_details_screen.dart`;
   - `CarDetailsView(args)` from `lib/features/cars/presentation/car_details_screen.dart`;
   - `PlaceDetailsView(placeId)` from `lib/features/destination/presentation/place_details_screen.dart`.
 
   Update their tests to cover both the screen and the view.
-- [ ] T062 [US2] Fill the Details pane in `lib/features/side_panel/presentation/details_pane.dart`, by `selected` card kind:
+- [X] T062 [US2] Fill the Details pane in `lib/features/side_panel/presentation/details_pane.dart`, by `selected` card kind:
   - Hotel → `HotelDetailsView`.
   - Car → `CarDetailsView` from the card's `CarOffer`.
   - Place with an `otm:` id → `PlaceDetailsView`; any other place → a compact view from the card (photo, name, kind, coordinates, "Open link" when `url`).
@@ -371,25 +371,25 @@ cards, at 390 px and 1440 px.
   - Facts → `FactsRows` in full.
 
   Each view shows `MatchBadge` and its reason at the top when ranked, and a footer slot for the bookmark (US6) and Add to plan (US3). When `foundAt` is over 24 h old, it shows "Found on {date}" and Search again (it sends "Search again for …" as a message). A card with no `selected` shows "Tap a card in the chat to see it here."
-- [ ] T063 [US2] Wire every card's tap to `sidePanelProvider(chatKey).openCard(card)`, which opens the sheet on phones
-- [ ] T064 [P] [US2] Create `lib/core/widgets/cards/pin_preview.dart` (research R-7):
+- [X] T063 [US2] Wire every card's tap to `sidePanelProvider(chatKey).openCard(card)`, which opens the sheet on phones
+- [X] T064 [P] [US2] Create `lib/core/widgets/cards/pin_preview.dart` (research R-7):
   - `PinPreview(List<MapPin>)`, with `MapPin(id, lat, lng, kind, label, approximate)`.
   - A `CustomPaint`: an equirectangular projection of the pins' bounding box with 12 % padding (a minimum span of 0.01°), pins coloured by kind (hotel brandPrimary, place statusSuccess, event brandAccent, car textSecondary, plan day textPrimary with its number), approximate pins hollow, and a scale bar.
   - A list under the canvas. A tap on a pin or a row calls `onSelect(id)`. The legend "Some places show the city centre" appears when any pin is approximate.
-- [ ] T065 [US2] Fill the Map pane in `lib/features/side_panel/presentation/map_pane.dart`:
+- [X] T065 [US2] Fill the Map pane in `lib/features/side_panel/presentation/map_pane.dart`:
   - the pins of every card in this chat's messages, plus the open plan's day items when a plan is open;
   - a tap opens the card in Details;
   - empty: "Pins show here when the assistant finds hotels, places or events."
 
   Use `PinPreview` in the Plan pane's Map tab too.
-- [ ] T066 [P] [US2] Widget tests:
+- [X] T066 [P] [US2] Widget tests:
   - `test/core/widgets/cards/`: media_card for each kind, result_row for flight and car, facts_rows with null parts, pin_preview (projection of known points, hollow pins, tap);
   - `test/features/side_panel/presentation/details_pane_test.dart`: each kind, old `foundAt`, loading and error of the hotel and place views;
   - `map_pane_test.dart`;
   - `card_group_test.dart`: See all targets.
 
   At both widths and in both modes.
-- [ ] T067 [US2] Flow test `test/flows/any_one_thing_flow_test.dart`: six fake answers (flights, hotels, cars, places, events, facts) → each shows its card kind → tap → Details shows it → See all on hotels opens the hotels list with the chat's city and dates
+- [X] T067 [US2] Flow test `test/flows/any_one_thing_flow_test.dart`: six fake answers (flights, hotels, cars, places, events, facts) → each shows its card kind → tap → Details shows it → See all on hotels opens the hotels list with the chat's city and dates
 
 ---
 

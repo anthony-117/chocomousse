@@ -19,10 +19,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 /// One hotel for the trip's dates and adults, with the way to book it on Booking.com (design H3).
-class HotelDetailsScreen extends ConsumerWidget {
+class HotelDetailsScreen extends StatelessWidget {
   const HotelDetailsScreen({required this.hotelId, super.key});
 
   final String hotelId;
+
+  @override
+  Widget build(BuildContext context) => PageFrame(
+    children: [
+      Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: HotelDetailsView(hotelId: hotelId),
+        ),
+      ),
+    ],
+  );
+}
+
+/// The hotel's details, for the screen and for the side panel's Details pane. [from], [to] and [adults] default to
+/// the trip settings; the panel passes the chat's trip.
+class HotelDetailsView extends ConsumerWidget {
+  const HotelDetailsView({required this.hotelId, this.from, this.to, this.adults, super.key});
+
+  final String hotelId;
+  final DateTime? from;
+  final DateTime? to;
+  final int? adults;
 
   Future<void> _open(BuildContext context, WidgetRef ref, String url) async {
     final messenger = ScaffoldMessenger.of(context);
@@ -32,10 +55,11 @@ class HotelDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final trip = ref.watch(tripSettingsProvider);
+    final settings = ref.watch(tripSettingsProvider);
+    final trip = settings.copyWith(from: from, to: to, adults: adults);
     final query = (hotelId: hotelId, from: trip.from, to: trip.to, adults: trip.adults, currency: trip.currency);
 
-    final body = ref
+    return ref
         .watch(hotelDetailsProvider(query))
         .when(
           loading: () => const _Placeholders(),
@@ -51,14 +75,6 @@ class HotelDetailsScreen extends ConsumerWidget {
           data: (hotel) =>
               _Details(hotel: hotel, trip: trip, onBook: () => unawaited(_open(context, ref, hotel.bookingUrl))),
         );
-
-    return PageFrame(
-      children: [
-        Center(
-          child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 720), child: body),
-        ),
-      ],
-    );
   }
 }
 

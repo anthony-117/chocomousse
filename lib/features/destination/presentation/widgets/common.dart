@@ -12,7 +12,18 @@ LinearGradient photoGradient(BuildContext context) => LinearGradient(
   colors: [context.palette.brandPrimary, context.palette.brandAccent],
 );
 
-/// Soft round back button from the v0.2 design.
+/// Marks a details view shown inside the side panel (spec 008 US2): its back buttons hide, since the panel has
+/// its own tabs and Close.
+class EmbeddedDetails extends InheritedWidget {
+  const EmbeddedDetails({required super.child, super.key});
+
+  static bool of(BuildContext context) => context.dependOnInheritedWidgetOfExactType<EmbeddedDetails>() != null;
+
+  @override
+  bool updateShouldNotify(EmbeddedDetails oldWidget) => false;
+}
+
+/// Soft round back button from the v0.2 design. Hidden inside [EmbeddedDetails].
 class BackCircleButton extends StatelessWidget {
   const BackCircleButton({this.onDark = false, super.key});
 
@@ -20,6 +31,7 @@ class BackCircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (EmbeddedDetails.of(context)) return const SizedBox.shrink();
     return Material(
       color: onDark ? Colors.white.withValues(alpha: 0.9) : context.palette.bgApp,
       shape: const CircleBorder(),

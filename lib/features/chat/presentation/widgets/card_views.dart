@@ -1,16 +1,25 @@
 import 'dart:async';
 
 import 'package:chocomousse/app/theme/app_icons.dart';
+import 'package:chocomousse/app/theme/app_text.dart';
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
+import 'package:chocomousse/core/widgets/cards/facts_rows.dart';
 import 'package:chocomousse/core/widgets/cards/media_card.dart';
 import 'package:chocomousse/core/widgets/cards/plan_card_tile.dart';
 import 'package:chocomousse/core/widgets/cards/result_row.dart';
+import 'package:chocomousse/features/chat/application/chat_trip.dart';
 import 'package:chocomousse/features/chat/data/cards.dart';
+import 'package:chocomousse/features/destination/application/destination_providers.dart';
+import 'package:chocomousse/features/destination/data/models.dart';
+import 'package:chocomousse/features/destination/data/preferences.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/offers.dart';
+import 'package:chocomousse/features/itinerary/presentation/widgets/plan_texts.dart';
 import 'package:chocomousse/features/side_panel/application/side_panel_controller.dart';
 import 'package:chocomousse/features/side_panel/presentation/side_panel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 final _day = DateFormat('EEE d MMM');
@@ -84,7 +93,43 @@ void openAssistantCard(BuildContext context, WidgetRef ref, String chatKey, Assi
   if (MediaQuery.sizeOf(context).width < kWideLayoutBreakpoint) unawaited(showSidePanelSheet(context, chatKey));
 }
 
-/// One card of an answer, drawn for its kind. Car, place, event and facts cards get their own look in spec 008 US2.
+/// A place's kind for its card: "Restaurant", "Nature", "Nightlife" or "Sight".
+String placeKindLabel(Place place) {
+  if (place.category == PlaceCategory.restaurant) return 'Restaurant';
+  final kind = place.kind?.toLowerCase() ?? '';
+  if (RegExp('park|garden|beach|lake|mountain|forest|nature|reserve').hasMatch(kind)) return 'Nature';
+  if (RegExp('bar|club|pub|night').hasMatch(kind)) return 'Nightlife';
+  return 'Sight';
+}
+
+/// A place card's lines: "Sight · ★ 4.7" (or the price level), and nothing for the price.
+extension PlaceCardLines on PlaceCard {
+  String get subtitle => [
+    placeKindLabel(place),
+    if (place.rating case final rating?) '★ ${rating.toStringAsFixed(1)}' else ?place.priceLevel,
+  ].join(' · ');
+}
+
+/// An event card's lines: "Sun 11 Apr · 21:00" with the venue, and "from €35" when known.
+extension EventCardLines on EventCard {
+  String get when => [_day.format(event.date), ?event.time].join(' · ');
+
+  String get subtitle => [when, ?event.venue].join(' · ');
+
+  String get price => event.priceFrom ?? '';
+}
+
+/// A car card as a row: "Fiat 600 · Budget" over "Pick-up via Sardegna · 10 – 14 Apr".
+extension CarCardRow on CarCard {
+  String get rowTitle => '${car.model} · ${car.company.name}';
+
+  String rowSubtitle({DateTime? from, DateTime? to}) =>
+      ['Pick-up ${car.pickUp.name}', if (from != null && to != null) planDates(from, to)].join(' · ');
+
+  String get rowPrice => formatMoney(car.price.total, car.price.currency);
+}
+
+/// One card of an answer, drawn for its kind. A tap opens it in the side panel.
 class AssistantCardView extends ConsumerWidget {
   const AssistantCardView({required this.card, required this.chatKey, super.key});
 
@@ -94,6 +139,7 @@ class AssistantCardView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     void open() => openAssistantCard(context, ref, chatKey, card);
+    final palette = context.palette;
     return switch (card) {
       PlanCard(:final plan) => PlanCardTile(
         plan: plan,
@@ -120,28 +166,90 @@ class AssistantCardView extends ConsumerWidget {
       ),
       final CarCard car => ResultRow(
         icon: AppIcons.car,
-        title: _itemName(car) ?? 'Car',
-        subtitle: 'Rental car',
-        price: '',
+        title: car.rowTitle,
+        subtitle: car.rowSubtitle(
+          from: ref.watch(chatTripProvider.select((t) => t.trip.from)),
+          to: ref.watch(chatTripProvider.select((t) => t.trip.to)),
+        ),
+        price: car.rowPrice,
         match: car.match,
         onTap: open,
       ),
-      _ => ResultRow(
-        icon: switch (card) {
-          PlaceCard() => AppIcons.landmark,
-          EventCard() => AppIcons.ticket,
-          _ => AppIcons.globe,
-        },
-        title: _itemName(card) ?? CardKind.of(card).label,
-        subtitle: '',
+      final PlaceCard place => MediaCard(
+        photoUrl: place.place.imageUrl,
+        title: place.place.name,
+        subtitle: place.subtitle,
         price: '',
         onTap: open,
       ),
+      final EventCard event => MediaCard(
+        photoUrl: null,
+        title: event.event.name,
+        subtitle: event.subtitle,
+        price: event.price,
+        onTap: open,
+      ),
+      FactsCard(:final facts) => Material(
+        color: palette.bgSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          side: BorderSide(color: palette.borderDefault),
+        ),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          onTap: open,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(facts.destination.name, style: AppText.bodyStrong.copyWith(color: palette.textPrimary)),
+                const SizedBox(height: AppSpacing.xs),
+                FactsRows(facts: facts),
+              ],
+            ),
+          ),
+        ),
+      ),
     };
   }
+}
 
-  static String? _itemName(AssistantCard card) {
-    final item = card.raw['item'];
-    return item is Map<String, dynamic> ? item['name'] as String? ?? item['model'] as String? : null;
+/// Where "See all" goes for [cards] of one kind, from the chat's city: the list screens of each kind, or the city
+/// overview for events. Null without a city, or for plans and facts.
+String? seeAllRoute(List<AssistantCard> cards, String? destinationId) {
+  if (destinationId == null || cards.isEmpty) return null;
+  final base = '/discover/destination/$destinationId';
+  return switch (cards.first) {
+    HotelCard() => '$base/hotels',
+    FlightCard() => '$base/flights',
+    CarCard() => '$base/cars',
+    PlaceCard(:final place) => '$base/places?category=${place.category.name}',
+    EventCard() => base,
+    PlanCard() || FactsCard() => null,
+  };
+}
+
+/// Opens [route] with the trip settings the list screens read set from the chat's trip: dates, adults and the
+/// preferences when the traveller changed them.
+void openSeeAll(BuildContext context, WidgetRef ref, String route) {
+  final chips = ref.read(chatTripProvider);
+  final settings = ref.read(tripSettingsProvider.notifier);
+  final from = chips.trip.from;
+  final to = chips.trip.to;
+  if (from != null && to != null) settings.setDates(from, to);
+  if (chips.trip.adults case final adults?) settings.setAdults(adults);
+  if (chips.preferencesChanged) {
+    settings.setPreferences(
+      Preferences(
+        levels: {
+          for (final c in Criterion.values)
+            if (chips.preferences[c.name] case final weight?) c: ?Level.ofWeight(weight),
+        },
+        tripBudget: ref.read(tripSettingsProvider).preferences.tripBudget,
+      ),
+    );
   }
+  if (chips.paceChanged) settings.setPace(chips.pace);
+  unawaited(GoRouter.of(context).push<void>(route));
 }

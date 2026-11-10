@@ -1,3 +1,4 @@
+import 'package:chocomousse/core/network/api_client.dart';
 import 'package:chocomousse/features/side_panel/application/side_panel_controller.dart';
 import 'package:chocomousse/features/side_panel/presentation/side_panel.dart';
 import 'package:flutter/material.dart';
@@ -5,10 +6,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../helpers.dart';
+import '../chat/fakes.dart';
 
 void main() {
   forBothModes('the icon bar switches panes and closes', (tester, mode) async {
-    final container = ProviderContainer();
+    // The Map pane reads the chat; this one has expired.
+    final container = ProviderContainer(
+      retry: noRetry,
+      overrides: chatOverrides(FakeChatTransport(), answers: [(404, null)]),
+    );
     addTearDown(container.dispose);
     container.read(sidePanelProvider('c1').notifier).openPane(PanelPane.plan);
     tester.view
@@ -41,6 +47,7 @@ void main() {
     await tester.tap(find.byTooltip('Close panel'));
     await tester.pump();
     expect(container.read(sidePanelProvider('c1')).open, isFalse);
+    await tester.pumpAndSettle();
   });
 
   testWidgets('the phone sheet shows the same panel and Close pops it', (tester) async {
