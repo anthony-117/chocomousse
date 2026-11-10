@@ -201,9 +201,9 @@ feature's widget tests to pump with `AppTheme.light()`. Commit one feature per t
 **Independent test**: switch Appearance to Dark, check the dark tokens, restart with the stored value, and check
 it's kept.
 
-- [ ] T034 [P] [US8] Create `lib/app/theme/appearance.dart`: `appearanceProvider` (`Notifier<ThemeMode>`) reads `SharedPreferences` key `appearance` (`system`, `light` or `dark`; missing or unknown → `system`). `set(mode)` writes it. Wrap every read and write in try/catch: a failure keeps the in-memory value.
-- [ ] T035 [US8] Edit `lib/app/app.dart`: `MaterialApp.router(theme: AppTheme.light(), darkTheme: AppTheme.dark(), themeMode: ref.watch(appearanceProvider))`
-- [ ] T036 [P] [US8] Tests:
+- [X] T034 [P] [US8] Create `lib/app/theme/appearance.dart`: `appearanceProvider` (`Notifier<ThemeMode>`) reads `SharedPreferences` key `appearance` (`system`, `light` or `dark`; missing or unknown → `system`). `set(mode)` writes it. Wrap every read and write in try/catch: a failure keeps the in-memory value.
+- [X] T035 [US8] Edit `lib/app/app.dart`: `MaterialApp.router(theme: AppTheme.light(), darkTheme: AppTheme.dark(), themeMode: ref.watch(appearanceProvider))`
+- [X] T036 [P] [US8] Tests:
   - `test/app/theme/appearance_test.dart` (`SharedPreferences.setMockInitialValues`): default, each value, unknown, write;
   - `test/flows/appearance_flow_test.dart`: Dark shows `AppPalette.dark.bgApp` on the scaffold; a rebuilt app keeps it.
 

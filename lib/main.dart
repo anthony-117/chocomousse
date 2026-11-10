@@ -1,4 +1,5 @@
 import 'package:chocomousse/app/app.dart';
+import 'package:chocomousse/app/theme/appearance.dart';
 import 'package:chocomousse/core/network/api_client.dart';
 import 'package:chocomousse/env.dart';
 import 'package:chocomousse/features/account/application/session.dart';
@@ -23,5 +24,14 @@ Future<void> main() async {
     auth = NotConfiguredAuthRepository(settings.missing!);
   }
 
-  runApp(ProviderScope(retry: noRetry, overrides: accountOverrides(auth), child: const TravelGenieApp()));
+  // Read before the first frame, so a dark choice doesn't flash light.
+  final appearance = await AppearanceController.read();
+
+  runApp(
+    ProviderScope(
+      retry: noRetry,
+      overrides: [...accountOverrides(auth), appearanceProvider.overrideWith(() => AppearanceController(appearance))],
+      child: const TravelGenieApp(),
+    ),
+  );
 }
