@@ -194,7 +194,7 @@ class _TripEditorSheetState extends ConsumerState<TripEditorSheet> {
 }
 
 /// The level nearest to a weight from the profile or a chat.
-Level _levelOf(int? weight) {
+Level levelOfWeight(int? weight) {
   if (weight == null) return Level.medium;
   return Level.values.reduce((a, b) => (a.weight - weight).abs() <= (b.weight - weight).abs() ? a : b);
 }
@@ -209,7 +209,7 @@ class PreferencesSheet extends ConsumerStatefulWidget {
 
 class _PreferencesSheetState extends ConsumerState<PreferencesSheet> {
   late final Map<Criterion, Level> _levels = {
-    for (final c in Criterion.values) c: _levelOf(ref.read(chatTripProvider).preferences[c.name]),
+    for (final c in Criterion.values) c: levelOfWeight(ref.read(chatTripProvider).preferences[c.name]),
   };
   late Pace _pace = ref.read(chatTripProvider).pace;
 

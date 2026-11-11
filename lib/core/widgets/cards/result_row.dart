@@ -16,6 +16,7 @@ class ResultRow extends StatelessWidget {
     required this.price,
     this.match,
     this.onTap,
+    this.add,
     super.key,
   });
 
@@ -25,6 +26,9 @@ class ResultRow extends StatelessWidget {
   final String price;
   final Match? match;
   final VoidCallback? onTap;
+
+  /// The "+" slot at the end (spec 008 US3).
+  final Widget? add;
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +84,7 @@ class ResultRow extends StatelessWidget {
                   if (match != null) ...[const SizedBox(height: AppSpacing.xs), MatchPill(match)],
                 ],
               ),
+              if (add case final add?) ...[const SizedBox(width: AppSpacing.xs), add],
             ],
           ),
         ),

@@ -92,9 +92,12 @@ class DayList extends StatelessWidget {
 
 /// One day (I1, I2): title, date, weather and walk, then its items in time order on a timeline.
 class DayCard extends StatelessWidget {
-  const DayCard({required this.day, required this.onItem, super.key});
+  const DayCard({required this.day, required this.onItem, this.itemAction, super.key});
 
   final PlanDay day;
+
+  /// A button at the end of an item's row (the Plan pane's swap icon); null for none.
+  final Widget? Function(PlanItem item)? itemAction;
 
   /// Null for an item that opens nothing.
   final VoidCallback? Function(PlanItem item) onItem;
@@ -115,7 +118,13 @@ class DayCard extends StatelessWidget {
             Text('Nothing planned this day.', style: textTheme.bodySmall)
           else
             for (final (i, item) in day.items.indexed)
-              TripItemRow(item: item, first: i == 0, last: i == day.items.length - 1, onTap: onItem(item)),
+              TripItemRow(
+                item: item,
+                first: i == 0,
+                last: i == day.items.length - 1,
+                onTap: onItem(item),
+                action: itemAction?.call(item),
+              ),
         ],
       ),
     );
@@ -124,12 +133,13 @@ class DayCard extends StatelessWidget {
 
 /// TripItemRow: the start time, a dot on the line, the name and its details.
 class TripItemRow extends StatelessWidget {
-  const TripItemRow({required this.item, required this.first, required this.last, this.onTap, super.key});
+  const TripItemRow({required this.item, required this.first, required this.last, this.onTap, this.action, super.key});
 
   final PlanItem item;
   final bool first;
   final bool last;
   final VoidCallback? onTap;
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -179,6 +189,7 @@ class TripItemRow extends StatelessWidget {
                 ),
               ),
             ),
+            ?action,
             if (onTap != null) Icon(Icons.chevron_right, size: 18, color: context.palette.textSecondary),
           ],
         ),

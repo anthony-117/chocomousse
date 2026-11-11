@@ -315,6 +315,7 @@ class Plan {
     this.hotel,
     this.flight,
     this.car,
+    this.edits = const [],
   });
 
   factory Plan.fromJson(Map<String, dynamic> json) {
@@ -344,6 +345,7 @@ class Plan {
       notes: (json['notes'] as List<dynamic>? ?? const []).cast<String>(),
       warnings: (json['warnings'] as List<dynamic>? ?? const []).cast<String>(),
       updatedAt: _date(json['updatedAt']),
+      edits: _list(json['edits']).map(PlanEdit.fromJson).toList(),
     );
   }
 
@@ -368,6 +370,9 @@ class Plan {
   final List<String> notes;
   final List<String> warnings;
   final DateTime updatedAt;
+
+  /// The day edits the traveller made, kept through every rebuild (API spec 010 plan edits).
+  final List<PlanEdit> edits;
 
   int get nights => to.difference(from).inDays;
 }
@@ -465,4 +470,67 @@ class Alternatives<T> {
     chosenId: json['chosenId'] as String?,
     checkedAt: _time(json['checkedAt']),
   );
+}
+
+enum EditAction { replace, add, remove, other }
+
+/// A day edit kept in the plan: an item replaced, added or removed.
+@immutable
+class PlanEdit {
+  const PlanEdit({required this.day, required this.action, this.itemId, this.newItem});
+
+  factory PlanEdit.fromJson(Map<String, dynamic> json) => PlanEdit(
+    day: json['day']! as int,
+    action: _enum(EditAction.values, json['action'], EditAction.other),
+    itemId: json['itemId'] as String?,
+    newItem: switch (json['newItem']) {
+      final Map<String, dynamic> m => (
+        kind: _enum(RefKind.values, m['kind'], RefKind.other),
+        id: m['id']! as String,
+        name: m['name'] as String? ?? '',
+      ),
+      _ => null,
+    },
+  );
+
+  final int day;
+  final EditAction action;
+
+  /// The item replaced or removed; null for an add.
+  final String? itemId;
+
+  /// The item put in; null for a remove.
+  final ({RefKind kind, String id, String name})? newItem;
+}
+
+/// What a day edit is about: the kinds the alternatives route takes.
+enum AlternativeKind { sight, nature, restaurant, nightlife, event }
+
+/// What the plan's values become on Rebuild plan; a null field keeps the plan's.
+@immutable
+class RebuildRequest {
+  const RebuildRequest({this.from, this.to, this.adults, this.originId, this.preferences, this.pace, this.tripBudget});
+
+  final DateTime? from;
+  final DateTime? to;
+  final int? adults;
+  final String? originId;
+
+  /// The six weights (0-100) by criterion name.
+  final Map<String, int>? preferences;
+  final Pace? pace;
+  final num? tripBudget;
+
+  static String _day(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  Map<String, Object?> toJson() => {
+    if (from case final from?) 'from': _day(from),
+    if (to case final to?) 'to': _day(to),
+    'adults': ?adults,
+    'originId': ?originId,
+    'preferences': ?preferences,
+    if (pace case final pace?) 'pace': pace.name,
+    'tripBudget': ?tripBudget,
+  };
 }

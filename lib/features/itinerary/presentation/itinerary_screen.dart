@@ -41,18 +41,21 @@ class ItineraryScreen extends StatelessWidget {
 
 /// A saved plan, loaded: the full page, or [embedded] in the chat's side panel (spec 008 US1, the Plan pane).
 class ItineraryView extends ConsumerWidget {
-  const ItineraryView({required this.planId, this.day, this.embedded = false, super.key});
+  const ItineraryView({required this.planId, this.day, this.embedded = false, this.chatKey, super.key});
 
   final String planId;
   final int? day;
   final bool embedded;
 
+  /// The panel the embedded view sits in; its chat takes the day questions (spec 008 US3).
+  final String? chatKey;
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final plan = ref.watch(planProvider(planId));
     if (embedded) {
+      // A reload after the assistant changed the plan keeps the plan on screen, so the day shown and the tab stay.
       return plan.when(
-        skipLoadingOnRefresh: false,
         loading: () => const Padding(padding: EdgeInsets.all(AppSpacing.xl), child: DayPlaceholders()),
         error: (e, _) => Padding(
           padding: const EdgeInsets.all(AppSpacing.xl),
@@ -60,7 +63,7 @@ class ItineraryView extends ConsumerWidget {
               ? const WarningNote('This plan was deleted.')
               : ErrorRetryBanner(message: describePlanError(e), onRetry: () => ref.invalidate(planProvider(planId))),
         ),
-        data: (plan) => EmbeddedPlanView(plan: plan),
+        data: (plan) => EmbeddedPlanView(plan: plan, chatKey: chatKey),
       );
     }
     return plan.when(

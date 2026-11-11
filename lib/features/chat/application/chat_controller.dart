@@ -174,6 +174,14 @@ class ChatController extends Notifier<ChatState> {
     await _run(_repository.send(chatId: state.chatId, request: request));
   }
 
+  /// A line from the app, not the assistant ("Swapped in Hotel Santa Maria"). It is shown, not stored.
+  void addNote(String text) => state = state.copyWith(
+    messages: [
+      ...state.messages,
+      ChatMessage(id: 'local-${_localIds++}', role: ChatRole.assistant, text: text, at: DateTime.now()),
+    ],
+  );
+
   /// Sends the last unanswered message again, as a new message.
   Future<void> retry() async {
     if (!state.canRetry) return;

@@ -47,6 +47,11 @@ class SidePanelController extends Notifier<SidePanelState> {
   void openPlan(String id) => state = state.copyWith(open: true, pane: PanelPane.plan, planId: id);
 
   void close() => state = state.copyWith(open: false);
+
+  /// Takes another panel's state: a chat started from the home keeps the home's panel.
+  // A method, as the other changes are, not a setter.
+  // ignore: use_setters_to_change_properties
+  void adopt(SidePanelState other) => state = other;
 }
 
 /// The key of the home's panel.

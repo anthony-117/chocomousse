@@ -8,8 +8,8 @@ import 'package:chocomousse/features/chat/data/chat_models.dart';
 import 'package:chocomousse/features/chat/presentation/widgets/card_views.dart';
 import 'package:chocomousse/features/itinerary/application/plan_providers.dart';
 import 'package:chocomousse/features/itinerary/presentation/embedded_plan_view.dart';
+import 'package:chocomousse/features/side_panel/application/panel_chat.dart';
 import 'package:chocomousse/features/side_panel/application/side_panel_controller.dart';
-import 'package:chocomousse/features/side_panel/presentation/details_pane.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 

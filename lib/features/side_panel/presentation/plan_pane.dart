@@ -24,6 +24,6 @@ class PlanPane extends ConsumerWidget {
         ),
       );
     }
-    return ItineraryView(key: ValueKey(planId), planId: planId, embedded: true);
+    return ItineraryView(key: ValueKey(planId), planId: planId, embedded: true, chatKey: chatKey);
   }
 }

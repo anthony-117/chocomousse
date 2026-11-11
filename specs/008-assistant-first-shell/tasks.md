@@ -433,7 +433,7 @@ cards, at 390 px and 1440 px.
 Plan pane.
 **Independent test**: a fake answer with `planChanged`; the Plan pane reloads and shows the new plan.
 
-- [ ] T075 [P] [US3] Extend `lib/features/itinerary/data/plan_repository.dart` and `plan_models.dart` (data-model "Plan additions"):
+- [X] T075 [P] [US3] Extend `lib/features/itinerary/data/plan_repository.dart` and `plan_models.dart` (data-model "Plan additions"):
   - `Plan.edits` (`PlanEdit` with action replace, add or remove);
   - `dayAlternatives(planId, day, {itemId, kind})`;
   - `addOrReplaceItem(planId, day, {kind, id, replaces})`;
@@ -441,28 +441,28 @@ Plan pane.
   - `rebuild(planId, RebuildRequest)`.
 
   Map the failures: `DayFull` (422 `day-full`, the API's message), `NoPlaces` (422 `no-places`), `PlanFieldError` (400) and `PlanNotFound` (404).
-- [ ] T076 [P] [US3] Unit tests in `test/features/itinerary/data/plan_edits_test.dart`: each new route's path and body, each failure, `edits` parsing
-- [ ] T077 [US3] In `ItineraryView` (embedded), wire:
+- [X] T076 [P] [US3] Unit tests in `test/features/itinerary/data/plan_edits_test.dart`: each new route's path and body, each failure, `edits` parsing
+- [X] T077 [US3] In `ItineraryView` (embedded), wire:
   - the day-item swap icon: send "Show me alternatives to {item name} on day {n}" with `about: {planId, day, itemId}` to the panel's chat;
   - "Ask to change this day…": a field whose message is sent with `about: {planId, day}` (the day shown).
 
   Both go through `chatProvider(chatKey).send`. On `/`, the home creates the chat first.
-- [ ] T078 [US3] "+" on hotel and car cards (`media_card.dart`, `result_row.dart`):
+- [X] T078 [US3] "+" on hotel and car cards (`media_card.dart`, `result_row.dart`):
   - with a plan open in the panel (or the chat's latest `PlanCard`), call `PUT /plans/{id}/{hotel|car}` (`offerId` = card id) through the existing 007 `PlanActions.swap`, then open the Plan pane and append a local note "Swapped in {name}";
   - a 400 on `offerId` sends "Swap {name} into my plan" to the assistant instead;
   - without a plan, send "Build a plan with {name}".
 
   In the Details pane, the same action reads "Add to plan" or "Swap into plan".
-- [ ] T079 [US3] Fill the Trip pane in `lib/features/side_panel/presentation/trip_pane.dart`:
+- [X] T079 [US3] Fill the Trip pane in `lib/features/side_panel/presentation/trip_pane.dart`:
   - editable rows for city, dates, adults, departure city, preferences (the six sliders), pace and trip budget, all bound to `chatTripProvider`;
   - "Rebuild plan" (enabled when a plan is open): `rebuild(planId, values)`, with a progress state; the plan is unchanged on failure, with the error shown;
   - "This chat": plans built (plan cards), found by kind with counts (e.g. "Hotels · 48"), and saved items from this chat. Each opens its pane.
-- [ ] T080 [US3] `planChanged` handling: after `AnswerDone`, when the panel shows that plan, reload it (T029 invalidates `planProvider`). The pane shows a short "Plan updated" highlight.
-- [ ] T081 [P] [US3] Widget tests:
+- [X] T080 [US3] `planChanged` handling: after `AnswerDone`, when the panel shows that plan, reload it (T029 invalidates `planProvider`). The pane shows a short "Plan updated" highlight.
+- [X] T081 [P] [US3] Widget tests:
   - `test/features/side_panel/presentation/trip_pane_test.dart`: edits, Rebuild success and failure, outputs;
   - `plan_pane_edits_test.dart`: the swap icon sends with `about`, the change field, reload on `planChanged`;
   - `card_plus_test.dart`: swap path, the 400 fallback, the no-plan message.
-- [ ] T082 [US3] Flow test `test/flows/change_plan_by_chat_flow_test.dart`: open a plan → swap icon on a day item → a fake answer with place cards → "Use Villa Borghese" → a fake answer with `planChanged` → the Plan pane shows the new item; "+" on a hotel card swaps the hotel
+- [X] T082 [US3] Flow test `test/flows/change_plan_by_chat_flow_test.dart`: open a plan → swap icon on a day item → a fake answer with place cards → "Use Villa Borghese" → a fake answer with `planChanged` → the Plan pane shows the new item; "+" on a hotel card swaps the hotel
 
 ---
 

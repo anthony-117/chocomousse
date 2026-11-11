@@ -7,6 +7,7 @@ import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/network/api_client.dart';
 import 'package:chocomousse/core/widgets/cards/pin_preview.dart';
 import 'package:chocomousse/core/widgets/cards/result_row.dart';
+import 'package:chocomousse/features/chat/data/chat_models.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/offers.dart';
 import 'package:chocomousse/features/itinerary/application/plan_providers.dart';
 import 'package:chocomousse/features/itinerary/data/plan_models.dart';
@@ -14,6 +15,7 @@ import 'package:chocomousse/features/itinerary/presentation/change_offer_screen.
 import 'package:chocomousse/features/itinerary/presentation/plan_why_view.dart';
 import 'package:chocomousse/features/itinerary/presentation/widgets/day_view.dart';
 import 'package:chocomousse/features/itinerary/presentation/widgets/plan_texts.dart';
+import 'package:chocomousse/features/side_panel/application/panel_chat.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,12 +39,15 @@ List<MapPin> planPins(Plan plan) => [
 /// The plan in the chat's side panel (spec 008 US1, Figma "Side panel / Plan"): the header, three summary tiles,
 /// the tabs Days, Hotel, Flight, Car, Map and Costs, and the bottom bar.
 class EmbeddedPlanView extends ConsumerStatefulWidget {
-  const EmbeddedPlanView({required this.plan, this.onAskAboutDay, super.key});
+  const EmbeddedPlanView({required this.plan, this.chatKey, super.key});
 
   final Plan plan;
 
-  /// "Ask to change this day…" (spec 008 US3); off until then.
-  final ValueChanged<int>? onAskAboutDay;
+  /// The panel's chat, which takes the swap icon's and "Ask to change this day…"'s messages; without it they are off.
+  final String? chatKey;
+
+  /// How long "Plan updated" shows after a change arrives.
+  static const updatedFor = Duration(seconds: 3);
 
   @override
   ConsumerState<EmbeddedPlanView> createState() => _EmbeddedPlanViewState();
@@ -51,6 +56,57 @@ class EmbeddedPlanView extends ConsumerStatefulWidget {
 class _EmbeddedPlanViewState extends ConsumerState<EmbeddedPlanView> {
   int? _day;
   bool _saving = false;
+  final _ask = TextEditingController();
+
+  /// Shows "Plan updated" for a moment after a change arrives (spec 008 US3).
+  bool _updated = false;
+  Timer? _updatedTimer;
+
+  @override
+  void didUpdateWidget(EmbeddedPlanView old) {
+    super.didUpdateWidget(old);
+    final changed = old.plan.id == plan.id && old.plan.updatedAt != plan.updatedAt && old.plan.status == plan.status;
+    if (!changed) return;
+    _updatedTimer?.cancel();
+    setState(() => _updated = true);
+    _updatedTimer = Timer(EmbeddedPlanView.updatedFor, () {
+      if (mounted) setState(() => _updated = false);
+    });
+  }
+
+  @override
+  void dispose() {
+    _updatedTimer?.cancel();
+    _ask.dispose();
+    super.dispose();
+  }
+
+  void _askAlternatives(PlanItem item, int day) {
+    final key = widget.chatKey;
+    final itemId = item.ref?.id;
+    if (key == null || itemId == null) return;
+    sendFromPanel(
+      context,
+      ref,
+      key,
+      'Show me alternatives to ${item.name} on day $day',
+      about: MessageAbout(planId: plan.id, day: day, itemId: itemId),
+    );
+  }
+
+  void _askAboutDay(int day) {
+    final key = widget.chatKey;
+    final text = _ask.text.trim();
+    if (key == null || ChatRequest.textError(text) != null) return;
+    _ask.clear();
+    sendFromPanel(
+      context,
+      ref,
+      key,
+      text,
+      about: MessageAbout(planId: plan.id, day: day),
+    );
+  }
 
   Plan get plan => widget.plan;
 
@@ -83,7 +139,7 @@ class _EmbeddedPlanViewState extends ConsumerState<EmbeddedPlanView> {
     final match = plan.match;
     final budget = plan.tripBudget;
     final total = formatMoney(plan.total.amount, plan.total.currency);
-    final onAsk = widget.onAskAboutDay;
+    final canAsk = widget.chatKey != null;
 
     return DefaultTabController(
       length: 6,
@@ -158,6 +214,23 @@ class _EmbeddedPlanViewState extends ConsumerState<EmbeddedPlanView> {
               ],
             ),
           ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 200),
+            child: _updated
+                ? Container(
+                    margin: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.md, AppSpacing.xl, 0),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+                    decoration: BoxDecoration(
+                      color: palette.statusSuccessSoft,
+                      borderRadius: BorderRadius.circular(AppRadius.sm),
+                    ),
+                    child: Semantics(
+                      liveRegion: true,
+                      child: Text('Plan updated', style: AppText.smallStrong.copyWith(color: palette.statusSuccess)),
+                    ),
+                  )
+                : const SizedBox(width: double.infinity),
+          ),
           const SizedBox(height: AppSpacing.sm),
           const TabBar(
             isScrollable: true,
@@ -180,7 +253,19 @@ class _EmbeddedPlanViewState extends ConsumerState<EmbeddedPlanView> {
                   else ...[
                     DayChips(days: days, selected: chosen.number, onSelected: (n) => setState(() => _day = n)),
                     const SizedBox(height: AppSpacing.md),
-                    DayCard(day: chosen, onItem: (_) => null),
+                    DayCard(
+                      day: chosen,
+                      onItem: (_) => null,
+                      itemAction: (item) =>
+                          canAsk && (item.ref?.kind == RefKind.place || item.ref?.kind == RefKind.event)
+                          ? IconButton(
+                              tooltip: 'Alternatives to ${item.name}',
+                              visualDensity: VisualDensity.compact,
+                              onPressed: () => _askAlternatives(item, chosen.number),
+                              icon: AppIcon(AppIcons.swap, size: 16, color: palette.textSecondary),
+                            )
+                          : null,
+                    ),
                   ],
                 ]),
                 _scroll([_offer(context, OfferKind.hotel)]),
@@ -208,9 +293,22 @@ class _EmbeddedPlanViewState extends ConsumerState<EmbeddedPlanView> {
               child: Row(
                 children: [
                   Expanded(
-                    child: OutlinedButton(
-                      onPressed: onAsk == null || chosen == null ? null : () => onAsk(chosen.number),
-                      child: const Text('Ask to change this day…', maxLines: 1, overflow: TextOverflow.ellipsis),
+                    child: TextField(
+                      controller: _ask,
+                      enabled: canAsk && chosen != null,
+                      maxLength: ChatRequest.maxLength,
+                      textInputAction: TextInputAction.send,
+                      decoration: InputDecoration(
+                        isDense: true,
+                        counterText: '',
+                        hintText: 'Ask to change this day…',
+                        suffixIcon: IconButton(
+                          tooltip: 'Ask about this day',
+                          onPressed: chosen == null ? null : () => _askAboutDay(chosen.number),
+                          icon: AppIcon(AppIcons.arrowUp, size: 16, color: palette.textSecondary),
+                        ),
+                      ),
+                      onSubmitted: chosen == null ? null : (_) => _askAboutDay(chosen.number),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),

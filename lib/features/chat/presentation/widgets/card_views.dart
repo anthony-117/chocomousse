@@ -15,6 +15,7 @@ import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:chocomousse/features/destination/data/preferences.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/offers.dart';
 import 'package:chocomousse/features/itinerary/presentation/widgets/plan_texts.dart';
+import 'package:chocomousse/features/side_panel/application/panel_chat.dart';
 import 'package:chocomousse/features/side_panel/application/side_panel_controller.dart';
 import 'package:chocomousse/features/side_panel/presentation/side_panel.dart';
 import 'package:flutter/material.dart';
@@ -140,6 +141,23 @@ class AssistantCardView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     void open() => openAssistantCard(context, ref, chatKey, card);
     final palette = context.palette;
+    Widget plus() {
+      // The label follows the plan open in the panel.
+      ref.watch(sidePanelProvider(chatKey).select((s) => s.planId));
+      return IconButton(
+        tooltip: planActionLabel(ref, chatKey, card),
+        // Fits the card's price line.
+        style: IconButton.styleFrom(
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          minimumSize: const Size.square(28),
+          fixedSize: const Size.square(28),
+          padding: EdgeInsets.zero,
+        ),
+        onPressed: () => unawaited(addCardToPlan(context, ref, chatKey, card)),
+        icon: AppIcon(AppIcons.plus, size: 18, color: palette.brandPrimary),
+      );
+    }
+
     return switch (card) {
       PlanCard(:final plan) => PlanCardTile(
         plan: plan,
@@ -163,6 +181,7 @@ class AssistantCardView extends ConsumerWidget {
         price: hotel.nightPrice,
         match: hotel.match,
         onTap: open,
+        add: plus(),
       ),
       final CarCard car => ResultRow(
         icon: AppIcons.car,
@@ -174,6 +193,7 @@ class AssistantCardView extends ConsumerWidget {
         price: car.rowPrice,
         match: car.match,
         onTap: open,
+        add: plus(),
       ),
       final PlaceCard place => MediaCard(
         photoUrl: place.place.imageUrl,

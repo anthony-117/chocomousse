@@ -6,6 +6,7 @@ import 'package:chocomousse/features/side_panel/application/side_panel_controlle
 import 'package:chocomousse/features/side_panel/presentation/details_pane.dart';
 import 'package:chocomousse/features/side_panel/presentation/map_pane.dart';
 import 'package:chocomousse/features/side_panel/presentation/plan_pane.dart';
+import 'package:chocomousse/features/side_panel/presentation/trip_pane.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -38,6 +39,7 @@ typedef PaneBuilder = Widget Function(BuildContext context, String chatKey);
 
 /// The panes' content, by pane. Stories register theirs here (spec 008 US2, US3, US6).
 final Map<PanelPane, PaneBuilder> panelPanes = {
+  PanelPane.trip: (context, chatKey) => TripPane(chatKey: chatKey),
   PanelPane.plan: (context, chatKey) => PlanPane(chatKey: chatKey),
   PanelPane.details: (context, chatKey) => DetailsPane(chatKey: chatKey),
   PanelPane.map: (context, chatKey) => MapPane(chatKey: chatKey),

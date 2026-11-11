@@ -16,15 +16,13 @@ import 'package:chocomousse/features/destination/presentation/widgets/common.dar
 import 'package:chocomousse/features/destination/presentation/widgets/offers.dart';
 import 'package:chocomousse/features/hotels/presentation/hotel_details_screen.dart';
 import 'package:chocomousse/features/ranking/data/ranking_models.dart';
+import 'package:chocomousse/features/side_panel/application/panel_chat.dart';
 import 'package:chocomousse/features/side_panel/application/side_panel_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 final _found = DateFormat('d MMM');
-
-/// The chat a panel belongs to: null for the home's.
-String? chatOfPanel(String chatKey) => chatKey == homePanelKey ? null : chatKey;
 
 /// A card's title, for "Search again for …".
 String cardTitle(AssistantCard card) => switch (card) {
@@ -95,6 +93,22 @@ class DetailsPane extends ConsumerWidget {
               child: const Text('Search again'),
             ),
           ],
+        ),
+        const SizedBox(height: AppSpacing.md),
+      ],
+      if (card is HotelCard || card is CarCard) ...[
+        Builder(
+          builder: (context) {
+            // The label follows the plan open in the panel.
+            ref.watch(sidePanelProvider(chatKey).select((s) => s.planId));
+            return Align(
+              alignment: Alignment.centerLeft,
+              child: FilledButton.tonal(
+                onPressed: sending ? null : () => unawaited(addCardToPlan(context, ref, chatKey, card)),
+                child: Text(planActionLabel(ref, chatKey, card)),
+              ),
+            );
+          },
         ),
         const SizedBox(height: AppSpacing.md),
       ],
