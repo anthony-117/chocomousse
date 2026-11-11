@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:chocomousse/app/router.dart';
 import 'package:chocomousse/app/theme/app_theme.dart';
+import 'package:chocomousse/app/theme/appearance.dart';
 import 'package:chocomousse/features/account/application/session.dart';
 
 import 'package:flutter/material.dart';
@@ -30,6 +31,8 @@ class _TravelGenieAppState extends ConsumerState<TravelGenieApp> {
       title: 'TravelGenie',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: ref.watch(appearanceProvider),
       routerConfig: ref.watch(routerProvider),
     );
   }

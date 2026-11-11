@@ -125,7 +125,7 @@ void main() {
     });
 
     test('takes a confirmed traveller away from the sign-in screens, back where they were going', () {
-      expect(authRedirect(confirmed, Uri.parse('/sign-in')), '/discover');
+      expect(authRedirect(confirmed, Uri.parse('/sign-in')), '/');
       expect(authRedirect(confirmed, Uri.parse('/welcome?from=%2Fplans')), '/plans');
       expect(authRedirect(confirmed, Uri.parse('/plans')), isNull);
     });
@@ -133,7 +133,7 @@ void main() {
     test('never follows a from that leaves the app', () {
       for (final from in ['https://evil.test', '//evil.test/x', 'evil', '/sign-in']) {
         final uri = Uri(path: '/sign-in', queryParameters: {'from': from});
-        expect(authRedirect(confirmed, uri), '/discover', reason: from);
+        expect(authRedirect(confirmed, uri), '/', reason: from);
         expect(authRedirect(signedOut, Uri(path: '/plans', queryParameters: {'from': from})), '/welcome');
       }
     });

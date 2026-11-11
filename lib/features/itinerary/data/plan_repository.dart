@@ -2,6 +2,7 @@ import 'package:chocomousse/core/network/api_client.dart';
 import 'package:chocomousse/core/network/auth_interceptor.dart';
 import 'package:chocomousse/features/account/data/profile_repository.dart';
 import 'package:chocomousse/features/cars/data/car_models.dart';
+import 'package:chocomousse/features/chat/data/cards.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/destination/data/preferences.dart';
 import 'package:chocomousse/features/flights/data/flight_models.dart';
@@ -33,6 +34,11 @@ class NoPlaces extends PlanFailure {
 /// 404: the plan is gone, or isn't the traveller's.
 class PlanNotFound extends PlanFailure {
   const PlanNotFound() : super("This plan doesn't exist or isn't yours.");
+}
+
+/// 422 `day-full`: the day has no free slot for its pace, in the API's words ("Day 2 is full for a balanced pace...").
+class DayFull extends PlanFailure {
+  const DayFull([super.message = 'This day is full. Replace a place instead.']);
 }
 
 /// 400: the API refused a value; [field] is the API's name for it.
@@ -113,6 +119,43 @@ class PlanRepository {
 
   Future<Plan> removeCar(String id) => _call(() => _dio.delete<Map<String, dynamic>>('/plans/$id/car'), Plan.fromJson);
 
+  /// Places or events that could take [itemId]'s place on [day], or fill a new slot without it.
+  Future<DayAlternatives> dayAlternatives(String id, int day, {String? itemId, AlternativeKind? kind}) => _call(
+    () => _dio.get<Map<String, dynamic>>(
+      '/plans/$id/days/$day/alternatives',
+      queryParameters: {'itemId': ?itemId, 'kind': ?kind?.name},
+    ),
+    DayAlternatives.fromJson,
+  );
+
+  /// Adds an alternative to [day], or puts it in place of [replaces]; returns the rebuilt plan.
+  Future<Plan> addOrReplaceItem(
+    String id,
+    int day, {
+    required RefKind kind,
+    required String itemId,
+    String? replaces,
+  }) => _call(
+    () => _dio.post<Map<String, dynamic>>(
+      '/plans/$id/days/$day/items',
+      data: {'kind': kind.name, 'id': itemId, 'replaces': ?replaces},
+    ),
+    Plan.fromJson,
+  );
+
+  /// Removes an item; its time becomes free time.
+  Future<Plan> removeItem(String id, int day, String itemId) => _call(
+    () => _dio.delete<Map<String, dynamic>>('/plans/$id/days/$day/items/${Uri.encodeComponent(itemId)}'),
+    Plan.fromJson,
+  );
+
+  /// Rebuilds the plan in place with [values]; on any failure the saved plan is unchanged.
+  Future<Plan> rebuild(String id, RebuildRequest values, {String city = 'this city'}) => _call(
+    () => _dio.post<Map<String, dynamic>>('/plans/$id/rebuild', data: values.toJson(), options: _slow),
+    Plan.fromJson,
+    city: city,
+  );
+
   Future<Alternatives<T>> _alternatives<T>(String id, OfferKind kind, T Function(Map<String, dynamic>) read) => _call(
     () => _dio.get<Map<String, dynamic>>('/plans/$id/alternatives/${kind.listName}', options: _slow),
     (json) => Alternatives.fromJson(json, read),
@@ -135,11 +178,44 @@ class PlanRepository {
     final code = problemCode(e.response);
     if (status == 409 && code == 'too-many-plans') return const PlanLimitReached();
     if (status == 422 && code == 'no-places') return NoPlaces(city);
+    if (status == 422 && code == 'day-full') return DayFull(_detail(e.response) ?? const DayFull().message);
     if (status == 404) return const PlanNotFound();
     final fields = ProfileRepository.fieldErrorsOf(e);
     if (fields != null && fields.isNotEmpty) return PlanFieldError(fields.keys.first, fields.values.first);
     return null;
   }
+}
+
+/// The problem's own words, when it has them.
+String? _detail(Response<dynamic>? response) {
+  final data = response?.data;
+  return data is Map && data['detail'] is String ? data['detail'] as String : null;
+}
+
+/// One alternative for a day: a place or event card and how far it is from the day's other items.
+typedef DayAlternative = ({AssistantCard card, double walkKmFromDay});
+
+/// The answer of the day alternatives route: at most 6, nearest first; [message] when there are none.
+class DayAlternatives {
+  const DayAlternatives({required this.day, required this.kind, required this.items, this.itemId, this.message});
+
+  factory DayAlternatives.fromJson(Map<String, dynamic> json) => DayAlternatives(
+    day: json['day']! as int,
+    itemId: json['itemId'] as String?,
+    kind: AlternativeKind.values.asNameMap()[json['kind']] ?? AlternativeKind.sight,
+    items: [
+      for (final raw in (json['items'] as List<dynamic>? ?? const []).whereType<Map<String, dynamic>>())
+        if (AssistantCard.fromJson(raw) case final card?)
+          (card: card, walkKmFromDay: (raw['walkKmFromDay'] as num?)?.toDouble() ?? 0),
+    ],
+    message: json['message'] as String?,
+  );
+
+  final int day;
+  final String? itemId;
+  final AlternativeKind kind;
+  final List<DayAlternative> items;
+  final String? message;
 }
 
 final planRepositoryProvider = Provider<PlanRepository>((ref) => PlanRepository(ref.watch(dioProvider)));

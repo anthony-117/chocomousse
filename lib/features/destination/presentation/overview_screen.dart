@@ -1,7 +1,8 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/skeleton.dart';
-import 'package:chocomousse/features/assistant/presentation/widgets/assistant_entry.dart';
 import 'package:chocomousse/features/cars/presentation/widgets/cars_entry.dart';
+import 'package:chocomousse/features/chat/presentation/widgets/assistant_entry.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
@@ -12,7 +13,6 @@ import 'package:chocomousse/features/flights/presentation/widgets/flights_entry.
 import 'package:chocomousse/features/hotels/presentation/widgets/hotels_entry.dart';
 import 'package:chocomousse/features/itinerary/presentation/build_plan_screen.dart';
 import 'package:chocomousse/features/ranking/presentation/widgets/plan_entry.dart';
-import 'package:chocomousse/features/shell/floating_nav.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -49,7 +49,7 @@ class _OverviewPlaceholder extends StatelessWidget {
     final wide = MediaQuery.sizeOf(context).width >= kWideLayoutBreakpoint;
     final sidePadding = wide ? 64.0 : AppSpacing.xl;
     final animate = banner == null;
-    final onHero = AppColors.onPrimary.withValues(alpha: 0.35);
+    final onHero = context.palette.brandOnPrimary.withValues(alpha: 0.35);
 
     return _OverviewFrame(
       wide: wide,
@@ -134,7 +134,7 @@ class _OverviewFrame extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.only(bottom: wide ? 64 : FloatingNav.height + 48),
+      padding: EdgeInsets.only(bottom: wide ? 64 : 48),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -254,10 +254,10 @@ class _Hero extends StatelessWidget {
       lines: [
         Text(
           '${d.flag ?? ''} ${d.countryName.toUpperCase()} · ${d.timeZone.toUpperCase()}'.trim(),
-          style: textTheme.labelSmall?.copyWith(color: AppColors.primarySoft),
+          style: textTheme.labelSmall?.copyWith(color: context.palette.brandPrimarySoft),
         ),
-        Text(d.name, style: textTheme.displaySmall?.copyWith(color: AppColors.onPrimary)),
-        Text(dates, style: textTheme.bodyLarge?.copyWith(color: AppColors.onPrimary)),
+        Text(d.name, style: textTheme.displaySmall?.copyWith(color: context.palette.brandOnPrimary)),
+        Text(dates, style: textTheme.bodyLarge?.copyWith(color: context.palette.brandOnPrimary)),
       ],
     );
   }
@@ -276,7 +276,7 @@ class _HeroFrame extends StatelessWidget {
     final hero = Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        gradient: kPhotoGradient,
+        gradient: photoGradient(context),
         borderRadius: rounded ? BorderRadius.circular(AppRadius.lg + 4) : null,
       ),
       padding: EdgeInsets.fromLTRB(sidePadding, AppSpacing.lg, sidePadding, AppSpacing.xl),
@@ -310,7 +310,14 @@ class _Facts extends ConsumerWidget {
     final trip = ref.watch(tripSettingsProvider);
     return _FactGrid(
       columns: columns,
-      tiles: [_weather(), _currency(trip.currency), _visa(trip.passport), _safety(), _holidays(), _country()],
+      tiles: [
+        _weather(),
+        _currency(trip.currency),
+        _visa(context, trip.passport),
+        _safety(context),
+        _holidays(),
+        _country(),
+      ],
     );
   }
 
@@ -349,7 +356,7 @@ class _Facts extends ConsumerWidget {
     );
   }
 
-  Widget _visa(String passport) {
+  Widget _visa(BuildContext context, String passport) {
     final visa = data.visa;
     return FactTile(
       icon: Icons.badge_outlined,
@@ -359,14 +366,14 @@ class _Facts extends ConsumerWidget {
       tone: visa == null
           ? null
           : visa.isFree
-          ? AppColors.success
+          ? context.palette.statusSuccess
           : visa.requirement == 'visa required'
-          ? AppColors.danger
-          : AppColors.warning,
+          ? context.palette.statusDanger
+          : context.palette.statusWarning,
     );
   }
 
-  Widget _safety() {
+  Widget _safety(BuildContext context) {
     final a = data.advisory;
     if (a == null) {
       return const FactTile(icon: Icons.shield_outlined, title: 'Safety', value: '—', note: 'No advisory');
@@ -377,9 +384,9 @@ class _Facts extends ConsumerWidget {
       value: 'Level ${a.level}',
       note: a.label,
       tone: switch (a.level) {
-        1 => AppColors.success,
-        2 => AppColors.warning,
-        _ => AppColors.danger,
+        1 => context.palette.statusSuccess,
+        2 => context.palette.statusWarning,
+        _ => context.palette.statusDanger,
       },
     );
   }
@@ -458,7 +465,10 @@ class _WeatherStrip extends StatelessWidget {
               width: 96,
               margin: const EdgeInsets.only(right: AppSpacing.sm),
               padding: const EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(color: AppColors.canvas, borderRadius: BorderRadius.circular(AppRadius.md)),
+              decoration: BoxDecoration(
+                color: context.palette.bgApp,
+                borderRadius: BorderRadius.circular(AppRadius.md),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

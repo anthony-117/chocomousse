@@ -1,10 +1,13 @@
 import 'package:chocomousse/app/app.dart';
+import 'package:chocomousse/features/shell/app_drawer.dart';
+import 'package:chocomousse/features/shell/sidebar.dart';
 import 'package:chocomousse/features/system/data/system_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'account/fakes.dart';
+import 'helpers.dart';
 
 Widget _app() => ProviderScope(
   overrides: [
@@ -16,44 +19,46 @@ Widget _app() => ProviderScope(
   child: const TravelGenieApp(),
 );
 
-void main() {
-  testWidgets('phone layout opens on Discover and switches tabs with the floating nav', (tester) async {
-    tester.view.physicalSize = const Size(390, 844);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.reset);
+void _size(WidgetTester tester, Size size) {
+  tester.view
+    ..physicalSize = size
+    ..devicePixelRatio = 1;
+  addTearDown(tester.view.reset);
+}
 
+void main() {
+  testWidgets('phone layout opens on the home, with the top bar and the drawer', (tester) async {
+    _size(tester, phone);
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
-    expect(find.text('Discover'), findsOneWidget);
+    expect(find.byType(Sidebar), findsNothing);
+    expect(find.text('TravelGenie'), findsOneWidget);
+    expect(find.byTooltip('New trip chat'), findsOneWidget);
 
-    await tester.tap(find.byTooltip('Plans'));
-    await tester.pumpAndSettle();
-    expect(find.text('My plans'), findsOneWidget);
+    await openShellPlace(tester, 'Explore');
+    expect(find.text('Explore'), findsOneWidget, reason: 'the top bar names the place');
+    expect(find.byType(AppDrawer), findsNothing, reason: 'the drawer closes after a choice');
 
-    await tester.tap(find.byTooltip('Assistant'));
-    await tester.pumpAndSettle();
-    expect(find.text('Ask about any city'), findsOneWidget);
+    await openShellPlace(tester, 'My plans');
+    expect(find.text('My plans'), findsWidgets);
 
-    await tester.tap(find.byTooltip('Profile'));
-    await tester.pumpAndSettle();
+    await openProfileFromMenu(tester);
     expect(find.text('Connected to pamplemousse 1.0.0 (Test)'), findsOneWidget);
   });
 
-  testWidgets('wide layout shows the web header with text links', (tester) async {
-    tester.view.physicalSize = const Size(1440, 1024);
-    tester.view.devicePixelRatio = 1;
-    addTearDown(tester.view.reset);
-
+  testWidgets('wide layout shows the sidebar beside the page', (tester) async {
+    _size(tester, desktop);
     await tester.pumpWidget(_app());
     await tester.pumpAndSettle();
 
-    // Desktop Discover (W1): header link plus the large "Where to next?" search hero.
-    expect(find.text('Discover'), findsOneWidget);
+    expect(find.byType(Sidebar), findsOneWidget);
+    expect(find.byTooltip('Open menu'), findsNothing);
+
+    await openShellPlace(tester, 'Explore');
     expect(find.text('Where to next?'), findsWidgets);
 
-    await tester.tap(find.text('Plans'));
-    await tester.pumpAndSettle();
-    expect(find.text('My plans'), findsOneWidget);
+    await openShellPlace(tester, 'My plans');
+    expect(find.text('My plans'), findsWidgets);
   });
 }

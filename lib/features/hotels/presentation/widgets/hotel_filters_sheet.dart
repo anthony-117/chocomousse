@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/hotels/data/hotel_models.dart';
 import 'package:flutter/material.dart';
@@ -164,7 +165,7 @@ class _HotelFiltersFormState extends State<HotelFiltersForm> {
           const SizedBox(height: AppSpacing.xs),
           Text(
             'The minimum price is above the maximum.',
-            style: textTheme.bodySmall?.copyWith(color: AppColors.danger),
+            style: textTheme.bodySmall?.copyWith(color: context.palette.statusDanger),
           ),
         ],
         const SizedBox(height: AppSpacing.lg),

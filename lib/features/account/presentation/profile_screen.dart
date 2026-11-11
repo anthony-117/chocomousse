@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
 import 'package:chocomousse/core/widgets/skeleton.dart';
@@ -33,10 +34,13 @@ class ProfileScreen extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: 32,
-              backgroundColor: AppColors.primary,
+              backgroundColor: context.palette.brandPrimary,
               child: Text(
                 name.trim().isEmpty ? '?' : name.trim()[0].toUpperCase(),
-                style: textTheme.headlineSmall?.copyWith(color: AppColors.onPrimary, fontWeight: FontWeight.w700),
+                style: textTheme.headlineSmall?.copyWith(
+                  color: context.palette.brandOnPrimary,
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ),
             const SizedBox(width: AppSpacing.lg),
@@ -45,7 +49,7 @@ class ProfileScreen extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(name, style: textTheme.titleLarge),
-                  Text(user?.email ?? '', style: textTheme.bodyMedium?.copyWith(color: AppColors.muted)),
+                  Text(user?.email ?? '', style: textTheme.bodyMedium?.copyWith(color: context.palette.textSecondary)),
                   Text(
                     user?.method == SignInMethod.google ? 'Signed in with Google' : 'Signed in with email',
                     style: textTheme.bodySmall,
@@ -75,7 +79,7 @@ class ProfileScreen extends ConsumerWidget {
         ),
         const SizedBox(height: AppSpacing.sm),
         TextButton(
-          style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+          style: TextButton.styleFrom(foregroundColor: context.palette.statusDanger),
           onPressed: () => unawaited(showDeleteAccountSheet(context)),
           child: const Text('Delete my account'),
         ),
@@ -110,7 +114,7 @@ class _ProfileCards extends ConsumerWidget {
             const SizedBox(height: AppSpacing.sm),
             Text(
               "New trips start with these. Changing a trip doesn't change them.",
-              style: textTheme.bodySmall?.copyWith(color: AppColors.muted),
+              style: textTheme.bodySmall?.copyWith(color: context.palette.textSecondary),
             ),
           ],
         ),
@@ -167,7 +171,7 @@ class _Row extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(label, style: textTheme.bodyMedium?.copyWith(color: AppColors.muted)),
+            child: Text(label, style: textTheme.bodyMedium?.copyWith(color: context.palette.textSecondary)),
           ),
           Flexible(
             child: Text(value, style: textTheme.bodyLarge, textAlign: TextAlign.end),

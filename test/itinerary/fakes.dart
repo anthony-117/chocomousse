@@ -283,7 +283,10 @@ class FakePlanRepository implements PlanRepository {
         hotelName: current.hotel?.offer.name ?? 'Hotel Artemide',
       ),
     );
-    return _plans[id] = Plan.fromJson({...json, 'updatedAt': DateTime.now().toUtc().toIso8601String()});
+    return _plans[id] = Plan.fromJson({
+      ..._withDayEdits(id, json),
+      'updatedAt': DateTime.now().toUtc().toIso8601String(),
+    });
   }
 
   @override
@@ -374,4 +377,119 @@ class FakePlanRepository implements PlanRepository {
     _fail();
     return _change(id, (j) => planJson(id: id, name: j['name']! as String));
   }
+
+  /// The alternatives every day offers: Villa Borghese and the Pantheon.
+  List<Map<String, Object?>> dayAlternativeCards = [
+    {...alternativeCardJson(), 'walkKmFromDay': 0.8},
+    {...alternativeCardJson(id: 'otm:pantheon', name: 'Pantheon'), 'walkKmFromDay': 1.4},
+  ];
+
+  /// Items put in a day by [addOrReplaceItem], kept through later changes: day -> (replaced id or null, new item).
+  final _dayEdits = <String, List<(int, String?, Map<String, Object?>)>>{};
+
+  @override
+  Future<DayAlternatives> dayAlternatives(String id, int day, {String? itemId, AlternativeKind? kind}) async {
+    calls.add('day alternatives $id $day ${itemId ?? '-'} ${kind?.name ?? '-'}');
+    _fail();
+    return DayAlternatives.fromJson({
+      'day': day,
+      'itemId': itemId,
+      'kind': kind?.name ?? 'sight',
+      'items': dayAlternativeCards,
+      if (dayAlternativeCards.isEmpty) 'message': 'Nothing else nearby for this day.',
+    });
+  }
+
+  @override
+  Future<Plan> addOrReplaceItem(
+    String id,
+    int day, {
+    required RefKind kind,
+    required String itemId,
+    String? replaces,
+  }) async {
+    calls.add('add $id $day $itemId ${replaces ?? '-'}');
+    _fail();
+    final card = dayAlternativeCards.firstWhere((c) => c['id'] == itemId);
+    final name = (card['item']! as Map)['name']! as String;
+    final item = itemJson('sight', '09:00', name, ref: placeRef(itemId));
+    (_dayEdits[id] ??= []).add((day, replaces, item));
+    return _change(id, (j) => j);
+  }
+
+  @override
+  Future<Plan> removeItem(String id, int day, String itemId) async {
+    calls.add('remove $id $day $itemId');
+    _fail();
+    (_dayEdits[id] ??= []).add((day, itemId, const {}));
+    return _change(id, (j) => j);
+  }
+
+  RebuildRequest? rebuiltWith;
+
+  @override
+  Future<Plan> rebuild(String id, RebuildRequest values, {String city = 'this city'}) async {
+    calls.add('rebuild $id');
+    await gate?.future;
+    _fail();
+    rebuiltWith = values;
+    return _change(id, (j) => {...j, if (values.pace case final pace?) 'pace': pace.name});
+  }
+
+  /// The plan's days with the day edits applied.
+  Map<String, Object?> _withDayEdits(String id, Map<String, Object?> json) {
+    final edits = _dayEdits[id];
+    if (edits == null || edits.isEmpty) return json;
+    final days = [
+      for (final day in (json['days']! as List).cast<Map<String, Object?>>())
+        () {
+          var items = (day['items']! as List).cast<Map<String, Object?>>().toList();
+          for (final (n, replaces, item) in edits) {
+            if (n != day['number']) continue;
+            final at = items.indexWhere((i) => (i['ref'] as Map?)?['id'] == replaces);
+            if (item.isEmpty) {
+              if (at >= 0) items.removeAt(at);
+            } else if (replaces != null && at >= 0) {
+              items[at] = {...item, 'start': items[at]['start']};
+            } else {
+              items = [...items, item];
+            }
+          }
+          return {...day, 'items': items};
+        }(),
+    ];
+    return {
+      ...json,
+      'days': days,
+      'edits': [
+        for (final (n, replaces, item) in edits)
+          {
+            'day': n,
+            'action': item.isEmpty ? 'remove' : (replaces == null ? 'add' : 'replace'),
+            'itemId': replaces,
+            'newItem': item.isEmpty ? null : {'kind': 'place', 'id': (item['ref']! as Map)['id'], 'name': item['name']},
+          },
+      ],
+    };
+  }
 }
+
+/// A place card the day alternatives route offers.
+Map<String, Object?> alternativeCardJson({String id = 'otm:N123', String name = 'Villa Borghese'}) => {
+  'kind': 'place',
+  'id': id,
+  'lat': 41.9142,
+  'lng': 12.4923,
+  'approximate': false,
+  'foundAt': '2026-11-10T19:02:05Z',
+  'item': {
+    'id': id,
+    'name': name,
+    'category': 'attraction',
+    'location': {'lat': 41.9142, 'lng': 12.4923},
+    'kind': 'Gardens and parks',
+    'rating': 4.6,
+    'imageUrl': null,
+    'source': 'opentripmap',
+  },
+};

@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/offers.dart';
 import 'package:chocomousse/features/itinerary/data/plan_models.dart';
@@ -135,7 +136,7 @@ class _OfferRow extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(kind, style: textTheme.labelSmall?.copyWith(color: AppColors.muted)),
+          Text(kind, style: textTheme.labelSmall?.copyWith(color: context.palette.textSecondary)),
           Row(
             children: [
               Expanded(child: Text(title, style: textTheme.titleSmall)),
@@ -171,9 +172,9 @@ class PlanPanel extends StatelessWidget {
       width: double.infinity,
       padding: padding,
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.palette.bgSurface,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.palette.borderDefault),
       ),
       child: child,
     );

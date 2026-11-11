@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/network/api_client.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
@@ -133,7 +134,7 @@ class _EditProfileFormState extends ConsumerState<_EditProfileForm> {
         ),
         const SizedBox(height: AppSpacing.xl),
         if (_error != null) ...[
-          Text(_error!, style: const TextStyle(color: AppColors.danger)),
+          Text(_error!, style: TextStyle(color: context.palette.statusDanger)),
           const SizedBox(height: AppSpacing.lg),
         ],
         TextField(
@@ -177,9 +178,9 @@ class _EditProfileFormState extends ConsumerState<_EditProfileForm> {
           style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52), shape: const StadiumBorder()),
           onPressed: _saving ? null : () => unawaited(_save()),
           child: _saving
-              ? const SizedBox.square(
+              ? SizedBox.square(
                   dimension: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.onPrimary),
+                  child: CircularProgressIndicator(strokeWidth: 2, color: context.palette.brandOnPrimary),
                 )
               : const Text('Save'),
         ),
@@ -208,7 +209,7 @@ class _PickTile extends StatelessWidget {
           ),
         ],
       ),
-      subtitle: error == null ? null : Text(error!, style: const TextStyle(color: AppColors.danger)),
+      subtitle: error == null ? null : Text(error!, style: TextStyle(color: context.palette.statusDanger)),
       trailing: const Icon(Icons.chevron_right),
       onTap: () => unawaited(onTap()),
     );

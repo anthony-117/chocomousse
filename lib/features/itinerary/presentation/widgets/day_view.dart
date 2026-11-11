@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/skeleton.dart';
 import 'package:chocomousse/features/itinerary/data/plan_models.dart';
@@ -53,7 +54,7 @@ class DayList extends StatelessWidget {
         children: [
           for (final day in days)
             Material(
-              color: day.number == selected ? AppColors.primarySoft : Colors.transparent,
+              color: day.number == selected ? context.palette.brandPrimarySoft : Colors.transparent,
               borderRadius: BorderRadius.circular(AppRadius.md),
               child: InkWell(
                 borderRadius: BorderRadius.circular(AppRadius.md),
@@ -69,7 +70,9 @@ class DayList extends StatelessWidget {
                             Text(
                               dayLabel(day),
                               style: textTheme.labelSmall?.copyWith(
-                                color: day.number == selected ? AppColors.primary : AppColors.muted,
+                                color: day.number == selected
+                                    ? context.palette.brandPrimary
+                                    : context.palette.textSecondary,
                               ),
                             ),
                             Text(dayTopic(day), style: textTheme.titleSmall),
@@ -89,9 +92,12 @@ class DayList extends StatelessWidget {
 
 /// One day (I1, I2): title, date, weather and walk, then its items in time order on a timeline.
 class DayCard extends StatelessWidget {
-  const DayCard({required this.day, required this.onItem, super.key});
+  const DayCard({required this.day, required this.onItem, this.itemAction, super.key});
 
   final PlanDay day;
+
+  /// A button at the end of an item's row (the Plan pane's swap icon); null for none.
+  final Widget? Function(PlanItem item)? itemAction;
 
   /// Null for an item that opens nothing.
   final VoidCallback? Function(PlanItem item) onItem;
@@ -112,7 +118,13 @@ class DayCard extends StatelessWidget {
             Text('Nothing planned this day.', style: textTheme.bodySmall)
           else
             for (final (i, item) in day.items.indexed)
-              TripItemRow(item: item, first: i == 0, last: i == day.items.length - 1, onTap: onItem(item)),
+              TripItemRow(
+                item: item,
+                first: i == 0,
+                last: i == day.items.length - 1,
+                onTap: onItem(item),
+                action: itemAction?.call(item),
+              ),
         ],
       ),
     );
@@ -121,12 +133,13 @@ class DayCard extends StatelessWidget {
 
 /// TripItemRow: the start time, a dot on the line, the name and its details.
 class TripItemRow extends StatelessWidget {
-  const TripItemRow({required this.item, required this.first, required this.last, this.onTap, super.key});
+  const TripItemRow({required this.item, required this.first, required this.last, this.onTap, this.action, super.key});
 
   final PlanItem item;
   final bool first;
   final bool last;
   final VoidCallback? onTap;
+  final Widget? action;
 
   @override
   Widget build(BuildContext context) {
@@ -148,13 +161,13 @@ class TripItemRow extends StatelessWidget {
                   Positioned(
                     top: first ? 6 : 0,
                     bottom: 0,
-                    child: Container(width: 2, color: AppColors.border),
+                    child: Container(width: 2, color: context.palette.borderDefault),
                   ),
                   Container(
                     margin: const EdgeInsets.only(top: 2),
                     width: 10,
                     height: 10,
-                    decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+                    decoration: BoxDecoration(color: context.palette.brandPrimary, shape: BoxShape.circle),
                   ),
                 ],
               ),
@@ -168,7 +181,7 @@ class TripItemRow extends StatelessWidget {
                   children: [
                     Text(
                       item.name,
-                      style: textTheme.titleSmall?.copyWith(color: onTap == null ? null : AppColors.text),
+                      style: textTheme.titleSmall?.copyWith(color: onTap == null ? null : context.palette.textPrimary),
                     ),
                     const SizedBox(height: 2),
                     Text(itemDetails(item, first: first), style: textTheme.bodySmall),
@@ -176,7 +189,8 @@ class TripItemRow extends StatelessWidget {
                 ),
               ),
             ),
-            if (onTap != null) const Icon(Icons.chevron_right, size: 18, color: AppColors.muted),
+            ?action,
+            if (onTap != null) Icon(Icons.chevron_right, size: 18, color: context.palette.textSecondary),
           ],
         ),
       ),

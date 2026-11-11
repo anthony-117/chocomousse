@@ -1,8 +1,8 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
-import 'package:chocomousse/features/shell/floating_nav.dart';
 import 'package:flutter/material.dart';
 
-/// Standard scrollable page: mobile padding and room for the floating nav on phones,
+/// Standard scrollable page: mobile padding on phones,
 /// wider centred content on the web layout.
 class PageFrame extends StatelessWidget {
   const PageFrame({required this.children, super.key});
@@ -14,7 +14,7 @@ class PageFrame extends StatelessWidget {
     final wide = MediaQuery.sizeOf(context).width >= kWideLayoutBreakpoint;
     final padding = wide
         ? const EdgeInsets.fromLTRB(64, 40, 64, 64)
-        : const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, FloatingNav.height + 48);
+        : const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.xl, AppSpacing.xl, 48);
 
     return SafeArea(
       bottom: false,
@@ -42,7 +42,7 @@ class SoftCard extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.xl),
-      decoration: BoxDecoration(color: AppColors.canvas, borderRadius: BorderRadius.circular(AppRadius.lg)),
+      decoration: BoxDecoration(color: context.palette.bgApp, borderRadius: BorderRadius.circular(AppRadius.lg)),
       child: child,
     );
   }
@@ -65,8 +65,8 @@ class EmptyState extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 28,
-            backgroundColor: AppColors.primarySoft,
-            child: Icon(icon, color: AppColors.primary, size: 28),
+            backgroundColor: context.palette.brandPrimarySoft,
+            child: Icon(icon, color: context.palette.brandPrimary, size: 28),
           ),
           const SizedBox(height: AppSpacing.lg),
           Text(title, style: textTheme.titleMedium, textAlign: TextAlign.center),

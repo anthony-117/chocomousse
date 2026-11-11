@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
@@ -79,12 +80,15 @@ class _SearchPill extends StatelessWidget {
         onTap: () => context.push('/discover/search'),
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
-          decoration: BoxDecoration(color: AppColors.canvas, borderRadius: BorderRadius.circular(AppRadius.full)),
+          decoration: BoxDecoration(color: context.palette.bgApp, borderRadius: BorderRadius.circular(AppRadius.full)),
           child: Row(
             children: [
-              const Icon(Icons.search, color: AppColors.muted),
+              Icon(Icons.search, color: context.palette.textSecondary),
               const SizedBox(width: AppSpacing.md),
-              Text('Where to next?', style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: AppColors.muted)),
+              Text(
+                'Where to next?',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(color: context.palette.textSecondary),
+              ),
             ],
           ),
         ),
@@ -111,14 +115,14 @@ class _DestinationCard extends StatelessWidget {
         onTap: onTap,
         child: Ink(
           height: height,
-          decoration: const BoxDecoration(gradient: kPhotoGradient),
+          decoration: BoxDecoration(gradient: photoGradient(context)),
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(city, style: textTheme.headlineSmall?.copyWith(color: AppColors.onPrimary)),
-              Text(subtitle, style: textTheme.bodySmall?.copyWith(color: AppColors.onPrimary)),
+              Text(city, style: textTheme.headlineSmall?.copyWith(color: context.palette.brandOnPrimary)),
+              Text(subtitle, style: textTheme.bodySmall?.copyWith(color: context.palette.brandOnPrimary)),
             ],
           ),
         ),

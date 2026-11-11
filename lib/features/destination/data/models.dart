@@ -217,11 +217,18 @@ class DestinationOverview {
   final List<String> warnings;
 }
 
+/// A place's category, the API's values. Nature and nightlife come from plans and the assistant (API spec 008), not from
+/// the places screen's tabs.
 enum PlaceCategory {
   attraction('Attractions'),
-  restaurant('Restaurants');
+  restaurant('Restaurants'),
+  nature('Nature'),
+  nightlife('Nightlife');
 
   PlaceCategory(this.label);
+
+  /// The places screen's tabs (Figma 05).
+  static const List<PlaceCategory> tabs = [attraction, restaurant];
 
   final String label;
 }
@@ -250,7 +257,8 @@ class Place {
     return Place(
       id: json['id'] as String,
       name: json['name'] as String,
-      category: PlaceCategory.values.byName(json['category'] as String),
+      // A category the app doesn't know yet reads as a sight, never a failure.
+      category: PlaceCategory.values.asNameMap()[json['category']] ?? PlaceCategory.attraction,
       lat: _double(location['lat'])!,
       lng: _double(location['lng'])!,
       kind: json['kind'] as String?,

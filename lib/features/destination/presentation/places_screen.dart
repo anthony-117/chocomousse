@@ -44,7 +44,7 @@ class _PlacesScreenState extends ConsumerState<PlacesScreen> {
         Wrap(
           spacing: AppSpacing.sm,
           children: [
-            for (final c in PlaceCategory.values)
+            for (final c in PlaceCategory.tabs)
               ChoiceChip(
                 label: Text(c.label),
                 selected: c == _category,

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';
@@ -161,9 +162,9 @@ class _RankedListViewState<T, R> extends State<RankedListView<T, R>> {
               : Container(
                   padding: const EdgeInsets.all(AppSpacing.xl),
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: context.palette.bgSurface,
                     borderRadius: BorderRadius.circular(AppRadius.lg),
-                    border: Border.all(color: AppColors.border),
+                    border: Border.all(color: context.palette.borderDefault),
                   ),
                   child: WhyView(
                     data: selected.$2,
@@ -190,10 +191,10 @@ class ErrorRetryBanner extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.sm, AppSpacing.sm),
-      decoration: BoxDecoration(color: AppColors.canvas, borderRadius: BorderRadius.circular(AppRadius.md)),
+      decoration: BoxDecoration(color: context.palette.bgApp, borderRadius: BorderRadius.circular(AppRadius.md)),
       child: Row(
         children: [
-          const Icon(Icons.cloud_off_outlined, color: AppColors.muted, size: 20),
+          Icon(Icons.cloud_off_outlined, color: context.palette.textSecondary, size: 20),
           const SizedBox(width: AppSpacing.sm),
           Expanded(child: Text(message, style: Theme.of(context).textTheme.bodySmall)),
           TextButton(onPressed: onRetry, child: const Text('Try again')),

@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/offers.dart';
 import 'package:chocomousse/features/itinerary/data/plan_models.dart';
@@ -97,12 +98,12 @@ class PlanWhyView extends StatelessWidget {
         if (total.events > 0) _CostRow(events == 0 ? 'Events' : 'Events · $events', money(total.events)),
         _CostRow('Total', money(total.amount), bold: true),
         const SizedBox(height: AppSpacing.sm),
-        ?_notIncluded(textTheme, money),
+        ?_notIncluded(context, textTheme, money),
       ],
     );
   }
 
-  Widget? _notIncluded(TextTheme textTheme, String Function(num) money) {
+  Widget? _notIncluded(BuildContext context, TextTheme textTheme, String Function(num) money) {
     final total = plan.total;
     final budget = plan.tripBudget;
     final over = total.overBudgetBy;
@@ -119,7 +120,7 @@ class PlanWhyView extends StatelessWidget {
     if (lines.isEmpty) return null;
     return Text(
       lines.join(' '),
-      style: textTheme.bodySmall?.copyWith(color: over != null && over > 0 ? AppColors.danger : null),
+      style: textTheme.bodySmall?.copyWith(color: over != null && over > 0 ? context.palette.statusDanger : null),
     );
   }
 }
@@ -146,7 +147,7 @@ class _PartRow extends StatelessWidget {
               Expanded(child: Text(label, style: textTheme.titleSmall)),
               Text(level, style: textTheme.bodySmall),
               const SizedBox(width: AppSpacing.sm),
-              Text('$percent%', style: textTheme.titleSmall?.copyWith(color: AppColors.primary)),
+              Text('$percent%', style: textTheme.titleSmall?.copyWith(color: context.palette.brandPrimary)),
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -155,8 +156,8 @@ class _PartRow extends StatelessWidget {
             child: LinearProgressIndicator(
               value: percent.clamp(0, 100) / 100,
               minHeight: 6,
-              backgroundColor: AppColors.border,
-              color: AppColors.primary,
+              backgroundColor: context.palette.borderDefault,
+              color: context.palette.brandPrimary,
               semanticsLabel: '$label $percent%',
             ),
           ),

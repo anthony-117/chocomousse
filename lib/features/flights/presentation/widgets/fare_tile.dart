@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/skeleton.dart';
 import 'package:chocomousse/features/flights/data/flight_models.dart';
@@ -34,10 +35,10 @@ class FareTile extends StatelessWidget {
     final duration = fare.durationMinutes;
 
     return Material(
-      color: AppColors.surface,
+      color: context.palette.bgSurface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.md),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.palette.borderDefault),
       ),
       child: InkWell(
         onTap: onOpen,
@@ -86,9 +87,9 @@ class FareTile extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('See live price', style: textTheme.labelSmall?.copyWith(color: AppColors.primary)),
+                  Text('See live price', style: textTheme.labelSmall?.copyWith(color: context.palette.brandPrimary)),
                   const SizedBox(width: AppSpacing.xs),
-                  const Icon(Icons.north_east, size: 14, color: AppColors.primary),
+                  Icon(Icons.north_east, size: 14, color: context.palette.brandPrimary),
                 ],
               ),
             ],
@@ -108,8 +109,11 @@ class _DateLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
-      decoration: BoxDecoration(color: AppColors.primarySoft, borderRadius: BorderRadius.circular(AppRadius.full)),
-      child: Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: AppColors.primary)),
+      decoration: BoxDecoration(
+        color: context.palette.brandPrimarySoft,
+        borderRadius: BorderRadius.circular(AppRadius.full),
+      ),
+      child: Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: context.palette.brandPrimary)),
     );
   }
 }

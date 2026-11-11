@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/destination/data/models.dart';
@@ -30,7 +31,7 @@ class TripChips extends ConsumerWidget {
       children: [
         if (showPassport)
           ActionChip(
-            avatar: const Icon(Icons.badge_outlined, size: 16, color: AppColors.primary),
+            avatar: Icon(Icons.badge_outlined, size: 16, color: context.palette.brandPrimary),
             label: Text('Passport: ${trip.passport}'),
             onPressed: () async {
               final code = await pickCountry(context, title: 'Your passport', value: (c) => c.code);
@@ -38,7 +39,7 @@ class TripChips extends ConsumerWidget {
             },
           ),
         ActionChip(
-          avatar: const Icon(Icons.payments_outlined, size: 16, color: AppColors.primary),
+          avatar: Icon(Icons.payments_outlined, size: 16, color: context.palette.brandPrimary),
           label: Text(trip.currency),
           onPressed: () async {
             final code = await pickCountry(
@@ -50,13 +51,13 @@ class TripChips extends ConsumerWidget {
           },
         ),
         ActionChip(
-          avatar: const Icon(Icons.calendar_today_outlined, size: 16, color: AppColors.primary),
+          avatar: Icon(Icons.calendar_today_outlined, size: 16, color: context.palette.brandPrimary),
           label: Text(dates),
           onPressed: () => pickTripDates(context, ref),
         ),
         if (showAdults)
           ActionChip(
-            avatar: const Icon(Icons.person_outline, size: 16, color: AppColors.primary),
+            avatar: Icon(Icons.person_outline, size: 16, color: context.palette.brandPrimary),
             label: Text('${adultsLabel(trip.adults)} · 1 room'),
             onPressed: () => showAdultsPicker(context),
           ),

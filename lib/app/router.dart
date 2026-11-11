@@ -4,9 +4,10 @@ import 'package:chocomousse/features/account/data/auth_repository.dart';
 import 'package:chocomousse/features/account/presentation/auth_screens.dart';
 import 'package:chocomousse/features/account/presentation/edit_profile_screen.dart';
 import 'package:chocomousse/features/account/presentation/profile_screen.dart';
-import 'package:chocomousse/features/assistant/presentation/assistant_screen.dart';
 import 'package:chocomousse/features/cars/presentation/car_details_screen.dart';
 import 'package:chocomousse/features/cars/presentation/cars_screen.dart';
+import 'package:chocomousse/features/chat/presentation/assistant_home.dart';
+import 'package:chocomousse/features/chat/presentation/chat_screen.dart';
 import 'package:chocomousse/features/destination/presentation/overview_screen.dart';
 import 'package:chocomousse/features/destination/presentation/place_details_screen.dart';
 import 'package:chocomousse/features/destination/presentation/places_screen.dart';
@@ -28,17 +29,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-/// Top-level destinations, in the order shown by the floating nav and the web header.
-enum AppTab {
-  discover('/discover', 'Discover'),
-  plans('/plans', 'Plans'),
-  assistant('/assistant', 'Assistant'),
-  profile('/profile', 'Profile');
+/// The shell's top-level places (spec 008 research R-5). Explore, My plans and the profile keep their v0.2 routes.
+abstract final class AppPaths {
+  static const home = '/';
+  static const saved = '/saved';
+  static const explore = '/discover';
+  static const plans = '/plans';
+  static const profile = '/profile';
 
-  AppTab(this.path, this.label);
-
-  final String path;
-  final String label;
+  static String chat(String id) => '/chat/$id';
 }
 
 final routerProvider = Provider<GoRouter>((ref) {
@@ -48,7 +47,7 @@ final routerProvider = Provider<GoRouter>((ref) {
     ..listen(authUserProvider, (_, next) => session.value = next)
     ..onDispose(session.dispose);
   return GoRouter(
-    initialLocation: AppTab.discover.path,
+    initialLocation: AppPaths.home,
     refreshListenable: session,
     redirect: (context, state) => authRedirect(session.value, state.uri),
     routes: [
@@ -58,77 +57,122 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: AuthPaths.signUp, builder: (context, state) => const SignUpScreen()),
       GoRoute(path: AuthPaths.forgotPassword, builder: (context, state) => const ForgotPasswordScreen()),
       GoRoute(path: AuthPaths.checkEmail, builder: (context, state) => const CheckEmailScreen()),
-      StatefulShellRoute.indexedStack(
-        builder: (context, state, shell) => AppShell(shell: shell),
-        branches: [
-          StatefulShellBranch(
+      // The v0.2 Assistant tab's address now opens the home.
+      GoRoute(path: '/assistant', redirect: (context, state) => AppPaths.home),
+      ShellRoute(
+        builder: (context, state, child) => AppShell(location: state.uri.path, child: child),
+        routes: [
+          // The v0.2 assistant stays the home until the v1 home is built (spec 008 T051).
+          GoRoute(path: AppPaths.home, builder: (context, state) => const AssistantHome()),
+          GoRoute(
+            path: '/chat/:chatId',
+            builder: (context, state) {
+              final id = state.pathParameters['chatId']!;
+              return ChatScreen(key: ValueKey(id), chatId: id);
+            },
+          ),
+          GoRoute(path: AppPaths.saved, builder: (context, state) => const AssistantHome(openSaved: true)),
+          GoRoute(
+            path: AppPaths.explore,
+            builder: (context, state) => const DiscoverScreen(),
             routes: [
+              GoRoute(path: 'search', builder: (context, state) => const SearchScreen()),
               GoRoute(
-                path: AppTab.discover.path,
-                builder: (context, state) => const DiscoverScreen(),
+                path: 'destination/:id',
+                builder: (context, state) => OverviewScreen(id: state.pathParameters['id']!),
                 routes: [
-                  GoRoute(path: 'search', builder: (context, state) => const SearchScreen()),
                   GoRoute(
-                    path: 'destination/:id',
-                    builder: (context, state) => OverviewScreen(id: state.pathParameters['id']!),
+                    path: 'places',
+                    builder: (context, state) => PlacesScreen(
+                      id: state.pathParameters['id']!,
+                      initialCategory: state.uri.queryParameters['category'],
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'flights',
+                    builder: (context, state) => FlightsScreen(id: state.pathParameters['id']!),
+                  ),
+                  GoRoute(
+                    path: 'hotels',
+                    builder: (context, state) => HotelsScreen(id: state.pathParameters['id']!),
                     routes: [
                       GoRoute(
-                        path: 'places',
-                        builder: (context, state) => PlacesScreen(
-                          id: state.pathParameters['id']!,
-                          initialCategory: state.uri.queryParameters['category'],
-                        ),
-                      ),
-                      GoRoute(
-                        path: 'flights',
-                        builder: (context, state) => FlightsScreen(id: state.pathParameters['id']!),
-                      ),
-                      GoRoute(
-                        path: 'hotels',
-                        builder: (context, state) => HotelsScreen(id: state.pathParameters['id']!),
-                        routes: [
-                          GoRoute(
-                            path: ':hotelId',
-                            builder: (context, state) => HotelDetailsScreen(hotelId: state.pathParameters['hotelId']!),
-                          ),
-                        ],
-                      ),
-                      GoRoute(
-                        path: 'cars',
-                        builder: (context, state) => CarsScreen(id: state.pathParameters['id']!),
-                        routes: [
-                          GoRoute(
-                            path: ':carId',
-                            // A car is shown from the search it was tapped in; opened without one (a reload or
-                            // a shared link), it goes to the list instead (spec FR-010).
-                            redirect: (context, state) => state.extra is CarDetailsArgs
-                                ? null
-                                : '/discover/destination/${state.pathParameters['id']}/cars',
-                            builder: (context, state) => CarDetailsScreen(args: state.extra! as CarDetailsArgs),
-                          ),
-                        ],
-                      ),
-                      GoRoute(
-                        path: 'plan',
-                        builder: (context, state) {
-                          final edit = state.uri.queryParameters['edit'];
-                          return PlanTripScreen(
-                            id: state.pathParameters['id']!,
-                            returnTo: edit == null ? null : RankedKind.parse(edit),
-                          );
-                        },
-                        routes: [
-                          GoRoute(
-                            path: 'best',
-                            builder: (context, state) => BestForYouScreen(
-                              id: state.pathParameters['id']!,
-                              tab: RankedKind.parse(state.uri.queryParameters['tab']),
-                            ),
-                          ),
-                        ],
+                        path: ':hotelId',
+                        builder: (context, state) => HotelDetailsScreen(hotelId: state.pathParameters['hotelId']!),
                       ),
                     ],
                   ),
+                  GoRoute(
+                    path: 'cars',
+                    builder: (context, state) => CarsScreen(id: state.pathParameters['id']!),
+                    routes: [
+                      GoRoute(
+                        path: ':carId',
+                        // A car is shown from the search it was tapped in; opened without one (a reload or
+                        // a shared link), it goes to the list instead (spec FR-010).
+                        redirect: (context, state) => state.extra is CarDetailsArgs
+                            ? null
+                            : '/discover/destination/${state.pathParameters['id']}/cars',
+                        builder: (context, state) => CarDetailsScreen(args: state.extra! as CarDetailsArgs),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
+                    path: 'plan',
+                    builder: (context, state) {
+                      final edit = state.uri.queryParameters['edit'];
+                      return PlanTripScreen(
+                        id: state.pathParameters['id']!,
+                        returnTo: edit == null ? null : RankedKind.parse(edit),
+                      );
+                    },
+                    routes: [
+                      GoRoute(
+                        path: 'best',
+                        builder: (context, state) => BestForYouScreen(
+                          id: state.pathParameters['id']!,
+                          tab: RankedKind.parse(state.uri.queryParameters['tab']),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              GoRoute(
+                path: 'place/:placeId',
+                builder: (context, state) => PlaceDetailsScreen(placeId: state.pathParameters['placeId']!),
+              ),
+            ],
+          ),
+          GoRoute(
+            path: AppPaths.plans,
+            builder: (context, state) => const MyPlansScreen(),
+            routes: [
+              GoRoute(
+                path: 'new',
+                // A build starts from Best for you or the overview; opened without one (a reload), it goes to
+                // My plans instead of building again.
+                redirect: (context, state) => state.extra is BuildPlanRequest ? null : AppPaths.plans,
+                builder: (context, state) => BuildPlanScreen(request: state.extra! as BuildPlanRequest),
+              ),
+              GoRoute(
+                path: ':planId',
+                builder: (context, state) => ItineraryScreen(
+                  id: state.pathParameters['planId']!,
+                  day: int.tryParse(state.uri.queryParameters['day'] ?? ''),
+                ),
+                routes: [
+                  GoRoute(
+                    path: 'change/:kind',
+                    redirect: (context, state) => OfferKind.parse(state.pathParameters['kind']) == null
+                        ? '/plans/${state.pathParameters['planId']}'
+                        : null,
+                    builder: (context, state) => ChangeOfferScreen(
+                      planId: state.pathParameters['planId']!,
+                      kind: OfferKind.parse(state.pathParameters['kind'])!,
+                    ),
+                  ),
+                  // Place details inside the Plans tab, so Back returns to the day (plan decision 6).
                   GoRoute(
                     path: 'place/:placeId',
                     builder: (context, state) => PlaceDetailsScreen(placeId: state.pathParameters['placeId']!),
@@ -137,58 +181,10 @@ final routerProvider = Provider<GoRouter>((ref) {
               ),
             ],
           ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppTab.plans.path,
-                builder: (context, state) => const MyPlansScreen(),
-                routes: [
-                  GoRoute(
-                    path: 'new',
-                    // A build starts from Best for you or the overview; opened without one (a reload), it goes to
-                    // My plans instead of building again.
-                    redirect: (context, state) => state.extra is BuildPlanRequest ? null : AppTab.plans.path,
-                    builder: (context, state) => BuildPlanScreen(request: state.extra! as BuildPlanRequest),
-                  ),
-                  GoRoute(
-                    path: ':planId',
-                    builder: (context, state) => ItineraryScreen(
-                      id: state.pathParameters['planId']!,
-                      day: int.tryParse(state.uri.queryParameters['day'] ?? ''),
-                    ),
-                    routes: [
-                      GoRoute(
-                        path: 'change/:kind',
-                        redirect: (context, state) => OfferKind.parse(state.pathParameters['kind']) == null
-                            ? '/plans/${state.pathParameters['planId']}'
-                            : null,
-                        builder: (context, state) => ChangeOfferScreen(
-                          planId: state.pathParameters['planId']!,
-                          kind: OfferKind.parse(state.pathParameters['kind'])!,
-                        ),
-                      ),
-                      // Place details inside the Plans tab, so Back returns to the day (plan decision 6).
-                      GoRoute(
-                        path: 'place/:placeId',
-                        builder: (context, state) => PlaceDetailsScreen(placeId: state.pathParameters['placeId']!),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ],
-          ),
-          StatefulShellBranch(
-            routes: [GoRoute(path: AppTab.assistant.path, builder: (context, state) => const AssistantScreen())],
-          ),
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppTab.profile.path,
-                builder: (context, state) => const ProfileScreen(),
-                routes: [GoRoute(path: 'edit', builder: (context, state) => const EditProfileScreen())],
-              ),
-            ],
+          GoRoute(
+            path: AppPaths.profile,
+            builder: (context, state) => const ProfileScreen(),
+            routes: [GoRoute(path: 'edit', builder: (context, state) => const EditProfileScreen())],
           ),
         ],
       ),

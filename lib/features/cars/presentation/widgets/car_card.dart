@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/skeleton.dart';
 import 'package:chocomousse/features/cars/data/car_models.dart';
@@ -70,11 +71,11 @@ class CarCard extends StatelessWidget {
     final price = car.price;
 
     return Material(
-      color: AppColors.surface,
+      color: context.palette.bgSurface,
       clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.md),
-        side: const BorderSide(color: AppColors.border),
+        side: BorderSide(color: context.palette.borderDefault),
       ),
       child: InkWell(
         onTap: onOpen,
@@ -88,7 +89,7 @@ class CarCard extends StatelessWidget {
                 children: [
                   // Car photos are cut-outs on white, so they fit inside the box rather than fill it.
                   ColoredBox(
-                    color: AppColors.surface,
+                    color: context.palette.bgSurface,
                     child: OfferPhoto(url: car.photoUrl, fit: BoxFit.contain),
                   ),
                   if (car.sponsored) const Positioned(left: AppSpacing.md, top: AppSpacing.md, child: _AdBadge()),
@@ -109,7 +110,7 @@ class CarCard extends StatelessWidget {
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(Icons.place_outlined, size: 14, color: AppColors.muted),
+                      Icon(Icons.place_outlined, size: 14, color: context.palette.textSecondary),
                       const SizedBox(width: AppSpacing.xs),
                       Expanded(child: Text(pickUpLine(car.pickUp), style: textTheme.bodySmall)),
                     ],
@@ -141,7 +142,7 @@ class CarCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                      Text('Booking.com', style: textTheme.labelSmall?.copyWith(color: AppColors.muted)),
+                      Text('Booking.com', style: textTheme.labelSmall?.copyWith(color: context.palette.textSecondary)),
                     ],
                   ),
                 ],
@@ -162,11 +163,11 @@ class _AdBadge extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: 2),
       decoration: BoxDecoration(
-        color: AppColors.canvas,
+        color: context.palette.bgApp,
         borderRadius: BorderRadius.circular(AppRadius.sm),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.palette.borderDefault),
       ),
-      child: Text('Ad', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.muted)),
+      child: Text('Ad', style: Theme.of(context).textTheme.labelSmall?.copyWith(color: context.palette.textSecondary)),
     );
   }
 }

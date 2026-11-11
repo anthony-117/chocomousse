@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/itinerary/application/plan_providers.dart';
 import 'package:chocomousse/features/itinerary/data/plan_models.dart';
@@ -41,7 +42,7 @@ Future<void> showPlanActions(BuildContext context, PlanSummary plan) async {
             TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Cancel')),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              style: TextButton.styleFrom(foregroundColor: AppColors.danger),
+              style: TextButton.styleFrom(foregroundColor: context.palette.statusDanger),
               child: const Text('Delete'),
             ),
           ],
@@ -88,7 +89,7 @@ class _PlanActionsSheet extends StatelessWidget {
             ),
             ListTile(
               contentPadding: EdgeInsets.zero,
-              title: const Text('Delete plan', style: TextStyle(color: AppColors.danger)),
+              title: Text('Delete plan', style: TextStyle(color: context.palette.statusDanger)),
               onTap: () => pick(_Action.delete),
             ),
             const SizedBox(height: AppSpacing.sm),

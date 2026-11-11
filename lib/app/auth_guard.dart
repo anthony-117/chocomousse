@@ -20,7 +20,7 @@ abstract final class AuthPaths {
 /// - while the saved sign-in is being restored, the splash;
 /// - signed out, Welcome, remembering where they were going;
 /// - signed in with an unconfirmed email, Check your email;
-/// - signed in and confirmed, away from the sign-in screens, to where they were going or Discover.
+/// - signed in and confirmed, away from the sign-in screens, to where they were going or the home.
 String? authRedirect(AsyncValue<AuthUser?> session, Uri uri) {
   final path = uri.path;
   final from = _from(uri);
@@ -37,7 +37,7 @@ String? authRedirect(AsyncValue<AuthUser?> session, Uri uri) {
 
   if (!user.emailConfirmed) return path == AuthPaths.checkEmail ? null : AuthPaths.checkEmail;
 
-  if (AuthPaths.all.contains(path)) return _safe(uri.queryParameters['from'] ?? '') ?? '/discover';
+  if (AuthPaths.all.contains(path)) return _safe(uri.queryParameters['from'] ?? '') ?? '/';
   return null;
 }
 

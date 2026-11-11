@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +18,7 @@ class PlanEntry extends ConsumerWidget {
     final preferences = ref.watch(tripSettingsProvider.select((t) => t.preferences));
 
     return Material(
-      color: AppColors.primarySoft,
+      color: context.palette.brandPrimarySoft,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.md),
@@ -26,7 +27,7 @@ class PlanEntry extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Row(
             children: [
-              const Icon(Icons.tune, color: AppColors.primary),
+              Icon(Icons.tune, color: context.palette.brandPrimary),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
@@ -41,7 +42,7 @@ class PlanEntry extends ConsumerWidget {
                   ],
                 ),
               ),
-              const Icon(Icons.chevron_right, color: AppColors.primary),
+              Icon(Icons.chevron_right, color: context.palette.brandPrimary),
             ],
           ),
         ),

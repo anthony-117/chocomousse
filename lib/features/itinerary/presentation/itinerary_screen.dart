@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/links/link_opener.dart';
 import 'package:chocomousse/core/network/api_client.dart';
@@ -11,6 +12,7 @@ import 'package:chocomousse/features/itinerary/application/plan_providers.dart';
 import 'package:chocomousse/features/itinerary/data/plan_models.dart';
 import 'package:chocomousse/features/itinerary/data/plan_repository.dart';
 import 'package:chocomousse/features/itinerary/presentation/change_offer_screen.dart';
+import 'package:chocomousse/features/itinerary/presentation/embedded_plan_view.dart';
 import 'package:chocomousse/features/itinerary/presentation/plan_why_view.dart';
 import 'package:chocomousse/features/itinerary/presentation/widgets/day_view.dart';
 import 'package:chocomousse/features/itinerary/presentation/widgets/plan_texts.dart';
@@ -25,7 +27,7 @@ import 'package:go_router/go_router.dart';
 String describePlanError(Object error) => error is PlanFailure ? error.message : describeApiError(error);
 
 /// The itinerary (I1, I2 on phones; W4 from [kWideLayoutBreakpoint]): the trip card, the days and their items.
-class ItineraryScreen extends ConsumerWidget {
+class ItineraryScreen extends StatelessWidget {
   const ItineraryScreen({required this.id, this.day, super.key});
 
   final String id;
@@ -34,22 +36,49 @@ class ItineraryScreen extends ConsumerWidget {
   final int? day;
 
   @override
+  Widget build(BuildContext context) => ItineraryView(planId: id, day: day);
+}
+
+/// A saved plan, loaded: the full page, or [embedded] in the chat's side panel (spec 008 US1, the Plan pane).
+class ItineraryView extends ConsumerWidget {
+  const ItineraryView({required this.planId, this.day, this.embedded = false, this.chatKey, super.key});
+
+  final String planId;
+  final int? day;
+  final bool embedded;
+
+  /// The panel the embedded view sits in; its chat takes the day questions (spec 008 US3).
+  final String? chatKey;
+
+  @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return ref
-        .watch(planProvider(id))
-        .when(
-          skipLoadingOnRefresh: false,
-          loading: () => const PlanLoading(),
-          error: (e, _) => e is PlanNotFound
-              ? const PlanProblem(message: "This plan doesn't exist or isn't yours.")
-              : PlanLoading(
-                  banner: ErrorRetryBanner(
-                    message: describePlanError(e),
-                    onRetry: () => ref.invalidate(planProvider(id)),
-                  ),
-                ),
-          data: (plan) => PlanView(plan: plan, day: day),
-        );
+    final plan = ref.watch(planProvider(planId));
+    if (embedded) {
+      // A reload after the assistant changed the plan keeps the plan on screen, so the day shown and the tab stay.
+      return plan.when(
+        loading: () => const Padding(padding: EdgeInsets.all(AppSpacing.xl), child: DayPlaceholders()),
+        error: (e, _) => Padding(
+          padding: const EdgeInsets.all(AppSpacing.xl),
+          child: e is PlanNotFound
+              ? const WarningNote('This plan was deleted.')
+              : ErrorRetryBanner(message: describePlanError(e), onRetry: () => ref.invalidate(planProvider(planId))),
+        ),
+        data: (plan) => EmbeddedPlanView(plan: plan, chatKey: chatKey),
+      );
+    }
+    return plan.when(
+      skipLoadingOnRefresh: false,
+      loading: () => const PlanLoading(),
+      error: (e, _) => e is PlanNotFound
+          ? const PlanProblem(message: "This plan doesn't exist or isn't yours.")
+          : PlanLoading(
+              banner: ErrorRetryBanner(
+                message: describePlanError(e),
+                onRetry: () => ref.invalidate(planProvider(planId)),
+              ),
+            ),
+      data: (plan) => PlanView(plan: plan, day: day),
+    );
   }
 }
 
@@ -194,11 +223,11 @@ class PlansBackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.canvas,
+      color: context.palette.bgApp,
       shape: const CircleBorder(),
       child: IconButton(
         tooltip: 'Back',
-        icon: const Icon(Icons.chevron_left, color: AppColors.text),
+        icon: Icon(Icons.chevron_left, color: context.palette.textPrimary),
         onPressed: () => context.canPop() ? context.pop() : context.go('/plans'),
       ),
     );
@@ -257,7 +286,7 @@ class PlanProblem extends StatelessWidget {
         SoftCard(
           child: Column(
             children: [
-              const Icon(Icons.map_outlined, size: 32, color: AppColors.muted),
+              Icon(Icons.map_outlined, size: 32, color: context.palette.textSecondary),
               const SizedBox(height: AppSpacing.md),
               Text(message, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyMedium),
               const SizedBox(height: AppSpacing.md),

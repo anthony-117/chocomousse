@@ -4,11 +4,15 @@ import 'package:chocomousse/core/network/auth_interceptor.dart';
 import 'package:chocomousse/features/account/data/auth_repository.dart';
 import 'package:chocomousse/features/account/data/profile_models.dart';
 import 'package:chocomousse/features/account/data/profile_repository.dart';
-import 'package:chocomousse/features/assistant/application/chat_controller.dart';
+import 'package:chocomousse/features/chat/application/chat_controller.dart';
+import 'package:chocomousse/features/chat/application/chat_trip.dart';
+import 'package:chocomousse/features/chat/application/recents.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/destination/data/destination_repository.dart';
 import 'package:chocomousse/features/destination/data/preferences.dart';
 import 'package:chocomousse/features/flights/application/flight_providers.dart';
+import 'package:chocomousse/features/saved/application/saved_providers.dart';
+import 'package:chocomousse/features/side_panel/application/side_panel_controller.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
 
@@ -35,13 +39,19 @@ class SessionController {
     }
   }
 
-  /// Forgets the traveller's trip settings, departure city, profile and assistant chat.
+  /// Forgets the traveller's trip settings, departure city, profile, chats, composer chips, side panels and saved
+  /// items.
   void clear() {
     _ref
+      ..invalidate(savedIdsProvider)
+      ..invalidate(savedProvider)
       ..invalidate(tripSettingsProvider)
       ..invalidate(departureCityProvider)
       ..invalidate(profileProvider)
-      ..invalidate(chatControllerProvider);
+      ..invalidate(chatProvider)
+      ..invalidate(chatTripProvider)
+      ..invalidate(recentsProvider)
+      ..invalidate(sidePanelProvider);
   }
 }
 

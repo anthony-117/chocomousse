@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/network/api_client.dart';
 import 'package:chocomousse/core/widgets/skeleton.dart';
@@ -5,13 +6,24 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 /// Indigo → coral gradient used for destination photos until real photos are wired in.
-const LinearGradient kPhotoGradient = LinearGradient(
+LinearGradient photoGradient(BuildContext context) => LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
-  colors: [AppColors.primary, AppColors.accent],
+  colors: [context.palette.brandPrimary, context.palette.brandAccent],
 );
 
-/// Soft round back button from the v0.2 design.
+/// Marks a details view shown inside the side panel (spec 008 US2): its back buttons hide, since the panel has
+/// its own tabs and Close.
+class EmbeddedDetails extends InheritedWidget {
+  const EmbeddedDetails({required super.child, super.key});
+
+  static bool of(BuildContext context) => context.dependOnInheritedWidgetOfExactType<EmbeddedDetails>() != null;
+
+  @override
+  bool updateShouldNotify(EmbeddedDetails oldWidget) => false;
+}
+
+/// Soft round back button from the v0.2 design. Hidden inside [EmbeddedDetails].
 class BackCircleButton extends StatelessWidget {
   const BackCircleButton({this.onDark = false, super.key});
 
@@ -19,12 +31,13 @@ class BackCircleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (EmbeddedDetails.of(context)) return const SizedBox.shrink();
     return Material(
-      color: onDark ? Colors.white.withValues(alpha: 0.9) : AppColors.canvas,
+      color: onDark ? Colors.white.withValues(alpha: 0.9) : context.palette.bgApp,
       shape: const CircleBorder(),
       child: IconButton(
         tooltip: 'Back',
-        icon: const Icon(Icons.chevron_left, color: AppColors.text),
+        icon: Icon(Icons.chevron_left, color: context.palette.textPrimary),
         onPressed: () => context.canPop() ? context.pop() : context.go('/discover'),
       ),
     );
@@ -47,7 +60,7 @@ class SectionTitle extends StatelessWidget {
         if (action != null)
           TextButton(
             onPressed: onAction,
-            child: Text(action!, style: textTheme.labelSmall?.copyWith(color: AppColors.primary)),
+            child: Text(action!, style: textTheme.labelSmall?.copyWith(color: context.palette.brandPrimary)),
           ),
       ],
     );
@@ -82,16 +95,16 @@ class FactTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.palette.bgSurface,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.palette.borderDefault),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              Icon(icon, size: 16, color: AppColors.muted),
+              Icon(icon, size: 16, color: context.palette.textSecondary),
               const SizedBox(width: 6),
               Flexible(child: Text(title, style: textTheme.bodySmall)),
             ],
@@ -127,11 +140,11 @@ class WarningNote extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
-      decoration: BoxDecoration(color: AppColors.canvas, borderRadius: BorderRadius.circular(AppRadius.md)),
+      decoration: BoxDecoration(color: context.palette.bgApp, borderRadius: BorderRadius.circular(AppRadius.md)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(Icons.info_outline, size: 18, color: AppColors.muted),
+          Icon(Icons.info_outline, size: 18, color: context.palette.textSecondary),
           const SizedBox(width: AppSpacing.sm),
           Expanded(child: Text(message, style: Theme.of(context).textTheme.bodySmall)),
         ],
@@ -152,10 +165,10 @@ class ErrorRetry extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(AppSpacing.lg, AppSpacing.sm, AppSpacing.sm, AppSpacing.sm),
-      decoration: BoxDecoration(color: AppColors.canvas, borderRadius: BorderRadius.circular(AppRadius.md)),
+      decoration: BoxDecoration(color: context.palette.bgApp, borderRadius: BorderRadius.circular(AppRadius.md)),
       child: Row(
         children: [
-          const Icon(Icons.cloud_off_outlined, color: AppColors.muted, size: 20),
+          Icon(Icons.cloud_off_outlined, color: context.palette.textSecondary, size: 20),
           const SizedBox(width: AppSpacing.sm),
           Expanded(child: Text(describeApiError(error), style: Theme.of(context).textTheme.bodySmall)),
           TextButton(onPressed: onRetry, child: const Text('Try again')),

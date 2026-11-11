@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/links/link_opener.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
@@ -18,10 +19,33 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 /// One hotel for the trip's dates and adults, with the way to book it on Booking.com (design H3).
-class HotelDetailsScreen extends ConsumerWidget {
+class HotelDetailsScreen extends StatelessWidget {
   const HotelDetailsScreen({required this.hotelId, super.key});
 
   final String hotelId;
+
+  @override
+  Widget build(BuildContext context) => PageFrame(
+    children: [
+      Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: HotelDetailsView(hotelId: hotelId),
+        ),
+      ),
+    ],
+  );
+}
+
+/// The hotel's details, for the screen and for the side panel's Details pane. [from], [to] and [adults] default to
+/// the trip settings; the panel passes the chat's trip.
+class HotelDetailsView extends ConsumerWidget {
+  const HotelDetailsView({required this.hotelId, this.from, this.to, this.adults, super.key});
+
+  final String hotelId;
+  final DateTime? from;
+  final DateTime? to;
+  final int? adults;
 
   Future<void> _open(BuildContext context, WidgetRef ref, String url) async {
     final messenger = ScaffoldMessenger.of(context);
@@ -31,10 +55,11 @@ class HotelDetailsScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final trip = ref.watch(tripSettingsProvider);
+    final settings = ref.watch(tripSettingsProvider);
+    final trip = settings.copyWith(from: from, to: to, adults: adults);
     final query = (hotelId: hotelId, from: trip.from, to: trip.to, adults: trip.adults, currency: trip.currency);
 
-    final body = ref
+    return ref
         .watch(hotelDetailsProvider(query))
         .when(
           loading: () => const _Placeholders(),
@@ -50,14 +75,6 @@ class HotelDetailsScreen extends ConsumerWidget {
           data: (hotel) =>
               _Details(hotel: hotel, trip: trip, onBook: () => unawaited(_open(context, ref, hotel.bookingUrl))),
         );
-
-    return PageFrame(
-      children: [
-        Center(
-          child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 720), child: body),
-        ),
-      ],
-    );
   }
 }
 
@@ -110,7 +127,7 @@ class _Details extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.place_outlined, size: 16, color: AppColors.muted),
+              Icon(Icons.place_outlined, size: 16, color: context.palette.textSecondary),
               const SizedBox(width: AppSpacing.sm),
               Expanded(child: Text(place, style: textTheme.bodySmall)),
             ],
@@ -123,7 +140,7 @@ class _Details extends StatelessWidget {
           children: [
             if (hotel.stayType case final type?)
               Chip(
-                avatar: const Icon(Icons.bed_outlined, size: 16, color: AppColors.primary),
+                avatar: Icon(Icons.bed_outlined, size: 16, color: context.palette.brandPrimary),
                 label: Text(type),
               ),
             if (hotel.freeCancellation ?? false) const OfferTag(icon: Icons.check, label: 'Free cancellation'),
@@ -158,7 +175,7 @@ class _Details extends StatelessWidget {
           const SizedBox(height: AppSpacing.xl),
           Text('Staff speak', style: textTheme.titleMedium),
           const SizedBox(height: AppSpacing.xs),
-          Text(languages.join(', '), style: textTheme.bodyMedium?.copyWith(color: AppColors.muted)),
+          Text(languages.join(', '), style: textTheme.bodyMedium?.copyWith(color: context.palette.textSecondary)),
         ],
         const SizedBox(height: AppSpacing.xl),
         _PriceBox(hotel: hotel, trip: trip, onBook: onBook),
@@ -205,12 +222,12 @@ class _PhotosState extends State<_Photos> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
                   decoration: BoxDecoration(
-                    color: AppColors.text.withValues(alpha: 0.6),
+                    color: context.palette.textPrimary.withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(AppRadius.full),
                   ),
                   child: Text(
                     '${_index + 1} / ${urls.length}',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.onPrimary),
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(color: context.palette.brandOnPrimary),
                   ),
                 ),
               ),
@@ -233,18 +250,18 @@ class _TimeTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.palette.bgSurface,
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.palette.borderDefault),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.schedule, size: 14, color: AppColors.muted),
+              Icon(Icons.schedule, size: 14, color: context.palette.textSecondary),
               const SizedBox(width: AppSpacing.xs),
-              Text(label, style: textTheme.labelSmall?.copyWith(color: AppColors.muted)),
+              Text(label, style: textTheme.labelSmall?.copyWith(color: context.palette.textSecondary)),
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -273,9 +290,9 @@ class _PriceBox extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.palette.bgSurface,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.palette.borderDefault),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/destination/data/models.dart';
@@ -18,10 +19,10 @@ class DepartureCityField extends ConsumerWidget {
     final city = ref.watch(departureCityProvider);
 
     return Material(
-      color: AppColors.surface,
+      color: context.palette.bgSurface,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.md),
-        side: BorderSide(color: city == null ? AppColors.primary : AppColors.border),
+        side: BorderSide(color: city == null ? context.palette.brandPrimary : context.palette.borderDefault),
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(AppRadius.md),
@@ -33,7 +34,7 @@ class DepartureCityField extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
           child: Row(
             children: [
-              const Icon(Icons.place_outlined, color: AppColors.primary),
+              Icon(Icons.place_outlined, color: context.palette.brandPrimary),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
@@ -43,12 +44,12 @@ class DepartureCityField extends ConsumerWidget {
                     const SizedBox(height: AppSpacing.xs),
                     Text(
                       city?.name ?? 'Choose a city',
-                      style: textTheme.labelLarge?.copyWith(color: city == null ? AppColors.muted : null),
+                      style: textTheme.labelLarge?.copyWith(color: city == null ? context.palette.textSecondary : null),
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.expand_more, color: AppColors.muted),
+              Icon(Icons.expand_more, color: context.palette.textSecondary),
             ],
           ),
         ),
@@ -128,7 +129,7 @@ class _DepartureCityPickerState extends ConsumerState<_DepartureCityPicker> {
                           final city = items[i];
                           return ListTile(
                             contentPadding: EdgeInsets.zero,
-                            leading: const Icon(Icons.place_outlined, color: AppColors.primary),
+                            leading: Icon(Icons.place_outlined, color: context.palette.brandPrimary),
                             title: Text(city.name, style: textTheme.labelLarge),
                             subtitle: Text('${city.subtitle} ${city.flag ?? ''}'.trim(), style: textTheme.bodySmall),
                             onTap: () => Navigator.pop(context, city),

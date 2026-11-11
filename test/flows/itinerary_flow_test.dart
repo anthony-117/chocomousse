@@ -43,6 +43,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    await openShellPlace(tester, 'Explore');
 
     Future<void> tap(Finder target) async {
       await tester.ensureVisible(target.first);

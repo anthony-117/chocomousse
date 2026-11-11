@@ -27,7 +27,7 @@ void main() {
       final app = PlanApp(tester, plans: _three());
       await app.open('/plans');
 
-      expect(find.text('My plans'), findsOneWidget);
+      expect(find.text('My plans'), findsWidgets);
       expect(_names(tester), ['Rome, 5 days', 'Rome with Maya', 'Lisbon, 3 days']);
       expect(find.text('PLANNED'), findsOneWidget);
       expect(find.text(r'10 – 14 Apr · $939'), findsNWidgets(3));

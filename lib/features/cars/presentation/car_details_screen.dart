@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/links/link_opener.dart';
 import 'package:chocomousse/core/widgets/page_frame.dart';
@@ -21,10 +22,31 @@ class CarDetailsArgs {
 }
 
 /// One car, with the way to find it on Booking.com (design C4).
-class CarDetailsScreen extends ConsumerWidget {
+class CarDetailsScreen extends StatelessWidget {
   const CarDetailsScreen({required this.args, super.key});
 
   final CarDetailsArgs args;
+
+  @override
+  Widget build(BuildContext context) => PageFrame(
+    children: [
+      Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 720),
+          child: CarDetailsView(car: args.car, results: args.results),
+        ),
+      ),
+    ],
+  );
+}
+
+/// The car's details, for the screen and for the side panel's Details pane. A car from a chat card has no
+/// [results]: the days, the driver and the search's warnings are then left out.
+class CarDetailsView extends ConsumerWidget {
+  const CarDetailsView({required this.car, this.results, super.key});
+
+  final CarOffer car;
+  final CarResults? results;
 
   Future<void> _open(BuildContext context, WidgetRef ref, String url) async {
     final messenger = ScaffoldMessenger.of(context);
@@ -33,30 +55,15 @@ class CarDetailsScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final car = args.car;
-    return PageFrame(
-      children: [
-        Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 720),
-            child: _Details(
-              car: car,
-              results: args.results,
-              onBook: () => unawaited(_open(context, ref, car.bookingUrl)),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  Widget build(BuildContext context, WidgetRef ref) =>
+      _Details(car: car, results: results, onBook: () => unawaited(_open(context, ref, car.bookingUrl)));
 }
 
 class _Details extends StatelessWidget {
   const _Details({required this.car, required this.results, required this.onBook});
 
   final CarOffer car;
-  final CarResults results;
+  final CarResults? results;
   final VoidCallback onBook;
 
   @override
@@ -94,7 +101,7 @@ class _Details extends StatelessWidget {
               fit: StackFit.expand,
               children: [
                 ColoredBox(
-                  color: AppColors.surface,
+                  color: context.palette.bgSurface,
                   child: Padding(
                     padding: const EdgeInsets.all(AppSpacing.xl),
                     child: OfferPhoto(url: car.photoUrl, fit: BoxFit.contain),
@@ -106,7 +113,10 @@ class _Details extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.xl),
-        for (final warning in results.warnings) ...[OfferWarning(warning), const SizedBox(height: AppSpacing.md)],
+        for (final warning in results?.warnings ?? const <String>[]) ...[
+          OfferWarning(warning),
+          const SizedBox(height: AppSpacing.md),
+        ],
         Text(carTitle(car), style: textTheme.headlineSmall),
         const SizedBox(height: AppSpacing.md),
         CompanyLine(company: car.company),
@@ -114,7 +124,7 @@ class _Details extends StatelessWidget {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Icon(Icons.place_outlined, size: 16, color: AppColors.muted),
+            Icon(Icons.place_outlined, size: 16, color: context.palette.textSecondary),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(
@@ -133,25 +143,27 @@ class _Details extends StatelessWidget {
           runSpacing: AppSpacing.sm,
           children: [
             Chip(
-              avatar: const Icon(Icons.directions_car_outlined, size: 16, color: AppColors.primary),
+              avatar: Icon(Icons.directions_car_outlined, size: 16, color: context.palette.brandPrimary),
               label: Text(car.size),
             ),
             if (car.freeCancellation ?? false) const OfferTag(icon: Icons.check, label: 'Free cancellation'),
             if (mileage != null) OfferTag(icon: Icons.speed, label: mileage),
           ],
         ),
-        const SizedBox(height: AppSpacing.lg),
-        Row(
-          children: [
-            Expanded(
-              child: _DayTile(label: 'Pick-up', value: rentalDay(results.from)),
-            ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: _DayTile(label: 'Return', value: rentalDay(results.to)),
-            ),
-          ],
-        ),
+        if (results case final results?) ...[
+          const SizedBox(height: AppSpacing.lg),
+          Row(
+            children: [
+              Expanded(
+                child: _DayTile(label: 'Pick-up', value: rentalDay(results.from)),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: _DayTile(label: 'Return', value: rentalDay(results.to)),
+              ),
+            ],
+          ),
+        ],
         if (specs.isNotEmpty) ...[
           const SizedBox(height: AppSpacing.xl),
           Text('The car', style: textTheme.titleMedium),
@@ -162,7 +174,7 @@ class _Details extends StatelessWidget {
             children: [
               for (final (icon, label) in specs)
                 Chip(
-                  avatar: Icon(icon, size: 16, color: AppColors.muted),
+                  avatar: Icon(icon, size: 16, color: context.palette.textSecondary),
                   label: Text(label),
                 ),
             ],
@@ -179,7 +191,7 @@ class _Details extends StatelessWidget {
               children: [
                 SizedBox(width: 120, child: Text(label, style: textTheme.labelLarge)),
                 Expanded(
-                  child: Text(value, style: textTheme.bodyMedium?.copyWith(color: AppColors.muted)),
+                  child: Text(value, style: textTheme.bodyMedium?.copyWith(color: context.palette.textSecondary)),
                 ),
               ],
             ),
@@ -203,18 +215,18 @@ class _DayTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.palette.bgSurface,
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.palette.borderDefault),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              const Icon(Icons.schedule, size: 14, color: AppColors.muted),
+              Icon(Icons.schedule, size: 14, color: context.palette.textSecondary),
               const SizedBox(width: AppSpacing.xs),
-              Text(label, style: textTheme.labelSmall?.copyWith(color: AppColors.muted)),
+              Text(label, style: textTheme.labelSmall?.copyWith(color: context.palette.textSecondary)),
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -229,21 +241,22 @@ class _PriceBox extends StatelessWidget {
   const _PriceBox({required this.car, required this.results, required this.onBook});
 
   final CarOffer car;
-  final CarResults results;
+  final CarResults? results;
   final VoidCallback onBook;
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
     final price = car.price;
-    final checkedAt = results.pricesFetchedAt;
+    final results = this.results;
+    final checkedAt = results?.pricesFetchedAt;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.lg),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: context.palette.bgSurface,
         borderRadius: BorderRadius.circular(AppRadius.lg),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: context.palette.borderDefault),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -261,7 +274,10 @@ class _PriceBox extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '${daysLabel(results.days)} · ${formatMoney(price.perDay, price.currency)} a day',
+                    [
+                      if (results != null) daysLabel(results.days),
+                      '${formatMoney(price.perDay, price.currency)} a day',
+                    ].join(' · '),
                     style: textTheme.bodySmall,
                   ),
                 ],
@@ -287,9 +303,9 @@ class _PriceBox extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.md),
           Text(
-            'Driver ${results.driverAge}.'
-            '${checkedAt == null ? '' : ' ${results.isSavedPrice ? 'Saved' : 'Checked'} ${describeCheckedAt(checkedAt)}.'}'
-            ' Booking.com opens its search for these dates and this place; find this car there, then book and pay '
+            '${results == null ? '' : 'Driver ${results.driverAge}. '}'
+            '${checkedAt == null || results == null ? '' : '${results.isSavedPrice ? 'Saved' : 'Checked'} ${describeCheckedAt(checkedAt)}. '}'
+            'Booking.com opens its search for these dates and this place; find this car there, then book and pay '
             'on Booking.com.',
             style: textTheme.bodySmall,
           ),

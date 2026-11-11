@@ -56,6 +56,19 @@ class PlanActions {
 
   Future<Plan> removeCar(String id) => _store(_repository.removeCar(id));
 
+  Future<Plan> addOrReplaceItem(
+    String id,
+    int day, {
+    required RefKind kind,
+    required String itemId,
+    String? replaces,
+  }) => _store(_repository.addOrReplaceItem(id, day, kind: kind, itemId: itemId, replaces: replaces));
+
+  Future<Plan> removeItem(String id, int day, String itemId) => _store(_repository.removeItem(id, day, itemId));
+
+  Future<Plan> rebuild(String id, RebuildRequest values, {String city = 'this city'}) =>
+      _store(_repository.rebuild(id, values, city: city));
+
   Future<Plan> rename(String id, String name) => _store(_repository.rename(id, name));
 
   Future<Plan> setStatus(String id, PlanStatus status) => _store(_repository.setStatus(id, status));

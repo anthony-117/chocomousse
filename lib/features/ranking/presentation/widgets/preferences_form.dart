@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/destination/data/preferences.dart';
@@ -90,7 +91,7 @@ class _PreferencesFormState extends ConsumerState<PreferencesForm> {
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(AppSpacing.lg),
-          decoration: BoxDecoration(color: AppColors.canvas, borderRadius: BorderRadius.circular(AppRadius.lg)),
+          decoration: BoxDecoration(color: context.palette.bgApp, borderRadius: BorderRadius.circular(AppRadius.lg)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -132,7 +133,7 @@ class LevelSlider extends StatelessWidget {
           child: Row(
             children: [
               Expanded(child: Text(criterion.label, style: textTheme.bodyMedium)),
-              Text(level.label, style: textTheme.bodySmall?.copyWith(color: AppColors.primary)),
+              Text(level.label, style: textTheme.bodySmall?.copyWith(color: context.palette.brandPrimary)),
             ],
           ),
         ),
@@ -165,10 +166,10 @@ class _FieldBox extends StatelessWidget {
         Text(label, style: textTheme.bodySmall),
         const SizedBox(height: AppSpacing.xs),
         Material(
-          color: AppColors.surface,
+          color: context.palette.bgSurface,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.md),
-            side: const BorderSide(color: AppColors.border),
+            side: BorderSide(color: context.palette.borderDefault),
           ),
           child: InkWell(
             borderRadius: BorderRadius.circular(AppRadius.md),
@@ -178,7 +179,7 @@ class _FieldBox extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(child: Text(value, style: textTheme.labelLarge)),
-                  const Icon(Icons.expand_more, color: AppColors.muted, size: 18),
+                  Icon(Icons.expand_more, color: context.palette.textSecondary, size: 18),
                 ],
               ),
             ),

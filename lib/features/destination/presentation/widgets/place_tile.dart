@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/skeleton.dart';
 import 'package:chocomousse/features/destination/data/models.dart';
@@ -37,7 +38,7 @@ class PlaceTile extends StatelessWidget {
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: AppColors.muted),
+            Icon(Icons.chevron_right, color: context.palette.textSecondary),
           ],
         ),
       ),
@@ -92,7 +93,7 @@ class RatingLine extends StatelessWidget {
     final reviews = count == null ? '' : ' · ${NumberFormat.compact().format(count)} reviews';
     return Text(
       '★ ${rating.toStringAsFixed(1)}$reviews',
-      style: Theme.of(context).textTheme.labelSmall?.copyWith(color: AppColors.warning),
+      style: Theme.of(context).textTheme.labelSmall?.copyWith(color: context.palette.statusWarning),
     );
   }
 }
@@ -104,7 +105,7 @@ class _Thumb extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final placeholder = Container(decoration: const BoxDecoration(gradient: kPhotoGradient));
+    final placeholder = Container(decoration: BoxDecoration(gradient: photoGradient(context)));
     return ClipRRect(
       borderRadius: BorderRadius.circular(AppRadius.md + 4),
       child: SizedBox(
@@ -137,7 +138,7 @@ class EventTile extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(color: AppColors.canvas, borderRadius: BorderRadius.circular(AppRadius.md)),
+      decoration: BoxDecoration(color: context.palette.bgApp, borderRadius: BorderRadius.circular(AppRadius.md)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

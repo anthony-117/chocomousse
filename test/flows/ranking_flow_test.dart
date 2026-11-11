@@ -38,6 +38,7 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+    await openShellPlace(tester, 'Explore');
 
     await tester.tap(find.text('Rome'));
     await tester.pumpAndSettle();

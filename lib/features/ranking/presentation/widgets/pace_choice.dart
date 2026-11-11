@@ -1,3 +1,4 @@
+import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/destination/data/preferences.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class PaceChoice extends StatelessWidget {
           '${value.placesPerDay} places a day, plus lunch and dinner. '
           '${Pace.relaxed.label} is ${Pace.relaxed.placesPerDay}, ${Pace.packed.label} is ${Pace.packed.placesPerDay}. '
           "Pace shapes the itinerary only; it doesn't change the rankings.",
-          style: textTheme.bodySmall?.copyWith(color: AppColors.muted),
+          style: textTheme.bodySmall?.copyWith(color: context.palette.textSecondary),
         ),
       ],
     );
