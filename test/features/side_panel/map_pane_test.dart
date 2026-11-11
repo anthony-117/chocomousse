@@ -1,4 +1,7 @@
 import 'package:chocomousse/core/widgets/cards/pin_preview.dart';
+import 'package:chocomousse/features/chat/application/chat_controller.dart';
+import 'package:chocomousse/features/chat/data/cards.dart';
+import 'package:chocomousse/features/chat/data/chat_models.dart';
 import 'package:chocomousse/features/side_panel/application/side_panel_controller.dart';
 import 'package:chocomousse/features/side_panel/presentation/map_pane.dart';
 import 'package:flutter/material.dart';
@@ -89,5 +92,26 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('Pins show here when the assistant finds hotels, places or events.'), findsOneWidget);
+  });
+
+  test('a chat card shows once, where it first came, in its latest version', () {
+    ChatMessage answer(String id, List<Map<String, Object?>> cards) => ChatMessage(
+      id: id,
+      role: ChatRole.assistant,
+      text: '',
+      at: DateTime.utc(2026, 11, 11),
+      cards: [for (final c in cards) AssistantCard.fromJson(c)!],
+    );
+    final chat = ChatState(
+      messages: [
+        answer('0002', [planCardJson(name: 'Rome, first'), hotelCardJson()]),
+        answer('0004', [planCardJson(name: 'Rome, changed')]),
+      ],
+    );
+
+    final cards = chatCards(chat);
+
+    expect(cards.map((c) => c.kind), ['plan', 'hotel']);
+    expect((cards.first as PlanCard).plan.name, 'Rome, changed');
   });
 }

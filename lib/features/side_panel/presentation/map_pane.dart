@@ -28,15 +28,16 @@ MapPin? pinOfCard(AssistantCard card) {
 
 /// Every card of a chat's messages and their steps, once each, newest answer last.
 List<AssistantCard> chatCards(ChatState chat) {
-  final seen = <String>{};
-  return [
-    for (final message in chat.messages)
-      for (final card in [...message.steps.expand((s) => s.cards), ...message.cards])
-        if (seen.add('${CardKind.of(card).name}:${card.id}')) card,
-    for (final step in chat.pending?.steps ?? const <ToolStep>[])
-      for (final card in step.cards)
-        if (seen.add('${CardKind.of(card).name}:${card.id}')) card,
-  ];
+  // Each item once, where it first came, in its latest version: a plan built and then changed shows as changed.
+  final latest = <String, AssistantCard>{};
+  void add(AssistantCard card) => latest['${CardKind.of(card).name}:${card.id}'] = card;
+  for (final message in chat.messages) {
+    [...message.steps.expand((s) => s.cards), ...message.cards].forEach(add);
+  }
+  for (final step in chat.pending?.steps ?? const <ToolStep>[]) {
+    step.cards.forEach(add);
+  }
+  return [...latest.values];
 }
 
 /// The Map pane (spec 008 US2): the pins of this chat's cards, and of the open plan's days. A tap opens the card in

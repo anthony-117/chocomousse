@@ -120,6 +120,22 @@ void main() {
     expect(tester.takeException(), isNull);
   });
 
+  testWidgets('910 px: opening the panel never squeezes the chat while the sidebar folds', (tester) async {
+    await _pumpApp(tester, const Size(910, 1000));
+    await _openChat(tester, 'Rome in April');
+
+    await tester.tap(find.text('Open plan').first);
+    // Frame by frame: an overflow in any frame of the fold is an error.
+    for (var i = 0; i < 12; i++) {
+      await tester.pump(const Duration(milliseconds: 20));
+    }
+    await tester.pumpAndSettle();
+
+    expect(find.byType(SidePanel), findsOneWidget);
+    expect(_sidebarWidth(tester), Sidebar.railWidth);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets('390 px: the panel is a sheet with the same icon bar', (tester) async {
     await _pumpApp(tester, const Size(390, 1000));
     await openShellPlace(tester, 'Rome in April');

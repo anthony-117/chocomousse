@@ -45,7 +45,8 @@ class Sidebar extends ConsumerWidget {
       icon: AppIcon(AppIcons.panelLeft, color: palette.textSecondary),
     );
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
+      // The panel forcing the rail is immediate: animating it would squeeze the chat for a few frames.
+      duration: forceRail ? Duration.zero : const Duration(milliseconds: 180),
       curve: Curves.easeOut,
       width: collapsed ? railWidth : width,
       color: palette.bgSidebar,

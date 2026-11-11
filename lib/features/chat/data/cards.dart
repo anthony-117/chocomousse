@@ -101,9 +101,14 @@ sealed class AssistantCard {
         ),
         _ => null,
       };
-      // A broken item from the API is skipped like an unknown kind (spec 003), so a cast failure is expected here.
+      // A broken item from the API is skipped like an unknown kind (spec 003): a cast or an unknown enum value is
+      // expected here, and one card must never end the whole answer.
       // ignore: avoid_catching_errors
     } on TypeError {
+      return null;
+      // An unknown enum value (a category added on the API) throws ArgumentError, also expected here.
+      // ignore: avoid_catching_errors
+    } on ArgumentError {
       return null;
     } on FormatException {
       return null;

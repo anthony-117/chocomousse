@@ -98,7 +98,16 @@ void openAssistantCard(BuildContext context, WidgetRef ref, String chatKey, Assi
 
 /// A place's kind for its card: "Restaurant", "Nature", "Nightlife" or "Sight".
 String placeKindLabel(Place place) {
-  if (place.category == PlaceCategory.restaurant) return 'Restaurant';
+  switch (place.category) {
+    case PlaceCategory.restaurant:
+      return 'Restaurant';
+    case PlaceCategory.nature:
+      return 'Nature';
+    case PlaceCategory.nightlife:
+      return 'Nightlife';
+    case PlaceCategory.attraction:
+      break;
+  }
   final kind = place.kind?.toLowerCase() ?? '';
   if (RegExp('park|garden|beach|lake|mountain|forest|nature|reserve').hasMatch(kind)) return 'Nature';
   if (RegExp('bar|club|pub|night').hasMatch(kind)) return 'Nightlife';

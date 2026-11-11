@@ -1,4 +1,6 @@
 import 'package:chocomousse/features/chat/data/cards.dart';
+import 'package:chocomousse/features/chat/presentation/widgets/card_views.dart';
+import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:chocomousse/features/destination/data/preferences.dart';
 import 'package:chocomousse/features/itinerary/data/plan_models.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -107,5 +109,30 @@ void main() {
 
     final cards = readCards([hotelCardJson(), envelope('train', 't1', {}), placeCardJson()]);
     expect(cards.map((c) => c.kind), ['hotel', 'place']);
+  });
+
+  test('nature and nightlife places read with their kind; an unknown category or enum never breaks a card', () {
+    final nature =
+        AssistantCard.fromJson({
+              ...placeCardJson(),
+              'item': {...placeItemJson(), 'category': 'nature'},
+            })!
+            as PlaceCard;
+    expect(nature.place.category, PlaceCategory.nature);
+    expect(placeKindLabel(nature.place), 'Nature');
+    final night =
+        AssistantCard.fromJson({
+              ...placeCardJson(),
+              'item': {...placeItemJson(), 'category': 'nightlife'},
+            })!
+            as PlaceCard;
+    expect(placeKindLabel(night.place), 'Nightlife');
+    final future =
+        AssistantCard.fromJson({
+              ...placeCardJson(),
+              'item': {...placeItemJson(), 'category': 'beach'},
+            })!
+            as PlaceCard;
+    expect(future.place.category, PlaceCategory.attraction);
   });
 }
