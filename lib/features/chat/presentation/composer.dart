@@ -5,10 +5,15 @@ import 'package:chocomousse/app/theme/app_text.dart';
 import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/features/chat/application/chat_trip.dart';
+import 'package:chocomousse/features/chat/application/tool_starters.dart';
 import 'package:chocomousse/features/chat/data/chat_models.dart';
+import 'package:chocomousse/features/chat/presentation/tools_sheet.dart';
 import 'package:chocomousse/features/chat/presentation/trip_sheets.dart';
 import 'package:chocomousse/features/destination/data/preferences.dart';
+import 'package:chocomousse/features/itinerary/application/plan_providers.dart';
 import 'package:chocomousse/features/itinerary/presentation/widgets/plan_texts.dart';
+import 'package:chocomousse/features/side_panel/application/side_panel_controller.dart';
+import 'package:chocomousse/features/side_panel/presentation/side_panel.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -51,10 +56,25 @@ bool get _enterSendsByDefault =>
     defaultTargetPlatform == TargetPlatform.linux;
 
 /// The message field with its chips (Figma 2302:111): "+", the trip, the preferences and send. No mic.
+/// "+" opens the tools sheet (M4) on phones and the same entries as a menu on wide screens (FR-029).
 class Composer extends ConsumerStatefulWidget {
-  const Composer({required this.onSend, this.sending = false, this.enterSends, this.autofocus = false, super.key});
+  const Composer({
+    required this.onSend,
+    this.sending = false,
+    this.enterSends,
+    this.autofocus = false,
+    this.controller,
+    this.panelKey = homePanelKey,
+    super.key,
+  });
 
   final ValueChanged<String> onSend;
+
+  /// The message's text; a tool writes its starter here. Null: the composer keeps its own.
+  final TextEditingController? controller;
+
+  /// The side panel "Open a saved plan" opens the plan in.
+  final String panelKey;
 
   /// While an answer runs, nothing more can be sent.
   final bool sending;
@@ -69,18 +89,31 @@ class Composer extends ConsumerStatefulWidget {
 }
 
 class _ComposerState extends ConsumerState<Composer> {
-  final _text = TextEditingController();
+  TextEditingController? _own;
+  TextEditingController get _text => widget.controller ?? (_own ??= TextEditingController());
   late final _focus = FocusNode(onKeyEvent: _onKey);
+  final _menu = MenuController();
 
   @override
   void initState() {
     super.initState();
-    _text.addListener(() => setState(() {}));
+    _text.addListener(_changed);
   }
 
   @override
+  void didUpdateWidget(Composer oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller == widget.controller) return;
+    (oldWidget.controller ?? _own)?.removeListener(_changed);
+    _text.addListener(_changed);
+  }
+
+  void _changed() => setState(() {});
+
+  @override
   void dispose() {
-    _text.dispose();
+    _text.removeListener(_changed);
+    _own?.dispose();
     _focus.dispose();
     super.dispose();
   }
@@ -101,35 +134,52 @@ class _ComposerState extends ConsumerState<Composer> {
     return KeyEventResult.handled;
   }
 
-  Future<void> _more() async {
-    final choice = await showModalBottomSheet<String>(
-      context: context,
-      showDragHandle: true,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const AppIcon(AppIcons.calendar),
-              title: const Text('Trip'),
-              onTap: () => Navigator.of(context).pop('trip'),
-            ),
-            ListTile(
-              leading: const AppIcon(AppIcons.sliders),
-              title: const Text('Preferences'),
-              onTap: () => Navigator.of(context).pop('preferences'),
-            ),
-          ],
-        ),
+  /// Acts on what the tools sheet or menu returned. A tool only fills the field: nothing is sent (FR-030).
+  Future<void> _picked(ToolChoice? choice) async {
+    if (!mounted || choice == null) return;
+    switch (choice) {
+      case PickedTool(tool: Tool.preferences):
+        await showPreferencesSheet(context);
+      case PickedTool(:final tool):
+        final starter = toolStarter(tool, ref.read(chatTripProvider).trip);
+        _text.value = TextEditingValue(
+          text: starter,
+          selection: TextSelection.collapsed(offset: starter.length),
+        );
+        _focus.requestFocus();
+      case PickedTripEditor():
+        await showTripEditor(context);
+      case PickedPlan(:final planId):
+        ref.read(sidePanelProvider(widget.panelKey).notifier).openPlan(planId);
+        if (MediaQuery.sizeOf(context).width < kWideLayoutBreakpoint) {
+          await showSidePanelSheet(context, widget.panelKey);
+        }
+    }
+  }
+
+  Widget _plusButton(BuildContext context) {
+    final palette = context.palette;
+    final icon = AppIcon(AppIcons.plus, color: palette.textSecondary);
+    if (MediaQuery.sizeOf(context).width < kWideLayoutBreakpoint) {
+      return IconButton(
+        tooltip: 'Tools, trip and plans',
+        onPressed: () async {
+          final choice = await showToolsSheet(context);
+          await _picked(choice);
+        },
+        icon: icon,
+      );
+    }
+    final plans = ref.watch(plansProvider).value?.items ?? const [];
+    return MenuAnchor(
+      controller: _menu,
+      menuChildren: toolMenuEntries(plans: plans, onPick: (choice) => unawaited(_picked(choice))),
+      child: IconButton(
+        tooltip: 'Tools, trip and plans',
+        onPressed: () => _menu.isOpen ? _menu.close() : _menu.open(),
+        icon: icon,
       ),
     );
-    if (!mounted) return;
-    switch (choice) {
-      case 'trip':
-        await showTripEditor(context);
-      case 'preferences':
-        await showPreferencesSheet(context);
-    }
   }
 
   @override
@@ -172,11 +222,7 @@ class _ComposerState extends ConsumerState<Composer> {
               const SizedBox(height: AppSpacing.xs),
               Row(
                 children: [
-                  IconButton(
-                    tooltip: 'Add trip or preferences',
-                    onPressed: () => unawaited(_more()),
-                    icon: AppIcon(AppIcons.plus, color: palette.textSecondary),
-                  ),
+                  _plusButton(context),
                   Expanded(
                     child: SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
@@ -233,6 +279,7 @@ class _Chip extends StatelessWidget {
       button: true,
       label: label,
       excludeSemantics: true,
+      onTap: onTap,
       child: Material(
         color: palette.bgSubtle,
         borderRadius: BorderRadius.circular(AppRadius.full),

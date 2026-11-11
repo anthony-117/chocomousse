@@ -198,6 +198,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                     const SizedBox(height: AppSpacing.sm),
                   ],
                   Composer(
+                    panelKey: key,
                     sending: state.isSending || state.status == ChatStatus.busyElsewhere,
                     onSend: (text) => unawaited(controller.send(text)),
                   ),
