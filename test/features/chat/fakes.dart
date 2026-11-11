@@ -13,6 +13,7 @@ import '../../flights/fakes.dart';
 import '../../hotels/fakes.dart';
 import '../../itinerary/fakes.dart';
 import '../../ranking/fakes.dart';
+import '../saved/fakes.dart';
 
 /// A card envelope as the API sends it.
 Map<String, Object?> envelope(
@@ -160,11 +161,16 @@ class EmptyRecents extends RecentsController {
 }
 
 /// The chat API answered by [transport] (messages) and [answers] (every other call), with empty Recents.
-List<Override> chatOverrides(FakeChatTransport transport, {List<(int, Object?)> answers = const []}) {
+List<Override> chatOverrides(
+  FakeChatTransport transport, {
+  List<(int, Object?)> answers = const [],
+  FakeSavedRepository? saved,
+}) {
   final dio = Dio(BaseOptions(baseUrl: 'https://api.test/api/v1'))..httpClientAdapter = ScriptedAdapter([...answers]);
   return [
     chatRepositoryProvider.overrideWithValue(ChatRepository(dio, transport)),
     recentsProvider.overrideWith(EmptyRecents.new),
+    ...savedOverrides(saved),
   ];
 }
 
@@ -296,4 +302,7 @@ class FakeChatApi extends ChatRepository {
 }
 
 /// The chat API answered by [api], with the real Recents.
-List<Override> chatApiOverrides(FakeChatApi api) => [chatRepositoryProvider.overrideWithValue(api)];
+List<Override> chatApiOverrides(FakeChatApi api, {FakeSavedRepository? saved}) => [
+  chatRepositoryProvider.overrideWithValue(api),
+  ...savedOverrides(saved),
+];

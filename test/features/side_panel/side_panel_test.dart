@@ -7,6 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../../helpers.dart';
 import '../chat/fakes.dart';
+import '../saved/fakes.dart';
 
 void main() {
   forBothModes('the icon bar switches panes and closes', (tester, mode) async {
@@ -56,6 +57,7 @@ void main() {
       Builder(
         builder: (context) => TextButton(onPressed: () => showSidePanelSheet(context, 'c1'), child: const Text('Open')),
       ),
+      overrides: savedOverrides(),
     );
     await tester.tap(find.text('Open'));
     await tester.pumpAndSettle();

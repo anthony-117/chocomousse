@@ -34,6 +34,10 @@ class AppDrawer extends StatelessWidget {
                 button: true,
                 label: 'Search chats and plans',
                 excludeSemantics: true,
+                onTap: () {
+                  close();
+                  showSearchChats(context);
+                },
                 child: Material(
                   color: palette.bgSubtle,
                   borderRadius: BorderRadius.circular(AppRadius.full),

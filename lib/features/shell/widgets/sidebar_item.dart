@@ -74,6 +74,7 @@ class SidebarItem extends StatelessWidget {
       selected: active,
       label: label,
       excludeSemantics: true,
+      onTap: onTap,
       child: iconOnly ? Tooltip(message: label, child: item) : item,
     );
   }

@@ -17,6 +17,7 @@ class ResultRow extends StatelessWidget {
     this.match,
     this.onTap,
     this.add,
+    this.semanticLabel,
     super.key,
   });
 
@@ -30,62 +31,80 @@ class ResultRow extends StatelessWidget {
   /// The "+" slot at the end (spec 008 US3).
   final Widget? add;
 
+  /// What a screen reader says for the row; the "+" keeps its own label. Null: the texts are read as they are.
+  final String? semanticLabel;
+
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    return Material(
-      color: palette.bgSurface,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        side: BorderSide(color: palette.borderDefault),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  color: palette.brandPrimarySoft,
-                  borderRadius: BorderRadius.circular(AppRadius.sm),
-                ),
-                alignment: Alignment.center,
-                child: AppIcon(icon, color: palette.brandPrimary),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppText.bodyStrong.copyWith(color: palette.textPrimary),
+    final labelled = semanticLabel != null;
+    return Semantics(
+      container: true,
+      button: onTap != null,
+      label: semanticLabel,
+      child: Material(
+        color: palette.bgSurface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+          side: BorderSide(color: palette.borderDefault),
+        ),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Row(
+              children: [
+                Expanded(
+                  child: ExcludeSemantics(
+                    excluding: labelled,
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            color: palette.brandPrimarySoft,
+                            borderRadius: BorderRadius.circular(AppRadius.sm),
+                          ),
+                          alignment: Alignment.center,
+                          child: AppIcon(icon, color: palette.brandPrimary),
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppText.bodyStrong.copyWith(color: palette.textPrimary),
+                              ),
+                              Text(
+                                subtitle,
+                                maxLines: 2,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppText.small.copyWith(color: palette.textSecondary),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(price, style: AppText.bodyStrong.copyWith(color: palette.textPrimary)),
+                            if (match != null) ...[const SizedBox(height: AppSpacing.xs), MatchPill(match)],
+                          ],
+                        ),
+                      ],
                     ),
-                    Text(
-                      subtitle,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppText.small.copyWith(color: palette.textSecondary),
-                    ),
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(price, style: AppText.bodyStrong.copyWith(color: palette.textPrimary)),
-                  if (match != null) ...[const SizedBox(height: AppSpacing.xs), MatchPill(match)],
-                ],
-              ),
-              if (add case final add?) ...[const SizedBox(width: AppSpacing.xs), add],
-            ],
+                if (add case final add?) ...[const SizedBox(width: AppSpacing.xs), add],
+              ],
+            ),
           ),
         ),
       ),

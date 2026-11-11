@@ -15,6 +15,8 @@ import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:chocomousse/features/destination/data/preferences.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/offers.dart';
 import 'package:chocomousse/features/itinerary/presentation/widgets/plan_texts.dart';
+import 'package:chocomousse/features/ranking/data/ranking_models.dart';
+import 'package:chocomousse/features/saved/presentation/bookmark_button.dart';
 import 'package:chocomousse/features/side_panel/application/panel_chat.dart';
 import 'package:chocomousse/features/side_panel/application/side_panel_controller.dart';
 import 'package:chocomousse/features/side_panel/presentation/side_panel.dart';
@@ -130,6 +132,23 @@ extension CarCardRow on CarCard {
   String get rowPrice => formatMoney(car.price.total, car.price.currency);
 }
 
+String? _matchLabel(Match? match) => match == null ? null : '${match.percent}% match';
+
+/// What a screen reader says for a card: its name, its match when ranked, then its key facts and price
+/// ("Hotel Artemide, 92% match, $132 a night"). Null for plan and facts cards, which read their own texts.
+String? cardSemanticLabel(AssistantCard card) => switch (card) {
+  final FlightCard f => [f.rowTitle, ?_matchLabel(f.match), f.rowSubtitle, f.rowPrice].join(', '),
+  final HotelCard h => [
+    h.hotel.name,
+    ?_matchLabel(h.match),
+    '${formatMoney(h.hotel.price.perNight, h.hotel.price.currency)} a night',
+  ].join(', '),
+  final CarCard c => [c.rowTitle, ?_matchLabel(c.match), '${c.rowPrice} in all'].join(', '),
+  final PlaceCard p => [p.place.name, p.subtitle].join(', '),
+  final EventCard e => [e.event.name, e.subtitle, if (e.price.isNotEmpty) e.price].join(', '),
+  PlanCard() || FactsCard() => null,
+};
+
 /// One card of an answer, drawn for its kind. A tap opens it in the side panel.
 class AssistantCardView extends ConsumerWidget {
   const AssistantCardView({required this.card, required this.chatKey, super.key});
@@ -146,9 +165,9 @@ class AssistantCardView extends ConsumerWidget {
       ref.watch(sidePanelProvider(chatKey).select((s) => s.planId));
       return IconButton(
         tooltip: planActionLabel(ref, chatKey, card),
-        // Fits the card's price line.
+        // Drawn at 28 px to fit the card's price line; the tap area stays 48 × 48 (T093).
         style: IconButton.styleFrom(
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          tapTargetSize: MaterialTapTargetSize.padded,
           minimumSize: const Size.square(28),
           fixedSize: const Size.square(28),
           padding: EdgeInsets.zero,
@@ -173,6 +192,7 @@ class AssistantCardView extends ConsumerWidget {
         price: flight.rowPrice,
         match: flight.match,
         onTap: open,
+        semanticLabel: cardSemanticLabel(flight),
       ),
       final HotelCard hotel => MediaCard(
         photoUrl: hotel.hotel.photoUrl,
@@ -181,6 +201,8 @@ class AssistantCardView extends ConsumerWidget {
         price: hotel.nightPrice,
         match: hotel.match,
         onTap: open,
+        semanticLabel: cardSemanticLabel(hotel),
+        bookmark: BookmarkButton(card: hotel),
         add: plus(),
       ),
       final CarCard car => ResultRow(
@@ -193,6 +215,7 @@ class AssistantCardView extends ConsumerWidget {
         price: car.rowPrice,
         match: car.match,
         onTap: open,
+        semanticLabel: cardSemanticLabel(car),
         add: plus(),
       ),
       final PlaceCard place => MediaCard(
@@ -201,6 +224,8 @@ class AssistantCardView extends ConsumerWidget {
         subtitle: place.subtitle,
         price: '',
         onTap: open,
+        semanticLabel: cardSemanticLabel(place),
+        bookmark: BookmarkButton(card: place),
       ),
       final EventCard event => MediaCard(
         photoUrl: null,
@@ -208,6 +233,8 @@ class AssistantCardView extends ConsumerWidget {
         subtitle: event.subtitle,
         price: event.price,
         onTap: open,
+        semanticLabel: cardSemanticLabel(event),
+        bookmark: BookmarkButton(card: event),
       ),
       FactsCard(:final facts) => Material(
         color: palette.bgSurface,

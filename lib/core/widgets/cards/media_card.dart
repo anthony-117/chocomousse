@@ -18,6 +18,7 @@ class MediaCard extends StatelessWidget {
     this.onTap,
     this.bookmark,
     this.add,
+    this.semanticLabel,
     super.key,
   });
 
@@ -37,73 +38,100 @@ class MediaCard extends StatelessWidget {
   /// "Add to plan" (spec 008 US3); empty until then.
   final Widget? add;
 
+  /// What a screen reader says for the card ("Hotel Artemide, 92% match, $132 a night"). The bookmark and "+" keep
+  /// their own labels. Null: the texts are read as they are.
+  final String? semanticLabel;
+
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final labelled = semanticLabel != null;
     return SizedBox(
       width: width,
       height: height,
-      child: Material(
-        color: palette.bgSurface,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.md),
-          side: BorderSide(color: palette.borderDefault),
-        ),
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          onTap: onTap,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              SizedBox(
-                height: 136,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    OfferPhoto(url: photoUrl),
-                    Positioned(left: AppSpacing.sm, top: AppSpacing.sm, child: MatchPill(match)),
-                    if (bookmark case final bookmark?)
-                      Positioned(right: AppSpacing.xs, top: AppSpacing.xs, child: bookmark),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.sm, AppSpacing.sm, AppSpacing.sm),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+      child: Semantics(
+        container: true,
+        button: onTap != null,
+        label: semanticLabel,
+        child: Material(
+          color: palette.bgSurface,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            side: BorderSide(color: palette.borderDefault),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(
+                  height: 136,
+                  child: Stack(
+                    fit: StackFit.expand,
                     children: [
-                      Text(
-                        title,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppText.bodyStrong.copyWith(color: palette.textPrimary),
+                      OfferPhoto(url: photoUrl),
+                      Positioned(
+                        left: AppSpacing.sm,
+                        top: AppSpacing.sm,
+                        child: ExcludeSemantics(excluding: labelled, child: MatchPill(match)),
                       ),
-                      Text(
-                        subtitle,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppText.small.copyWith(color: palette.textSecondary),
-                      ),
-                      const Spacer(),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              price,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: AppText.smallStrong.copyWith(color: palette.textPrimary),
-                            ),
-                          ),
-                          ?add,
-                        ],
-                      ),
+                      if (bookmark case final bookmark?)
+                        Positioned(right: AppSpacing.xs, top: AppSpacing.xs, child: bookmark),
                     ],
                   ),
                 ),
-              ),
-            ],
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(AppSpacing.md, AppSpacing.sm, AppSpacing.sm, AppSpacing.sm),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        ExcludeSemantics(
+                          excluding: labelled,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                title,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppText.bodyStrong.copyWith(color: palette.textPrimary),
+                              ),
+                              Text(
+                                subtitle,
+                                // The "+" keeps a 48 px tap area in the price line, so the subtitle gives up its
+                                // second line.
+                                maxLines: add == null ? 2 : 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: AppText.small.copyWith(color: palette.textSecondary),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Spacer(),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: ExcludeSemantics(
+                                excluding: labelled,
+                                child: Text(
+                                  price,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: AppText.smallStrong.copyWith(color: palette.textPrimary),
+                                ),
+                              ),
+                            ),
+                            ?add,
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

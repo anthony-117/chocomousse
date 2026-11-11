@@ -20,6 +20,9 @@ String planCardLine(PlanSummary plan) {
   ].join(' · ');
 }
 
+/// Below this width a [PlanCardTile] puts Open plan under the plan, so the name keeps room.
+const double kPlanTileStackWidth = 360;
+
 /// A plan as a card (Figma 2304:143): the photo, the name, [planCardLine] and Open plan. Its border is the brand
 /// colour while it is the plan open in the panel. A plan found deleted when opened says so and can't be opened again.
 class PlanCardTile extends ConsumerWidget {
@@ -42,35 +45,56 @@ class PlanCardTile extends ConsumerWidget {
       ),
       clipBehavior: Clip.antiAlias,
       padding: const EdgeInsets.all(AppSpacing.md),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(AppRadius.sm),
-            child: SizedBox(width: 56, height: 56, child: OfferPhoto(url: plan.imageUrl)),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final summary = Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppRadius.sm),
+                child: SizedBox(width: 56, height: 56, child: OfferPhoto(url: plan.imageUrl)),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      plan.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppText.bodyStrong.copyWith(color: palette.textPrimary),
+                    ),
+                    Text(
+                      deleted ? 'This plan was deleted' : planCardLine(plan),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppText.small.copyWith(color: palette.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          );
+          final open = FilledButton(onPressed: deleted ? null : onOpen, child: const Text('Open plan'));
+          // A narrow column (a phone, or a chat beside the panel) puts Open plan under the plan.
+          if (constraints.maxWidth < kPlanTileStackWidth) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  plan.name,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppText.bodyStrong.copyWith(color: palette.textPrimary),
-                ),
-                Text(
-                  deleted ? 'This plan was deleted' : planCardLine(plan),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppText.small.copyWith(color: palette.textSecondary),
-                ),
+                summary,
+                const SizedBox(height: AppSpacing.sm),
+                open,
               ],
-            ),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          FilledButton(onPressed: deleted ? null : onOpen, child: const Text('Open plan')),
-        ],
+            );
+          }
+          return Row(
+            children: [
+              Expanded(child: summary),
+              const SizedBox(width: AppSpacing.md),
+              open,
+            ],
+          );
+        },
       ),
     );
   }

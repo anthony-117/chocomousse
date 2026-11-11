@@ -1,8 +1,8 @@
 import 'package:chocomousse/app/theme/palette.dart';
 import 'package:chocomousse/app/theme/tokens.dart';
 import 'package:chocomousse/core/widgets/skeleton.dart';
-import 'package:chocomousse/features/assistant/presentation/widgets/assistant_entry.dart';
 import 'package:chocomousse/features/cars/presentation/widgets/cars_entry.dart';
+import 'package:chocomousse/features/chat/presentation/widgets/assistant_entry.dart';
 import 'package:chocomousse/features/destination/application/destination_providers.dart';
 import 'package:chocomousse/features/destination/data/models.dart';
 import 'package:chocomousse/features/destination/presentation/widgets/common.dart';

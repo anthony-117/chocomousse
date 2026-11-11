@@ -21,9 +21,12 @@ final sidebarCollapsedProvider = NotifierProvider<SidebarCollapsed, bool>(Sideba
 /// The wide-screen sidebar (W1): brand and collapse, the places, Recents and the account. Collapsed, a 64 px rail of
 /// icons.
 class Sidebar extends ConsumerWidget {
-  const Sidebar({required this.location, super.key});
+  const Sidebar({required this.location, this.forceRail = false, super.key});
 
   final String location;
+
+  /// The side panel is open on a narrow desktop: the rail, whatever the traveller chose, until the panel closes.
+  final bool forceRail;
 
   static const width = 272.0;
   static const railWidth = 64.0;
@@ -31,10 +34,14 @@ class Sidebar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
-    final collapsed = ref.watch(sidebarCollapsedProvider);
+    final collapsed = forceRail || ref.watch(sidebarCollapsedProvider);
     final toggle = IconButton(
-      tooltip: collapsed ? 'Open sidebar' : 'Close sidebar',
-      onPressed: ref.read(sidebarCollapsedProvider.notifier).toggle,
+      tooltip: forceRail
+          ? 'Close the panel to open the sidebar'
+          : collapsed
+          ? 'Open sidebar'
+          : 'Close sidebar',
+      onPressed: forceRail ? null : ref.read(sidebarCollapsedProvider.notifier).toggle,
       icon: AppIcon(AppIcons.panelLeft, color: palette.textSecondary),
     );
     return AnimatedContainer(

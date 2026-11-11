@@ -1,9 +1,9 @@
 # chocomousse — TravelGenie app
 
-Flutter app for Android, iOS and web, built from the approved Figma design v0.2 (minimalist, floating icon-only nav on phones, header on desktop).
+Flutter app for Android, iOS and web. Since design v1.0 (approved 2026-11-10, spec 008) TravelGenie is assistant-first: the home is a chat, a sidebar (a drawer on phones) holds New trip chat, Search chats, Explore, My plans, Saved and Recents, and a side panel beside the chat (a sheet on phones) shows the Trip, Plan, Details, Map and Saved panes. The v0.2 screens stay reachable from Explore and from cards in the chat.
 
 - Talks only to `pamplemousse` (the .NET backend) — never to third-party APIs or MCP servers directly
-- State: Riverpod · Navigation: go_router · HTTP: dio · Logo: flutter_svg
+- State: Riverpod · Navigation: go_router · HTTP: dio (and a streamed transport for the assistant: `dart:io` on devices, `dart:js_interop` fetch on the web) · Icons and logo: flutter_svg · Appearance on the device: shared_preferences
 - Hosting: Firebase Hosting (web), Firebase App Distribution (Android test builds)
 - Design: OneDrive FYP folder (`04-design/figma/figma-links.md`)
 - Docs (architecture, ADRs, process): [`pamplemousse/docs`](https://github.com/anthony-117/pamplemousse/blob/main/docs/README.md)
@@ -14,18 +14,21 @@ Flutter app for Android, iOS and web, built from the approved Figma design v0.2 
 lib/
   main.dart
   env.dart        every environment value the app reads (Env.get(name, default))
-  app/            app widget, router (4 tabs + sign-in screens), sign-in guard, theme + design tokens from Figma
+  app/            app widget, router (shell + sign-in screens), sign-in guard, v1 theme (light and dark), palette, text styles, icons, Appearance
   core/           network (dio, ID-token interceptor), shared widgets (logo, page frame, empty state)
   features/
     account/      sign-in (Firebase Auth), Profile tab, edit profile, delete account; seeds trips from the profile
-    shell/        app shell: floating nav (phone) / web header (≥ 900 px wide)
-    discover/     Discover tab: search entry, trending destinations
+    shell/        app shell: sidebar with Recents and the account menu (≥ 900 px wide), top bar and drawer on phones; Search chats
+    chat/         the assistant: home, chat screen, composer with trip and preferences chips, "+" tools sheet (M4), SSE stream, cards, Recents
+    side_panel/   the panel beside a chat: Trip, Plan, Details, Map and Saved panes; "+" on cards changes the open plan
+    saved/        bookmarks on hotels, places and events, kept per account
+    discover/     Explore: search entry, trending destinations
     destination/  search, city overview, places, place details (data → application → presentation)
     flights/      flights screen: departure city, fares, links to book (data → application → presentation)
     hotels/       hotels list and details: sort, filters, pages, links to book on Booking.com
     cars/         rental cars: pick-up place and driver's age, sort, filters, pages, car details, Booking.com search
-    plans/        My plans tab
-    assistant/    Assistant tab: chat with TravelGenie (Gemini on the backend), cards into the screens
+    itinerary/    My plans, build a plan, the itinerary, change hotel, flight or car
+    ranking/      Plan your trip and Best for you (weighted search)
     system/       ping API and the backend status card
 assets/
   brand/          logo mark (approved v0.3)
@@ -77,6 +80,10 @@ Every screen needs a signed-in traveller with a confirmed email; signed out, the
 | `/sign-up` | Create your account; sends the confirmation email | Sprint 4: A3 |
 | `/check-email` | Check your email: I've confirmed, Resend email (once a minute), Sign out | Sprint 4: A4 |
 | `/forgot-password` | Reset your password | Sprint 4: A5 |
+| `/` | Assistant home: greeting, composer (trip and preferences chips, "+" tools), what to ask, the latest plans. The first message starts a chat | Design v1.0: W1 / M1 |
+| `/chat/:chatId` | A chat: tool steps as they happen, the answer, cards by kind, next steps; the side panel beside it (a sheet on phones). `/assistant` redirects to `/` | W2 / M2, M3 |
+| `/saved` | The home with the side panel on Saved: hotels, places and events, newest first | Side-panel frames |
+| `/plans`, `/plans/:planId` | My plans and one plan, day by day; change the hotel, flight or car | Sprint 3: I1–I6 / W4 |
 | `/profile` | Profile: name, email, travel profile, default preferences, Sign out, Delete my account | Sprint 4: P1, P3 |
 | `/profile/edit` | Edit profile: name, passport, home currency, home city, default preferences | Sprint 4: P2 |
 | `/discover` | Discover: search pill, trending destinations | 02 / W1 |
@@ -91,7 +98,6 @@ Every screen needs a signed-in traveller with a confirmed email; signed out, the
 | `/discover/destination/:id/plan` | Plan your trip: dates, travellers, departure city, total budget and how much six things matter. `?edit=<tab>` returns to that tab | Sprint 3: S1 |
 | `/discover/destination/:id/plan/best?tab=hotels\|flights\|cars` | Best for you: one tab ranked by those preferences, with why each offer ranks where it does; on wide screens the form, the list and the reasons side by side | Sprint 3: S2–S6 / W1 |
 | `/discover/place/:placeId` | Place details | 13 |
-| `/assistant` | Assistant: chat about any city, or the one opened from an overview; answers carry cards into the screens above | 09 / W6 (chat column) |
 
 The map is a lightweight preview (pins around the city centre); Google Maps replaces it once a Maps key is configured.
 Sections whose data source has no API key yet show the backend's warning instead of data.
@@ -122,17 +128,20 @@ Every feature ships with tests, and CI requires **every test to pass**:
 |---|---|---|
 | `test/destination/*_test.dart`, `test/flights/*_test.dart`, `test/hotels/hotel_data_test.dart`, `test/cars/car_data_test.dart`, `test/system/`, `test/core/` | Unit | Models, repository against a fake Dio adapter (URLs, query, parsing), providers, error messages, `Env` |
 | `test/destination/` (screens, chips, events), `test/flights/flights_screen_test.dart`, `test/hotels/hotels_screen_test.dart`, `test/cars/cars_screen_test.dart` | Widget | Each screen and widget with a fake repository, incl. loading, error, empty and missing-key states |
-| `test/assistant/` | Unit + widget | Models, repository (body, last 20 messages, time-out), chat controller (send, retry, New chat, context), card opener, the screen's states |
+| `test/features/chat/`, `test/features/side_panel/`, `test/features/saved/`, `test/features/shell/` | Unit + widget | SSE decoder, chat models and repository, chat controller and trip chips, tool starters and the tools sheet, every card kind, each pane, bookmarks and the Saved pane, sidebar and Recents |
 | `test/account/` | Unit | Sign-in guard (incl. `from` never leaving the app), ID-token interceptor (renew once, sign out, email not confirmed), profile models and repository, Firebase settings, session (seeding, sign-out) |
-| `test/flows/` | Flow (integration) | The real app — router, shell, providers, screens — driven like a user: Discover → overview → places → details, flights, hotels, cars, assistant, search, failures; sign-in screens A1–A5, W5 and profile P1–P3 (`account_flow_test.dart`) |
+| `test/flows/` | Flow (integration) | The real app — router, shell, providers, screens — driven like a user: Discover → overview → places → details, flights, hotels, cars, search, failures; sign-in screens A1–A5, W5 and profile P1–P3 (`account_flow_test.dart`); the assistant: plan by asking, any one thing, change the plan by chatting, Recents and Search chats, the tools sheet, Saved, the side panel at 1440, 1100 and 390 px, and an accessibility pass (48 px tap targets, labelled controls) |
 
 ```bash
 flutter test
 ```
-Shared test helpers: `test/helpers.dart` (host a screen, phone size), `test/account/fakes.dart` (fake sign-in and account API; `signedIn()` for every test of the signed-in app) and `test/destination/fakes.dart`, `test/flights/fakes.dart`, `test/hotels/fakes.dart`, `test/cars/fakes.dart` (configurable fake APIs).
+Shared test helpers: `test/helpers.dart` (host a screen, phone size), `test/account/fakes.dart` (fake sign-in and account API; `signedIn()` for every test of the signed-in app) and `test/destination/fakes.dart`, `test/flights/fakes.dart`, `test/hotels/fakes.dart`, `test/cars/fakes.dart`, `test/itinerary/fakes.dart` (configurable fake APIs), `test/features/chat/fakes.dart` (fake chat stream and chat store) and `test/features/saved/fakes.dart` (an in-memory Saved store).
+
+## Appearance
+The account menu's Appearance (System, Light or Dark) is kept on the device with `shared_preferences`, never on the server. System follows the device.
 
 ## Conventions
-- Colours, spacing and radii live in `lib/app/theme/tokens.dart` and mirror the Figma variables; don't hard-code new values in screens.
+- Colours live in `lib/app/theme/palette.dart` (the v1 palette, light and dark), spacing and radii in `lib/app/theme/tokens.dart`; both mirror the Figma variables, so don't hard-code new values in screens.
 - Line length 120 (`analysis_options.yaml`); CI fails on unformatted code (`dart format lib test`).
 - No frontend code for a screen until its Figma design is approved (approval log in the FYP folder).
 

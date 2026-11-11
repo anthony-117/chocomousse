@@ -6,6 +6,7 @@ import 'package:chocomousse/features/side_panel/application/side_panel_controlle
 import 'package:chocomousse/features/side_panel/presentation/details_pane.dart';
 import 'package:chocomousse/features/side_panel/presentation/map_pane.dart';
 import 'package:chocomousse/features/side_panel/presentation/plan_pane.dart';
+import 'package:chocomousse/features/side_panel/presentation/saved_pane.dart';
 import 'package:chocomousse/features/side_panel/presentation/trip_pane.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -43,6 +44,7 @@ final Map<PanelPane, PaneBuilder> panelPanes = {
   PanelPane.plan: (context, chatKey) => PlanPane(chatKey: chatKey),
   PanelPane.details: (context, chatKey) => DetailsPane(chatKey: chatKey),
   PanelPane.map: (context, chatKey) => MapPane(chatKey: chatKey),
+  PanelPane.saved: (context, chatKey) => SavedPane(chatKey: chatKey),
 };
 
 /// The side panel of a chat (or of the home, key `home`): the icon bar and the active pane. The same widget sits
@@ -103,19 +105,30 @@ class PanelIconBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final narrow = MediaQuery.sizeOf(context).width < kWideLayoutBreakpoint;
     return Container(
       height: 53,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      // On phones the tabs are 48 px tap targets (T093), so the bar keeps less margin.
+      padding: EdgeInsets.symmetric(horizontal: narrow ? AppSpacing.md : 20),
       decoration: BoxDecoration(
         border: Border(bottom: BorderSide(color: palette.borderDefault)),
       ),
       child: Row(
         children: [
-          for (final pane in PanelPane.values) ...[
-            _Tab(pane: pane, active: pane == active, onTap: () => onSelect(pane)),
-            const SizedBox(width: AppSpacing.xs),
-          ],
-          const Spacer(),
+          // Scrolls sideways on the narrowest phones rather than shrink a tab below 48 px.
+          Expanded(
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  for (final pane in PanelPane.values) ...[
+                    _Tab(pane: pane, active: pane == active, onTap: () => onSelect(pane)),
+                    if (!narrow) const SizedBox(width: AppSpacing.xs),
+                  ],
+                ],
+              ),
+            ),
+          ),
           IconButton(
             tooltip: 'Close panel',
             onPressed: onClose,
@@ -145,6 +158,7 @@ class _Tab extends StatelessWidget {
       selected: active,
       label: pane.label,
       excludeSemantics: true,
+      onTap: onTap,
       child: Tooltip(
         message: pane.label,
         child: Material(
@@ -153,12 +167,15 @@ class _Tab extends StatelessWidget {
           child: InkWell(
             borderRadius: BorderRadius.circular(AppRadius.sm),
             onTap: onTap,
-            child: SizedBox(
-              height: 32,
+            child: ConstrainedBox(
+              constraints: MediaQuery.sizeOf(context).width < kWideLayoutBreakpoint
+                  ? const BoxConstraints(minWidth: 48, minHeight: 48, maxHeight: 48)
+                  : const BoxConstraints.tightFor(height: 32),
               child: Padding(
                 padding: EdgeInsets.symmetric(horizontal: active ? 12 : 9),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     AppIcon(pane.icon, size: 18, color: color),
                     if (active) ...[

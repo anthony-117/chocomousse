@@ -121,6 +121,13 @@ sealed class AssistantCard {
   /// The card's JSON as it came, kept so a saved item can be sent back as the contract asks.
   final Map<String, dynamic> raw;
 
+  /// The city the card's item is in (envelope `destinationId`, GeoNames id), when the API says. Saving files the item
+  /// under it; without it the chat's trip city is used.
+  String? get destinationId => raw['destinationId'] is String ? raw['destinationId'] as String : null;
+
+  /// The name of [destinationId]'s city.
+  String? get destinationName => raw['destinationName'] is String ? raw['destinationName'] as String : null;
+
   /// The API's `kind`.
   String get kind;
 

@@ -29,6 +29,7 @@ class AccountRow extends ConsumerWidget {
         button: true,
         label: 'Account: $name',
         excludeSemantics: true,
+        onTap: open,
         child: Material(
           color: Colors.transparent,
           borderRadius: BorderRadius.circular(AppRadius.md),

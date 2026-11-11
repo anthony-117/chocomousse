@@ -260,7 +260,6 @@ class _EmbeddedPlanViewState extends ConsumerState<EmbeddedPlanView> {
                           canAsk && (item.ref?.kind == RefKind.place || item.ref?.kind == RefKind.event)
                           ? IconButton(
                               tooltip: 'Alternatives to ${item.name}',
-                              visualDensity: VisualDensity.compact,
                               onPressed: () => _askAlternatives(item, chosen.number),
                               icon: AppIcon(AppIcons.swap, size: 16, color: palette.textSecondary),
                             )

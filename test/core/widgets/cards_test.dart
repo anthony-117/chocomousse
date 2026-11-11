@@ -13,6 +13,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import '../../features/chat/fakes.dart';
+import '../../features/saved/fakes.dart';
 import '../../helpers.dart';
 import '../../itinerary/fakes.dart';
 import '../../ranking/fakes.dart';
@@ -106,6 +107,7 @@ void main() {
           child: AssistantCardView(card: hotel, chatKey: 'c1'),
         ),
         size: desktop,
+        overrides: bookmarkOverrides(FakeSavedRepository()),
       );
       expect(find.byType(MediaCard), findsOneWidget);
       expect(find.text('Hotel Artemide'), findsOneWidget);

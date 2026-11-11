@@ -471,7 +471,7 @@ Plan pane.
 **Goal**: the M4 tools sheet on phones and the same menu on the web.
 **Independent test**: at 390 px, each tool fills the composer and doesn't send; trip dates update the chip.
 
-- [ ] T083 [P] [US7] Create `lib/features/chat/application/tool_starters.dart`: `toolStarter(Tool, ChatTrip)` returns a message. Unknown values are left as "…". The tools and their starters:
+- [X] T083 [P] [US7] Create `lib/features/chat/application/tool_starters.dart`: `toolStarter(Tool, ChatTrip)` returns a message. Unknown values are left as "…". The tools and their starters:
 
   | Tool | Starter |
   |---|---|
@@ -484,7 +484,7 @@ Plan pane.
   | travelInfo | "Visa and weather for {city}" |
   | preferences | "Show my travel preferences" |
 
-- [ ] T084 [US7] Create `lib/features/chat/presentation/tools_sheet.dart` (M4):
+- [X] T084 [US7] Create `lib/features/chat/presentation/tools_sheet.dart` (M4):
   - the title "What can I help with?" and the line "Pick one, or just type — I'll use the right tool.";
   - a 2-column grid of the eight tools with their icons and second lines:
     - Plan a trip: Day by day
@@ -498,7 +498,7 @@ Plan pane.
   - the rows "Set trip dates and travellers" (→ `TripEditorSheet`) and "Open a saved plan" (the latest 5 plans → `openPlan`). No attach and no location rows;
   - a tool sets the composer text (via a `TextEditingController` the composer exposes) and closes the sheet; My preferences opens `PreferencesSheet`.
   - On the web, the composer's "+" opens the same entries in a `MenuAnchor`.
-- [ ] T085 [P] [US7] Tests:
+- [X] T085 [P] [US7] Tests:
   - `test/features/chat/application/tool_starters_test.dart`: each tool, with a full trip and an empty one;
   - `test/features/chat/presentation/tools_sheet_test.dart`: the grid, rows, no attach or location, nothing sent;
   - flow `test/flows/tools_sheet_flow_test.dart`: 390 px "+" → Hotels → the composer has the starter → Set trip dates → the chip updates.
@@ -511,20 +511,20 @@ Plan pane.
 **Independent test**: bookmark a hotel and a place, open Saved, open one in Details, remove it, reload and check
 it's kept.
 
-- [ ] T086 [P] [US6] Create `lib/features/saved/data/saved_models.dart` and `saved_repository.dart`:
+- [X] T086 [P] [US6] Create `lib/features/saved/data/saved_models.dart` and `saved_repository.dart`:
   - `SavedKind` (hotel, place, event), `SavedItem` (`kind`, `id`, `destinationId`, `destinationName`, `name`, `imageUrl?`, `lat`, `lng`, `savedAt`, `card?` parsed from `item`), `SavedList` (`items`, `count`, `max`) and `SavedIds`.
   - `save(AssistantCard)`: `PUT /saved/{kind}/{id}` with `destinationId`, `name` ("1–200 characters"), `imageUrl`, `lat`, `lng` and `item` (the card's raw item, "at most 20 KB packed": leave `item` out when bigger).
   - `remove(kind, id)`, `list({kind, destinationId})` and `ids()`.
   - Failures: `TooManySaved` (409 `too-many-saved`) and `FieldError`.
-- [ ] T087 [US6] Create `lib/features/saved/application/saved_providers.dart`:
+- [X] T087 [US6] Create `lib/features/saved/application/saved_providers.dart`:
   - `savedIdsProvider` (`AsyncNotifier<SavedIds>`) with `toggle(card)`. It updates at once, calls the API, and on failure reverts and returns the failure, so the UI shows a snack bar ("Couldn't save. Try again." or the limit message).
   - `savedProvider` (`GET /saved`), invalidated after a toggle.
-- [ ] T088 [US6] Create `lib/features/saved/presentation/bookmark_button.dart` (filled or outlined `bookmark` icon from `savedIdsProvider`). Put it in the MediaCard slot for hotels, places and events, and in the Details pane footer for those kinds only.
-- [ ] T089 [US6] Fill the Saved pane in `lib/features/side_panel/presentation/saved_pane.dart`:
+- [X] T088 [US6] Create `lib/features/saved/presentation/bookmark_button.dart` (filled or outlined `bookmark` icon from `savedIdsProvider`). Put it in the MediaCard slot for hotels, places and events, and in the Details pane footer for those kinds only.
+- [X] T089 [US6] Fill the Saved pane in `lib/features/side_panel/presentation/saved_pane.dart`:
   - groups Hotels, Places and Events, newest first, each item a row (photo, name, city) that opens its `card` in Details;
   - skeleton rows, an error with Try again, and the empty text "Tap the bookmark on a hotel, place or event to keep it here.";
   - the sidebar's and drawer's Saved go to `/saved`, which opens this pane.
-- [ ] T090 [P] [US6] Tests:
+- [X] T090 [P] [US6] Tests:
   - `test/features/saved/data/saved_repository_test.dart`: each route and body, the 20 KB rule, 409;
   - `saved_providers_test.dart`: optimistic toggle and revert;
   - `test/features/saved/presentation/bookmark_button_test.dart`;
@@ -535,17 +535,17 @@ it's kept.
 
 ## Phase 11: Polish and cross-cutting
 
-- [ ] T091 Remove `lib/features/assistant/` (screen, widgets, `card_opener.dart`, models, repository) and `test/features/assistant/` and `test/flows/assistant_flow_test.dart`; make sure nothing imports them (`grep -rn "features/assistant" lib test`)
-- [ ] T092 [P] Side-panel flow `test/flows/side_panel_flow_test.dart`:
+- [X] T091 Remove `lib/features/assistant/` (screen, widgets, `card_opener.dart`, models, repository) and `test/features/assistant/` and `test/flows/assistant_flow_test.dart`; make sure nothing imports them (`grep -rn "features/assistant" lib test`)
+- [X] T092 [P] Side-panel flow `test/flows/side_panel_flow_test.dart`:
   - at 1440 px: open each pane from the icon bar; the chat stays visible; the panel remembers its pane when switching chats and back;
   - at 1100 px with the panel open, the sidebar collapses to its rail;
   - at 390 px the panel is a sheet with the same icon bar.
-- [ ] T093 [P] Accessibility pass:
+- [X] T093 [P] Accessibility pass:
   - every icon-only button has a `tooltip` or `Semantics(label)`;
   - card taps have semantics labels ("Hotel Artemide, 92% match, $132 a night");
   - check the minimum 48×48 tap targets on phones.
-- [ ] T094 [P] Check no chat text, trip or preferences are logged: `grep -rn "print(\|debugPrint(\|log(" lib/features/chat lib/features/saved lib/features/side_panel` returns nothing new (constitution, FR-024a)
-- [ ] T095 Run the gates: `flutter analyze --fatal-infos`, `dart format --set-exit-if-changed lib test`, `flutter test` and `flutter build web --release`
+- [X] T094 [P] Check no chat text, trip or preferences are logged: `grep -rn "print(\|debugPrint(\|log(" lib/features/chat lib/features/saved lib/features/side_panel` returns nothing new (constitution, FR-024a)
+- [X] T095 Run the gates: `flutter analyze --fatal-infos`, `dart format --set-exit-if-changed lib test`, `flutter test` and `flutter build web --release`
 - [ ] T096 The check in the running app ([quickstart.md](quickstart.md) "In the running app" steps 1–8), at 390 px and 1440 px in light and dark, against a local pamplemousse on `010-assistant-v2`. Check the step lines arrive live on the web (R-1). Note in the PR which states were built without their own Figma frame (constitution IV).
 - [ ] T097 [P] Docs:
   - update `README.md` (or the app docs folder) for the new shell, the routes `/` and `/chat/:id`, and Appearance;

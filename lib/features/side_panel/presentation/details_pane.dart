@@ -16,6 +16,8 @@ import 'package:chocomousse/features/destination/presentation/widgets/common.dar
 import 'package:chocomousse/features/destination/presentation/widgets/offers.dart';
 import 'package:chocomousse/features/hotels/presentation/hotel_details_screen.dart';
 import 'package:chocomousse/features/ranking/data/ranking_models.dart';
+import 'package:chocomousse/features/saved/data/saved_models.dart';
+import 'package:chocomousse/features/saved/presentation/bookmark_button.dart';
 import 'package:chocomousse/features/side_panel/application/panel_chat.dart';
 import 'package:chocomousse/features/side_panel/application/side_panel_controller.dart';
 import 'package:flutter/material.dart';
@@ -126,6 +128,13 @@ class DetailsPane extends ConsumerWidget {
                 child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: top),
               ),
             Expanded(child: PlaceDetailsView(placeId: place.id)),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(AppSpacing.xl, AppSpacing.sm, AppSpacing.xl, AppSpacing.lg),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: BookmarkButton(card: card, labelled: true),
+              ),
+            ),
           ],
         ),
       );
@@ -157,7 +166,13 @@ class DetailsPane extends ConsumerWidget {
         children: [
           ...top,
           body,
-          // The bookmark (spec 008 US6) and Add to plan (US3) go here.
+          if (SavedKind.of(card) != null) ...[
+            const SizedBox(height: AppSpacing.lg),
+            Align(
+              alignment: Alignment.centerLeft,
+              child: BookmarkButton(card: card, labelled: true),
+            ),
+          ],
           const SizedBox(height: AppSpacing.lg),
         ],
       ),
